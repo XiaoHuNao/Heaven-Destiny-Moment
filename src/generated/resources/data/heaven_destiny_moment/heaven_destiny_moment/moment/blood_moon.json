@@ -1,0 +1,43 @@
+{
+  "bar_render_type": "heaven_destiny_moment:terra",
+  "moment_data_context": {
+    "conditions": [
+      {
+        "type": "heaven_destiny_moment:time",
+        "flag": 3,
+        "time": 14000
+      }
+    ],
+    "mob_spawn_settings": {
+      "mob_spawn_black_white_list_settings": {
+        "entity_types": [
+          "minecraft:zombie"
+        ],
+        "is_black_list": false
+      },
+      "mob_spawn_settings": {
+        "spawn_costs": {},
+        "spawners": {
+          "ambient": [],
+          "axolotls": [],
+          "creature": [],
+          "misc": [],
+          "monster": [],
+          "underground_water_creature": [],
+          "water_ambient": [],
+          "water_creature": []
+        }
+      },
+      "spawn_category_multiplier": {
+        "monster": 3.0
+      }
+    },
+    "ready_time": 100,
+    "rewards": [
+      {
+        "type": "heaven_destiny_moment:xp",
+        "xp": 100
+      }
+    ]
+  }
+}
