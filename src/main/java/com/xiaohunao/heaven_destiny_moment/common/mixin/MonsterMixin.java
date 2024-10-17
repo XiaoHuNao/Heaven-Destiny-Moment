@@ -17,14 +17,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MonsterMixin {
     @Inject(method = "isDarkEnoughToSpawn", at = @At("RETURN"), cancellable = true)
     private static void isDarkEnoughToSpawn(ServerLevelAccessor serverLevelAccessor, BlockPos p_219011_, RandomSource p_219012_, CallbackInfoReturnable<Boolean> cir) {
-        MomentCap.getCap(serverLevelAccessor.getLevel()).ifPresent(momentCap -> {
-            MomentInstance momentInstance = momentCap.getOnlyModifiedMobSpawnSettingsMoment();
-            if (momentInstance != null){
-                MobSpawnSettingsContext mobSpawnSettingsContext = momentInstance.getMoment().momentDataContext().getMobSpawnSettingsContext();
-                if (mobSpawnSettingsContext.ignoreLightLevel()){
-                    cir.setReturnValue(true);
-                }
+        MomentInstance momentInstance = MomentCap.getCap(serverLevelAccessor.getLevel()).getLevelCoverageMomentMoment();
+        if (momentInstance != null) {
+            MobSpawnSettingsContext mobSpawnSettingsContext = momentInstance.getMoment().momentDataContext().mobSpawnSettingsContext();
+            if (mobSpawnSettingsContext.ignoreLightLevel()) {
+                cir.setReturnValue(true);
             }
-        });
+        }
     }
 }

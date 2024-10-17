@@ -15,7 +15,7 @@ public record MobSpawnSettingsContext(boolean allowOriginalBiomeSpawnSettings, b
                                       MobSpawnListContext mobSpawnListContext) {
     //SpawnPlacements  这里寻找生物生成的规则
 
-    public static final MobSpawnSettingsContext Default = new MobSpawnSettingsContext(true,false,false,MobSpawnSettings.EMPTY, Maps.newHashMap(), MobSpawnListContext.EMPTY);
+    public static final MobSpawnSettingsContext EMPTY = new MobSpawnSettingsContext(true,false,false,MobSpawnSettings.EMPTY, Maps.newHashMap(), MobSpawnListContext.EMPTY);
 
     public static final Codec<MobSpawnSettingsContext> CODEC = RecordCodecBuilder.create(builder ->
             builder.group(
@@ -29,7 +29,7 @@ public record MobSpawnSettingsContext(boolean allowOriginalBiomeSpawnSettings, b
     );
 
     public boolean isEmpty() {
-        return this == Default;
+        return this == EMPTY;
     }
 
 

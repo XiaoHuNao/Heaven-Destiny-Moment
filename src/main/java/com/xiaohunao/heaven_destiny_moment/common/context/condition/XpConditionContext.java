@@ -25,7 +25,7 @@ public class XpConditionContext extends ConditionContext {
     }
 
     @Override
-    public boolean canCreate(MomentInstance moment, Level level, BlockPos pos, Player player) {
+    public boolean test(MomentInstance moment, Level level, BlockPos pos, Player player) {
         if (player == null) return false;
         return player.experienceLevel >= xp;
     }

@@ -27,7 +27,7 @@ public abstract class ConditionContext implements CodecProvider<ConditionContext
         return custom.test(MomentInstance, level, pos, player);
     }
 
-    public abstract boolean canCreate(MomentInstance MomentInstance, Level level, BlockPos pos, Player player);
+    public abstract boolean test(MomentInstance MomentInstance, Level level, BlockPos pos, Player player);
 
     @Override
     public abstract Codec<? extends ConditionContext> getCodec();
@@ -41,5 +41,6 @@ public abstract class ConditionContext implements CodecProvider<ConditionContext
         CODEC.register(XpConditionContext.ID, XpConditionContext.CODEC);
         CODEC.register(YAxisHeightConditionContext.ID, YAxisHeightConditionContext.CODEC);
         CODEC.register(TimeConditionContext.ID,TimeConditionContext.CODEC);
+        CODEC.register(KillStatisticsConditionContext.ID,KillStatisticsConditionContext.CODEC);
     }
 }

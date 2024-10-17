@@ -1,30 +1,36 @@
 package com.xiaohunao.heaven_destiny_moment.common.capability;
 
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
-import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
+import com.google.common.collect.Maps;
 import com.xiaohunao.heaven_destiny_moment.common.init.ModCapability;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
+import com.xiaohunao.heaven_destiny_moment.common.moment.coverage.LevelCoverage;
+import com.xiaohunao.heaven_destiny_moment.common.network.ModMessages;
+import com.xiaohunao.heaven_destiny_moment.common.network.s2c.MomentInstanceAddS2CPacket;
+import com.xiaohunao.heaven_destiny_moment.common.network.s2c.MomentInstanceSyncS2CPacket;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
-import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
-public class MomentCap implements INBTSerializable<ListTag> {
-    private final Multimap<UUID, MomentInstance> runMoment = LinkedHashMultimap.create();
-
+public class MomentCap  {
+    private final Map<UUID, MomentInstance> runMoment = Maps.newHashMap();
+    private MomentInstance levelCoverageMomentMoment = null;
 
     private final Level level;
 
@@ -32,61 +38,98 @@ public class MomentCap implements INBTSerializable<ListTag> {
         this.level = level;
     }
 
-    public static LazyOptional<MomentCap> getCap(Level level) {
-        return level.getCapability(ModCapability.MOMENT_CAP);
+    public static MomentCap getCap(Level level) {
+        return level.getCapability(ModCapability.MOMENT_CAP).orElse(null);
     }
 
-
-    @Override
-    public ListTag serializeNBT() {
-        ListTag tags = new ListTag();
-        runMoment.values().forEach(moment -> tags.add(moment.serializeNBT()));
-        return tags;
-    }
-
-    @Override
-    public void deserializeNBT(ListTag tags) {
-        tags.stream()
-                .filter(tag -> tag instanceof CompoundTag)
-                .map(tag -> (CompoundTag) tag)
-                .map(compoundTag -> MomentInstance.createFromCompoundTag(compoundTag,level))
-                .filter(Objects::nonNull)
-                .forEach(moment -> runMoment.put(moment.getID(), moment));
-    }
 
     public void tick() {
-        runMoment.values().forEach(MomentInstance::baseTick);
+        CopyOnWriteArrayList<MomentInstance> momentInstances = new CopyOnWriteArrayList<>(runMoment.values());
+        momentInstances.forEach(instance -> {
+            if (instance.shouldEnd()) {
+                removeMoment(instance.getID());
+            }
+            instance.baseTick();
+        });
     }
 
-    public void addMoment(MomentInstance moment) {
-        runMoment.put(moment.getID(), moment);
-        System.out.println(runMoment);
-
-
-
-//        long count = runMoment.values().stream()
-//                .filter(moment1 -> !moment1.isMobSpawnSettingsEmpty())
-//                .count();
-//        if (count < 2) {
-//            runMoment.put(moment.getID(), moment);
-//        } else {
-//            HeavenDestinyMoment.LOGGER.debug("Only one Moment object that has modified MobSpawnSettings can exist at the same time, The current {} Moment object will not be added", moment.getRegistryName());
-//        }
+    public void addMoment(MomentInstance instance) {
+        Moment moment = instance.getMoment();
+        if (moment.isCompatible(runMoment.values())) {
+            runMoment.put(instance.getID(), instance);
+            if (moment.coverageType() == LevelCoverage.DEFAULT) {
+                levelCoverageMomentMoment = instance;
+            }
+            Map<ResourceKey<Moment>,UUID> map = Maps.newHashMap();
+            map.put(instance.getMomentKey(),instance.getID());
+            ModMessages.INSTANCE.send(PacketDistributor.ALL.noArg(),new MomentInstanceSyncS2CPacket(map,false));
+        }
     }
+
+    public void sync() {
+        ModMessages.INSTANCE.send(PacketDistributor.ALL.noArg(),new MomentInstanceSyncS2CPacket(getMomentMap(),true));
+    }
+    public Map<ResourceKey<Moment>,UUID> getMomentMap() {
+        Map<ResourceKey<Moment>,UUID> map = Maps.newHashMap();
+        for (MomentInstance instance : runMoment.values()) {
+            map.put(instance.getMomentKey(),instance.getID());
+        }
+        return map;
+    }
+
 
     public void removeMoment(UUID uuid) {
-        runMoment.removeAll(uuid);
-    }
-    public MomentInstance getOnlyModifiedMobSpawnSettingsMoment() {
-        return runMoment.values().stream()
-//                .filter(moment -> !moment.isMobSpawnSettingsEmpty())
-                .findFirst()
-                .orElse(null);
+        runMoment.remove(uuid);
     }
 
+    public Map<UUID, MomentInstance> getRunMoment() {
+        return runMoment;
+    }
+
+    public MomentInstance getLevelCoverageMomentMoment() {
+        return levelCoverageMomentMoment;
+    }
+
+    public void setLevelCoverageMomentMoment(MomentInstance levelCoverageMomentMoment) {
+        this.levelCoverageMomentMoment = levelCoverageMomentMoment;
+    }
+
+    public void addMomentKillCount(LivingEntity livingEntity){
+        CompoundTag tag = livingEntity.getPersistentData();
+        if (tag.contains("moment")) {
+            UUID moment = tag.getUUID("moment");
+            runMoment.values().stream()
+                    .filter(momentInstance -> momentInstance.getID().equals(moment))
+                    .forEach(momentInstance -> momentInstance.addKillCount(livingEntity));
+        }
+    }
 
 
-    public static class Provider implements ICapabilitySerializable<ListTag> {
+    public CompoundTag serializeNBT() {
+        CompoundTag compoundTag = new CompoundTag();
+        ListTag listTag = new ListTag();
+        runMoment.values().forEach(momentInstance -> listTag.add(momentInstance.serializeNBT()));
+        compoundTag.put("moment", listTag);
+        return compoundTag;
+    }
+
+    public void deserializeNBT(CompoundTag tags) {
+        ListTag listTag = tags.getList("moment", 10);
+        listTag.forEach(tag -> {
+            MomentInstance momentInstance = MomentInstance.createFromCompoundTag((CompoundTag) tag, level);
+            if (momentInstance != null) {
+                addMoment(momentInstance);
+            }
+        });
+    }
+
+    public void clear() {
+        runMoment.clear();
+        levelCoverageMomentMoment = null;
+    }
+
+
+    public static class Provider implements ICapabilitySerializable<CompoundTag>{
         private final MomentCap cap;
 
         public Provider(Level level) {
@@ -99,12 +142,12 @@ public class MomentCap implements INBTSerializable<ListTag> {
         }
 
         @Override
-        public ListTag serializeNBT() {
+        public CompoundTag serializeNBT() {
             return cap.serializeNBT();
         }
 
         @Override
-        public void deserializeNBT(ListTag nbt) {
+        public void deserializeNBT(CompoundTag nbt) {
             cap.deserializeNBT(nbt);
         }
     }

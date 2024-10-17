@@ -32,7 +32,7 @@ public class YAxisHeightConditionContext extends ConditionContext {
     }
 
     @Override
-    public boolean canCreate(MomentInstance moment, Level level, BlockPos pos, Player player) {
+    public boolean test(MomentInstance moment, Level level, BlockPos pos, Player player) {
         return switch (flag) {
             case 0 -> pos.getY() == yAxis;
             case 1 -> pos.getY() > yAxis;

@@ -2,6 +2,7 @@ package com.xiaohunao.heaven_destiny_moment.common.init;
 
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.common.capability.MomentCap;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -24,6 +25,9 @@ public class ModCapability{
     public static void attachLevelCapability(AttachCapabilitiesEvent<Level> event) {
         Level level = event.getObject();
         event.addCapability(HeavenDestinyMoment.asResource("moment_cap"), new MomentCap.Provider(level));
+        if (level instanceof  ServerLevel serverLevel) {
+
+        }
     }
 
 }

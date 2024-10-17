@@ -35,7 +35,7 @@ public class StructureConditionContext extends ConditionContext {
         return ResourceKey.create(Registries.STRUCTURE, structure);
     }
     @Override
-    public boolean canCreate(MomentInstance moment, Level level, BlockPos pos, Player player) {
+    public boolean test(MomentInstance moment, Level level, BlockPos pos, Player player) {
         if (level instanceof ServerLevel serverLevel){
             ResourceKey<Structure> key = this.getResourceKey();
             return serverLevel.structureManager().getAllStructuresAt(pos)

@@ -1,5 +1,11 @@
 {
+  "type": "heaven_destiny_moment:blood_moon",
   "bar_render_type": "heaven_destiny_moment:terra",
+  "clientSettingsContext": {
+    "clientMoonSettingsContext": {},
+    "environmentColor": 16711680,
+    "tipSettingsContext": {}
+  },
   "moment_data_context": {
     "conditions": [
       {

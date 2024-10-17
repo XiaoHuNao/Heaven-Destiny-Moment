@@ -41,7 +41,7 @@ public class TimeConditionContext extends ConditionContext {
     }
 
     @Override
-    public boolean canCreate(MomentInstance MomentInstance, Level level, BlockPos pos, Player player) {
+    public boolean test(MomentInstance MomentInstance, Level level, BlockPos pos, Player player) {
          return switch (flag) {
             case 0 -> level.getDayTime() % 24000 == time;
             case 1 -> level.getDayTime() % 24000 > time;

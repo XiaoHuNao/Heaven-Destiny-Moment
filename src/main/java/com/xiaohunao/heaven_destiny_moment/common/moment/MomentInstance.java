@@ -7,18 +7,21 @@ import com.xiaohunao.heaven_destiny_moment.common.capability.MomentCap;
 import com.xiaohunao.heaven_destiny_moment.common.context.EntityBattlePointContext;
 import com.xiaohunao.heaven_destiny_moment.common.event.MomentEvent;
 import com.xiaohunao.heaven_destiny_moment.common.init.ModMoments;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -27,17 +30,20 @@ import java.util.function.Predicate;
 public class MomentInstance {
     private static final EntityBattlePointContext entityBattlePointContext = EntityBattlePointContext.CONTEXT;
 
-    private final ResourceKey<Moment> momentKey;
-    private final Moment moment;
-    private final MomentBar bar;
-    private final Level level;
-    private final UUID uuid;
+    protected final ResourceKey<Moment> momentKey;
+    protected final Moment moment;
+    protected final MomentBar bar;
+    protected final Level level;
+    protected final UUID uuid;
 
 
     protected long tick;
-    private int battlePoint = 0;
+    protected float transition = 0.01F;
+    protected int battlePoint = 0;
     protected MomentState state = MomentState.READY;
     protected Set<UUID> players = Sets.newHashSet();
+    protected int killCount;
+
     private MomentInstance(ResourceKey<Moment> momentKey,Level level) {
         this.momentKey = momentKey;
         this.moment = getMoment(momentKey,level);
@@ -53,11 +59,12 @@ public class MomentInstance {
         this.bar = new MomentBar(uuid, momentKey);
     }
 
-    public static MomentInstance create(ResourceKey<Moment> momentKey,Level level,BlockPos pos, @Nullable Player player) {
+    public static MomentInstance create(ResourceKey<Moment> momentKey, Level level, BlockPos pos, @Nullable Player player) {
         MomentInstance momentInstance = create(momentKey,level);
+        MomentCap cap = MomentCap.getCap(level);
         if (momentInstance != null) {
-            if (momentInstance.canCreate(pos, player)) {
-                MomentCap.getCap(level).ifPresent(cap -> cap.addMoment(momentInstance));
+            if (momentInstance.canCreate(pos, player) && momentInstance.moment.isCompatible(cap.getRunMoment().values())) {
+                cap.addMoment(momentInstance);
                 return momentInstance;
             }
         }
@@ -77,7 +84,7 @@ public class MomentInstance {
         }
         return new MomentInstance(momentKey,level);
     }
-    public static MomentInstance create(ResourceKey<Moment> momentKey,Level level,UUID uuid) {
+    public static MomentInstance create(ResourceKey<Moment> momentKey,UUID uuid,Level level) {
         Registry<Moment> registryChecked = getRegistryChecked(momentKey, level);
         if (registryChecked == null) {
             return null;
@@ -96,6 +103,11 @@ public class MomentInstance {
     public boolean canCreate(BlockPos pos, @Nullable Player player) {
         return getMoment().momentDataContext().canCreate(this,level,pos,player);
     }
+
+    public boolean shouldEnd() {
+        return moment.shouldEnd(this);
+    }
+
 
     public Predicate<ServerPlayer> validPlayer() {
         return player -> !player.isSpectator();
@@ -118,6 +130,10 @@ public class MomentInstance {
         bar.getPlayers().forEach(player -> this.players.add(player.getUUID()));
     }
 
+    public Set<ServerPlayer> getPlayers() {
+        return bar.getPlayers();
+    }
+
     public void setState(MomentState state) {
         MinecraftForge.EVENT_BUS.post(MomentEvent.create(this, state));
         this.state = state;
@@ -126,6 +142,14 @@ public class MomentInstance {
 
     public Moment getMoment() {
         return moment;
+    }
+
+    public int getKillCount() {
+        return killCount;
+    }
+
+    public float getTransition() {
+        return transition;
     }
 
     public CompoundTag serializeNBT() {
@@ -153,13 +177,14 @@ public class MomentInstance {
 
     public final void baseTick() {
         tick++;
+        if(transition > 1.0F) transition = transition + 0.01F;
         if (level != null) {
             updatePlayers();
             tick();
         }
     }
     public void tick() {
-
+        moment.tick(this);
     }
 
     public static MomentInstance createFromCompoundTag(CompoundTag compoundTag,Level level) {
@@ -169,7 +194,7 @@ public class MomentInstance {
             return null;
         }
         UUID uuid = compoundTag.getUUID("uuid");
-        MomentInstance momentInstance = MomentInstance.create(result.get(),level,uuid);
+        MomentInstance momentInstance = MomentInstance.create(result.get(),uuid,level);
         if (momentInstance == null) {
             return null;
         }
@@ -187,6 +212,23 @@ public class MomentInstance {
     }
 
     public Double getSpawnMultiplier(MobCategory mobCategory) {
-        return moment.momentDataContext().getMobSpawnSettingsContext().getSpawnMultiplier(mobCategory);
+        return moment.momentDataContext().mobSpawnSettingsContext().getSpawnMultiplier(mobCategory);
+    }
+
+    public void finalizeSpawn(LivingEntity livingEntity) {
+        moment.finalizeSpawn(this,livingEntity);
+    }
+
+    public void addKillCount(LivingEntity livingEntity) {
+        killCount++;
+        //TODO: 待更新Bar
+    }
+
+    public int getBattlePoint() {
+        return battlePoint;
+    }
+
+    public ResourceKey<Moment> getMomentKey() {
+        return momentKey;
     }
 }

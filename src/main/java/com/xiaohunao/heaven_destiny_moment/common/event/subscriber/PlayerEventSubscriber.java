@@ -1,15 +1,10 @@
 package com.xiaohunao.heaven_destiny_moment.common.event.subscriber;
 
-import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
-import com.xiaohunao.heaven_destiny_moment.common.init.ModMoments;
-import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
-import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.server.level.ServerLevel;
+
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.border.WorldBorder;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -26,6 +21,11 @@ public class PlayerEventSubscriber {
         if (hand != InteractionHand.MAIN_HAND) {
             return;
         }
+
+        WorldBorder worldBorder = new WorldBorder();
+        worldBorder.setCenter(player.getX(), player.getY());
+        worldBorder.setSize(player.getBoundingBox().getSize() * 5);
+
 
 
 //        MomentInstance.create(ModMoments.BLOOD_MOON,level,player.blockPosition(),player);

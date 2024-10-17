@@ -9,17 +9,26 @@ import com.xiaohunao.heaven_destiny_moment.common.context.reward.RewardContext;
 import com.xiaohunao.heaven_destiny_moment.common.init.ModItems;
 import com.xiaohunao.heaven_destiny_moment.common.init.ModMoments;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
+import com.xiaohunao.heaven_destiny_moment.common.moment.MomentCoverage;
 import com.xiaohunao.heaven_destiny_moment.common.network.ModMessages;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
+import net.minecraftforge.client.event.RegisterTextureAtlasSpriteLoadersEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DataPackRegistryEvent;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 
 @Mod(HeavenDestinyMoment.MODID)
@@ -58,6 +67,8 @@ public class HeavenDestinyMoment {
 
     public static void loadClasses() {
         ModMoments.init();
+        Moment.register();
+        MomentCoverage.register();
         AmountContext.register();
         ConditionContext.register();
         EntityInfoContext.register();

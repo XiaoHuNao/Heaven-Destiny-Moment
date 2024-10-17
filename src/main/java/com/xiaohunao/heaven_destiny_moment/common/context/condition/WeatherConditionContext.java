@@ -25,7 +25,7 @@ public class WeatherConditionContext extends ConditionContext {
     }
 
     @Override
-    public boolean canCreate(MomentInstance moment, Level level, BlockPos pos, Player player) {
+    public boolean test(MomentInstance moment, Level level, BlockPos pos, Player player) {
         if (level.isRaining()) {
             return weather.equals("rain");
         } else if (level.isThundering()) {

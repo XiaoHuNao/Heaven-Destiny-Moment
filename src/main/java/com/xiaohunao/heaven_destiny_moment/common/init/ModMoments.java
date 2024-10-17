@@ -1,11 +1,19 @@
 package com.xiaohunao.heaven_destiny_moment.common.init;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
+import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettingsContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentDataContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.KillStatisticsConditionContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.TimeConditionContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.reward.XpRewardContext;
+import com.xiaohunao.heaven_destiny_moment.common.moment.DefaultMoment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
+import com.xiaohunao.heaven_destiny_moment.common.moment.coverage.AreaCoverage;
+import com.xiaohunao.heaven_destiny_moment.common.moment.coverage.LevelCoverage;
+import com.xiaohunao.heaven_destiny_moment.common.moment.type.BloodMoonMoment;
 import net.minecraft.core.Registry;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
@@ -16,10 +24,10 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class ModMoments {
-    public static final Map<ResourceKey<Moment>, Moment> MOMENTS = Maps.newHashMap();
+    public static final BiMap<ResourceKey<Moment>, Moment> MOMENTS = HashBiMap.create();
     public static final ResourceKey<Registry<Moment>> MOMENT_KEY = ResourceKey.createRegistryKey(HeavenDestinyMoment.asResource("moment"));
 
-    public static final ResourceKey<Moment> BLOOD_MOON = register("blood_moon", new Moment(HeavenDestinyMoment.asResource("terra"),
+    public static final ResourceKey<Moment> BLOOD_MOON = register("blood_moon", new BloodMoonMoment(HeavenDestinyMoment.asResource("terra"),
             new MomentDataContext.Builder()
             .readyTime(100)
             .addCondition(new TimeConditionContext("FullMoon",3))
@@ -28,7 +36,10 @@ public class ModMoments {
             .addBlackWhiteListEntityType(EntityType.ZOMBIE)
             .switchListType()
             .allowOriginalBiomeSpawnSettings(true)
-            .build()
+            .build(),
+            new ClientSettingsContext.Builder()
+                    .environmentColor(0xff0000)
+                    .build()
     ));
 
 
@@ -40,8 +51,6 @@ public class ModMoments {
     public static ResourceKey<Moment> create(String key) {
         return ResourceKey.create(MOMENT_KEY, HeavenDestinyMoment.asResource(key));
     }
-
-
 
     public static void init() {
     }

@@ -27,7 +27,7 @@ public class BiomesConditionContext extends ConditionContext {
         this(resourceKey.location());
     }
     @Override
-    public boolean canCreate(MomentInstance moment, Level level, BlockPos pos, Player player) {
+    public boolean test(MomentInstance moment, Level level, BlockPos pos, Player player) {
         Biome biome = ForgeRegistries.BIOMES.getValue(biomes);
         return level.getBiome(pos).get() == biome;
     }
