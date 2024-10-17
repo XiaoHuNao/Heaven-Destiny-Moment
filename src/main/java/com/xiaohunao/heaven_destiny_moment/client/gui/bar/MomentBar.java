@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.render.IBarRenderType;
+import com.xiaohunao.heaven_destiny_moment.common.init.ModMoments;
 import com.xiaohunao.heaven_destiny_moment.common.init.ModRenderBarTypes;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
@@ -21,9 +22,10 @@ import net.minecraft.world.BossEvent;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class MomentBar {
+    private ResourceLocation barRenderType;
+    private ResourceKey<Moment> momentKey;
     private UUID id;
     private Component name;
     private float progress = 1.0F;
@@ -33,13 +35,16 @@ public class MomentBar {
 
 
 
-    public MomentBar(UUID id, ResourceKey<Moment> momentKey) {
+    public MomentBar(UUID id, ResourceKey<Moment> momentKey,ResourceLocation barRenderType) {
         this.id = id;
+        this.momentKey = momentKey;
+        this.barRenderType = barRenderType;
         this.name = Component.translatable(HeavenDestinyMoment.asDescriptionId("gui.bar." + momentKey.location().toLanguageKey()));
     }
 
-    public MomentBar(UUID id, Component name, float progress, boolean visible, BossEvent.BossBarColor color, Set<ServerPlayer> players) {
+    public MomentBar(UUID id,ResourceKey<Moment> momentKey,ResourceLocation barRenderType, Component name, float progress, boolean visible, BossEvent.BossBarColor color, Set<ServerPlayer> players) {
         this.id = id;
+        this.momentKey = momentKey;
         this.name = name;
         this.progress = progress;
         this.visible = visible;
@@ -55,9 +60,19 @@ public class MomentBar {
         return name;
     }
 
+    public ResourceKey<Moment> getMomentKey() {
+        return momentKey;
+    }
 
     public float getProgress() {
         return progress;
+    }
+
+    public ResourceLocation getBarRenderType() {
+        return barRenderType;
+    }
+    public IBarRenderType getRenderType() {
+        return ModRenderBarTypes.REGISTRY_SUPPLIER.get().getValue(barRenderType);
     }
 
     public Set<ServerPlayer> getPlayers() {
@@ -131,6 +146,8 @@ public class MomentBar {
 
     public void write(FriendlyByteBuf friendlyByteBuf) {
         friendlyByteBuf.writeUUID(this.id);
+        friendlyByteBuf.writeResourceLocation(this.momentKey.location());
+        friendlyByteBuf.writeResourceLocation(this.barRenderType);
         friendlyByteBuf.writeComponent(this.name);
         friendlyByteBuf.writeFloat(this.progress);
         friendlyByteBuf.writeBoolean(this.visible);
@@ -138,10 +155,12 @@ public class MomentBar {
     }
     public static MomentBar read(FriendlyByteBuf friendlyByteBuf) {
         UUID id = friendlyByteBuf.readUUID();
+        ResourceKey<Moment> momentKey = ResourceKey.create(ModMoments.MOMENT_KEY, friendlyByteBuf.readResourceLocation());
+        ResourceLocation barRenderType = friendlyByteBuf.readResourceLocation();
         Component name = friendlyByteBuf.readComponent();
         float progress = friendlyByteBuf.readFloat();
         boolean visible = friendlyByteBuf.readBoolean();
         BossEvent.BossBarColor color = friendlyByteBuf.readEnum(BossEvent.BossBarColor.class);
-        return new MomentBar(id, null, progress, visible, color, Sets.newHashSet());
+        return new MomentBar(id, momentKey,barRenderType,name, progress, visible, color, Sets.newHashSet());
     }
 }

@@ -32,7 +32,6 @@ public class LevelEventSubscriber {
         if (player.level() instanceof ServerLevel){
             MomentCap.getCap(player.level()).sync();
         }
-
     }
 
 

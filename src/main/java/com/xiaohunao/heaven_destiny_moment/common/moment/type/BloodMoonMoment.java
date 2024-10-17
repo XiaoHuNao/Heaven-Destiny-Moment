@@ -33,10 +33,10 @@ public class BloodMoonMoment extends DefaultMoment {
         // 计算当前是否已经是di
         long dayTime = level.getDayTime();
         //当前时间是否不在范围（0-13800）内，如果在范围内就设置状态为结束
-        if (dayTime >= 0 && dayTime <= 13800) {
-            // 设置状态为结束
-            instance.setState(MomentState.END);
-        }
+//        if (dayTime >= 0 && dayTime <= 13800) {
+//            // 设置状态为结束
+//            instance.setState(MomentState.END);
+//        }
 
 
 

@@ -1,6 +1,7 @@
 package com.xiaohunao.heaven_destiny_moment;
 
 import com.mojang.logging.LogUtils;
+import com.xiaohunao.heaven_destiny_moment.client.gui.hud.MomentBarOverlay;
 import com.xiaohunao.heaven_destiny_moment.common.context.amount.AmountContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.ConditionContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.EntityInfoContext;
@@ -8,6 +9,7 @@ import com.xiaohunao.heaven_destiny_moment.common.context.predicate.PredicateCon
 import com.xiaohunao.heaven_destiny_moment.common.context.reward.RewardContext;
 import com.xiaohunao.heaven_destiny_moment.common.init.ModItems;
 import com.xiaohunao.heaven_destiny_moment.common.init.ModMoments;
+import com.xiaohunao.heaven_destiny_moment.common.init.ModRenderBarTypes;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentCoverage;
 import com.xiaohunao.heaven_destiny_moment.common.network.ModMessages;
@@ -17,6 +19,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
+import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterTextureAtlasSpriteLoadersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
@@ -41,6 +44,7 @@ public class HeavenDestinyMoment {
 
 
         ModItems.ITEMS.register(modEventBus);
+        ModRenderBarTypes.BAR_RENDER_TYPE.register(modEventBus);
 
         modEventBus.addListener(this::onDataPackRegistryNewRegistry);
         modEventBus.addListener(this::onFMLCommonSetup);
@@ -81,6 +85,10 @@ public class HeavenDestinyMoment {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
+        }
+        @SubscribeEvent
+        public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
+            event.registerAboveAll(HeavenDestinyMoment.MODID,new MomentBarOverlay());
         }
     }
 }

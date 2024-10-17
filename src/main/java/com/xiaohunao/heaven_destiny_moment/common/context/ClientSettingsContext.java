@@ -3,10 +3,7 @@ package com.xiaohunao.heaven_destiny_moment.common.context;
 import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.xiaohunao.heaven_destiny_moment.common.moment.MomentCoverage;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentState;
-import com.xiaohunao.heaven_destiny_moment.common.moment.coverage.AreaCoverage;
-import com.xiaohunao.heaven_destiny_moment.common.moment.coverage.LevelCoverage;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -59,6 +56,10 @@ public record ClientSettingsContext(int environmentColor, TipSettingsContext tip
         }
         public Builder addTip(MomentState momentState, Component component) {
             tipSettingsContext.addTip(momentState, component);
+            return this;
+        }
+        public Builder addTip(MomentState momentState, Component component,int color) {
+            addTip(momentState, component.copy().withStyle(style -> style.withColor(color)));
             return this;
         }
         public Builder addSound(MomentState momentState, Holder<SoundEvent> soundEvent) {

@@ -1,10 +1,15 @@
 package com.xiaohunao.heaven_destiny_moment.common.moment;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
 import com.xiaohunao.heaven_destiny_moment.common.capability.MomentCap;
+import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettingsContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.EntityBattlePointContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.TipSettingsContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.amount.AmountContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.EntityInfoContext;
 import com.xiaohunao.heaven_destiny_moment.common.event.MomentEvent;
 import com.xiaohunao.heaven_destiny_moment.common.init.ModMoments;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -12,6 +17,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,10 +27,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 
 import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class MomentInstance {
@@ -37,26 +40,28 @@ public class MomentInstance {
     protected final UUID uuid;
 
 
-    protected long tick;
-    protected float transition = 0.01F;
+    protected long tick = 0;
     protected int battlePoint = 0;
+    protected int wave = 0;
+    protected int currentEnemyCount = 0;
+    protected int killCount = 0;
     protected MomentState state = MomentState.READY;
     protected Set<UUID> players = Sets.newHashSet();
-    protected int killCount;
+    private Map<UUID,BlockPos> playersPos = Maps.newHashMap();
 
     private MomentInstance(ResourceKey<Moment> momentKey,Level level) {
         this.momentKey = momentKey;
         this.moment = getMoment(momentKey,level);
         this.level = level;
         this.uuid = UUID.randomUUID();
-        this.bar = new MomentBar(this.uuid, momentKey);
+        this.bar = new MomentBar(this.uuid, momentKey,moment.barRenderType);
     }
     private MomentInstance(ResourceKey<Moment> momentKey,Level level,UUID uuid) {
         this.momentKey = momentKey;
         this.moment = getMoment(momentKey,level);
         this.level = level;
         this.uuid = uuid;
-        this.bar = new MomentBar(uuid, momentKey);
+        this.bar = new MomentBar(uuid, momentKey,moment.barRenderType);
     }
 
     public static MomentInstance create(ResourceKey<Moment> momentKey, Level level, BlockPos pos, @Nullable Player player) {
@@ -70,6 +75,8 @@ public class MomentInstance {
         }
         return null;
     }
+
+
     public static Moment getMoment(ResourceKey<Moment> momentKey,Level level) {
         Registry<Moment> registryChecked = getRegistryChecked(momentKey, level);
         if (registryChecked == null) {
@@ -99,6 +106,35 @@ public class MomentInstance {
         }
         return registry;
     }
+    public void playTip(){
+        TipSettingsContext tipSettingsContext = moment.clientSettingsContext.tipSettingsContext();
+        tipSettingsContext.play(this);
+    }
+    public float remainingEnemyPercent() {
+        int sum = 0;
+        List<List<EntityInfoContext>> waves = moment.momentDataContext.waves();
+        if (!waves.isEmpty()) {
+            for (EntityInfoContext entityInfoContext : waves.get(wave)) {
+                int spawnAmount = entityInfoContext.getSpawnAmount();
+                sum += spawnAmount;
+            }
+        }
+        return (float) currentEnemyCount / sum;
+    }
+    public int getWaveCount() {
+        return moment.momentDataContext.waves().size();
+    }
+
+    public void ready(){
+        if (state == MomentState.READY) {
+            int readTime = moment.momentDataContext().readyTime();
+            if (tick == readTime){
+                setState(MomentState.START);
+                return;
+            }
+            bar.updateProgress(1 - ((float) tick / readTime));
+        }
+    }
 
     public boolean canCreate(BlockPos pos, @Nullable Player player) {
         return getMoment().momentDataContext().canCreate(this,level,pos,player);
@@ -107,7 +143,13 @@ public class MomentInstance {
     public boolean shouldEnd() {
         return moment.shouldEnd(this);
     }
+    public int getWave() {
+        return wave;
+    }
 
+    public int getCurrentEnemyCount() {
+        return currentEnemyCount;
+    }
 
     public Predicate<ServerPlayer> validPlayer() {
         return player -> !player.isSpectator();
@@ -127,11 +169,19 @@ public class MomentInstance {
         oldPlayers.stream()
                 .filter(player -> !newPlayers.contains(player))
                 .forEach(bar::removePlayer);
-        bar.getPlayers().forEach(player -> this.players.add(player.getUUID()));
+        bar.getPlayers().forEach(player -> {
+            this.players.add(player.getUUID());
+            playersPos.put(player.getUUID(),player.blockPosition());
+        });
+
+
     }
 
     public Set<ServerPlayer> getPlayers() {
         return bar.getPlayers();
+    }
+    public Map<UUID,BlockPos> getPlayersPos() {
+        return playersPos;
     }
 
     public void setState(MomentState state) {
@@ -148,10 +198,6 @@ public class MomentInstance {
         return killCount;
     }
 
-    public float getTransition() {
-        return transition;
-    }
-
     public CompoundTag serializeNBT() {
         CompoundTag compoundTag = new CompoundTag();
         ResourceKey.codec(ModMoments.MOMENT_KEY).encodeStart(NbtOps.INSTANCE, momentKey).resultOrPartial(HeavenDestinyMoment.LOGGER::error).ifPresent(tag -> compoundTag.put("moment_key", tag));
@@ -160,6 +206,9 @@ public class MomentInstance {
         compoundTag.putLong("tick", tick);
         compoundTag.putInt("battle_point", battlePoint);
         compoundTag.putString("state", state.name());
+        compoundTag.putInt("wave", wave);
+        compoundTag.putInt("kill_count", killCount);
+        compoundTag.putInt("current_enemy_count", currentEnemyCount);
         ListTag tags = new ListTag();
         players.forEach(player -> tags.add(StringTag.valueOf(player.toString())));
         compoundTag.put("players", tags);
@@ -169,6 +218,9 @@ public class MomentInstance {
         tick = compoundTag.getLong("tick");
         battlePoint = compoundTag.getInt("battle_point");
         state = MomentState.valueOf(compoundTag.getString("state"));
+        wave = compoundTag.getInt("wave");
+        killCount = compoundTag.getInt("kill_count");
+        currentEnemyCount = compoundTag.getInt("current_enemy_count");
         ListTag tags = compoundTag.getList("players", Tag.TAG_STRING);
         tags.forEach(tag -> players.add(UUID.fromString(tag.getAsString())));
     }
@@ -177,9 +229,13 @@ public class MomentInstance {
 
     public final void baseTick() {
         tick++;
-        if(transition > 1.0F) transition = transition + 0.01F;
         if (level != null) {
+            MinecraftForge.EVENT_BUS.post(new MomentEvent.Tick(this));
             updatePlayers();
+            if (tick == 0){
+                setState(MomentState.READY);
+            }
+            ready();
             tick();
         }
     }
@@ -230,5 +286,13 @@ public class MomentInstance {
 
     public ResourceKey<Moment> getMomentKey() {
         return momentKey;
+    }
+
+    public MomentState getState() {
+        return state;
+    }
+
+    public MomentBar getBar() {
+        return bar;
     }
 }

@@ -107,8 +107,8 @@ public record MomentDataContext(int readyTime, Set<RewardContext> rewards, Set<C
             return this;
         }
 
-        public Builder ignoreLightLevel(boolean ignoreLightLevel) {
-            this.ignoreLightLevel = ignoreLightLevel;
+        public Builder ignoreLightLevel() {
+            this.ignoreLightLevel = true;
             return this;
         }
 

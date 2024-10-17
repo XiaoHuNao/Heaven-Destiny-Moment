@@ -3,8 +3,8 @@ package com.xiaohunao.heaven_destiny_moment.common.moment;
 import com.mojang.serialization.Codec;
 
 public enum MomentState {
-    START("start", 0),
-    READY("ready", 1),
+    READY("ready", 0),
+    START("start", 1),
     ONGOING("ongoing", 2),
     VICTORY("victory", 3),
     LOSE("lose", 4),

@@ -15,6 +15,12 @@ public abstract class MomentEvent extends Event {
     public MomentInstance getMomentInstance() {
         return momentInstance;
     }
+    public static class Tick extends MomentEvent {
+        public Tick(MomentInstance momentInstance) {
+            super(momentInstance);
+        }
+    }
+
 
     public static class Start extends MomentEvent {
         public Start(MomentInstance momentInstance) {

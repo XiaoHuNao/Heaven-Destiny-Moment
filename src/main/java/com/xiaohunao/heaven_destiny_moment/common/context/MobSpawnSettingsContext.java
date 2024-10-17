@@ -21,7 +21,7 @@ public record MobSpawnSettingsContext(boolean allowOriginalBiomeSpawnSettings, b
             builder.group(
                     Codec.BOOL.optionalFieldOf("allow_original_biome_spawn_settings",true).orElse(false).forGetter(MobSpawnSettingsContext::allowOriginalBiomeSpawnSettings),
                     Codec.BOOL.optionalFieldOf("force_surface_spawning",false).orElse(false).forGetter(MobSpawnSettingsContext::forceSurfaceSpawning),
-                    Codec.BOOL.optionalFieldOf("slimes_spawn_everywhere",false).orElse(false).forGetter(MobSpawnSettingsContext::ignoreLightLevel),
+                    Codec.BOOL.optionalFieldOf("ignoreLightLevel",false).orElse(false).forGetter(MobSpawnSettingsContext::ignoreLightLevel),
                     MobSpawnSettings.CODEC.codec().optionalFieldOf("mob_spawn_settings",MobSpawnSettings.EMPTY).forGetter(MobSpawnSettingsContext::spawnInfo),
                     Codec.unboundedMap(MobCategory.CODEC, Codec.DOUBLE).optionalFieldOf("spawn_category_multiplier",Maps.newHashMap()).forGetter(MobSpawnSettingsContext::spawnCategoryMultiplier),
                     MobSpawnListContext.CODEC.optionalFieldOf("mob_spawn_black_white_list_settings", MobSpawnListContext.EMPTY).forGetter(MobSpawnSettingsContext::mobSpawnListContext)
