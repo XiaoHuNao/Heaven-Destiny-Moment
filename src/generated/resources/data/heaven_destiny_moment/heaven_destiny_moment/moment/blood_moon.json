@@ -3,7 +3,7 @@
   "bar_render_type": "heaven_destiny_moment:terra",
   "clientSettingsContext": {
     "clientMoonSettingsContext": {},
-    "environmentColor": 16711680,
+    "environmentColor": 0,
     "tipSettingsContext": {
       "soundEventMap": {
         "READY": "minecraft:item.goat_horn.sound.2"

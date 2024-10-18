@@ -37,9 +37,6 @@ public class BloodMoonMoment extends DefaultMoment {
 //            // 设置状态为结束
 //            instance.setState(MomentState.END);
 //        }
-
-
-
     }
 
     @Override

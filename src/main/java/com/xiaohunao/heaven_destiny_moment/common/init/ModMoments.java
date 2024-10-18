@@ -44,7 +44,7 @@ public class ModMoments {
             new ClientSettingsContext.Builder()
                     .addTip(MomentState.READY, Component.translatable(HeavenDestinyMoment.asDescriptionId("moment.blood_moon.tip.ready")),0xff0000)
                     .addSound(MomentState.READY, SoundEvents.GOAT_HORN_SOUND_VARIANTS.get(2))
-                    .environmentColor(0xff0000)
+//                    .environmentColor(0xff0000)
                     .build()
     ));
 
