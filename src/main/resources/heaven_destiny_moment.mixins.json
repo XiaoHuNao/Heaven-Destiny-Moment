@@ -1,19 +1,12 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.xiaohunao.heaven_destiny_moment.common.mixin",
+  "package": "com.xiaohunao.heaven_destiny_moment.mixin",
   "compatibilityLevel": "JAVA_8",
   "refmap": "heaven_destiny_moment.refmap.json",
   "mixins": [
-    "LocalMobCapCalculatorMixin",
-    "MonsterMixin",
-    "NaturalSpawnerMixin",
-    "NaturalSpawnerSpawnStateMixin",
-    "PathfinderMobMixin"
   ],
   "client": [
-    "client.MixinLightMapTexture",
-    "client.MixinWorldRenderer"
   ],
   "injectors": {
     "defaultRequire": 1
