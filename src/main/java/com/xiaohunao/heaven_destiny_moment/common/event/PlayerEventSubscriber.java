@@ -19,11 +19,6 @@ public class PlayerEventSubscriber {
         if (level.isClientSide() || hand != InteractionHand.MAIN_HAND) {
             return;
         }
-
-        if (level instanceof ServerLevel serverLevel) {
-            MomentManager momentManager = MomentManager.of(serverLevel);
-            System.out.println(momentManager);
-        }
     }
 
 }

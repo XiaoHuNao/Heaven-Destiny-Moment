@@ -1,6 +1,8 @@
 package com.xiaohunao.heaven_destiny_moment;
 
 import com.mojang.logging.LogUtils;
+import com.xiaohunao.heaven_destiny_moment.common.attachment.MomentAttachment;
+import com.xiaohunao.heaven_destiny_moment.common.init.ModAttachments;
 import com.xiaohunao.heaven_destiny_moment.common.init.MomentRegistry;
 import com.xiaohunao.heaven_destiny_moment.common.init.MomentTypeRegistry;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
@@ -25,6 +27,7 @@ public class HeavenDestinyMoment {
 
         MomentTypeRegistry.MOMENT_TYPE.register(modEventBus);
         MomentRegistry.MOMENT.register(modEventBus);
+        ModAttachments.ATTACHMENT_TYPES.register(modEventBus);
     }
 
     public void registerRegistries(NewRegistryEvent event) {
