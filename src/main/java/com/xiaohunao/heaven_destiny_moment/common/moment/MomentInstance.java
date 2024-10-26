@@ -8,6 +8,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.UUID;
 
 public abstract class MomentInstance {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -23,11 +25,25 @@ public abstract class MomentInstance {
     protected final Level level;
     protected final MomentType<?> type;
     private final Moment moment;
+    private final UUID uuid;
 
     public MomentInstance(MomentType<?> type,Level level, Moment moment) {
+        this.uuid = UUID.randomUUID();
         this.type = type;
         this.level = level;
         this.moment = moment;
+    }
+
+    public static MomentInstance create(ServerLevel level, Moment moment) {
+        MomentTypeRegistry.REGISTRY.entrySet().forEach(momentTypeEntry -> {
+            ResourceKey<MomentType<?>> key = momentTypeEntry.getKey();
+            MomentType<?> momentType = MomentTypeRegistry.REGISTRY.get(key);
+            if (momentType != null && momentType.isValid(moment)) {
+                MomentInstance momentInstance = momentType.create(level, moment);
+                MomentManager.of(level).addMoment(level,momentInstance);
+            }
+        });
+        return null;
     }
 
 
@@ -87,6 +103,10 @@ public abstract class MomentInstance {
     }
 
     public Level getLevel() {
-        return level;
+        return this.level;
+    }
+
+    public UUID getID() {
+        return this.uuid;
     }
 }

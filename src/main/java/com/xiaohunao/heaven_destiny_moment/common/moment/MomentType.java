@@ -9,9 +9,9 @@ import java.util.Set;
 
 public class MomentType<T extends MomentInstance> {
     private final MomentType.MomentSupplier<? extends T> factory;
-    private final Set<Moment> validMoments;
+    private final Set<Class<? extends Moment>> validMoments;
 
-    public MomentType(MomentType.MomentSupplier<? extends T> factory, Set<Moment> validMoments) {
+    public MomentType(MomentType.MomentSupplier<? extends T> factory, Set<Class<? extends Moment>> validMoments) {
         this.factory = factory;
         this.validMoments = validMoments;
     }
@@ -22,7 +22,7 @@ public class MomentType<T extends MomentInstance> {
     }
 
     public boolean isValid(Moment moment) {
-        return this.validMoments.contains(moment);
+        return this.validMoments.contains(moment.getClass());
     }
 
     @FunctionalInterface
@@ -32,14 +32,14 @@ public class MomentType<T extends MomentInstance> {
 
     public static final class Builder<T extends MomentInstance> {
         private final MomentSupplier<? extends T> factory;
-        final Set<Moment> validMoments;
+        final Set<Class<? extends Moment>> validMoments;
 
-        private Builder(MomentSupplier<? extends T> factory, Set<Moment> validMoments) {
+        private Builder(MomentSupplier<? extends T> factory, Set<Class<? extends Moment>> validMoments) {
             this.factory = factory;
             this.validMoments = validMoments;
         }
 
-        public static <T extends MomentInstance> Builder<T> of(MomentSupplier<? extends T> factory, Moment... validMoments) {
+        public static <T extends MomentInstance> Builder<T> of(MomentSupplier<? extends T> factory, Class<? extends Moment>... validMoments) {
             return new Builder<>(factory, ImmutableSet.copyOf(validMoments));
         }
 
