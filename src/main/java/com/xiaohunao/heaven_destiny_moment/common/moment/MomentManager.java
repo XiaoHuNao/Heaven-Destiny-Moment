@@ -16,14 +16,8 @@ import java.util.UUID;
 public class MomentManager extends SavedData {
     private static final String NAME = HeavenDestinyMoment.MODID + "_moment_manager";
 
-
-
     private final Map<UUID, MomentInstance> runMoment = Maps.newHashMap();
 
-    private ServerLevel level;
-
-    public MomentManager() {
-    }
 
     public static MomentManager of(ServerLevel level) {
         MomentManagerContainer container = (MomentManagerContainer)level;
@@ -32,7 +26,6 @@ public class MomentManager extends SavedData {
         if (momentManager == null) {
             momentManager = level.getDataStorage().computeIfAbsent(new Factory<>(MomentManager::new,
                     (CompoundTag compoundTag, HolderLookup.Provider tag) -> load(level,compoundTag, tag)), NAME);
-            momentManager.level = level;
             container.heaven_destiny_moment$setMomentManager(momentManager);
         }
         return momentManager;
