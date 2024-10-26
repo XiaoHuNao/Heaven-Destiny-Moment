@@ -4,6 +4,7 @@ import com.xiaohunao.heaven_destiny_moment.common.mixed.MomentManagerContainer;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -13,10 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.function.BooleanSupplier;
 
-@Mixin(ServerLevel.class)
-public abstract class ServerLevelMixin implements MomentManagerContainer {
-    @Shadow public abstract void tick(BooleanSupplier p_8794_);
-
+@Mixin(Level.class)
+public abstract class LevelMixin implements MomentManagerContainer {
     @Unique
     private MomentManager heaven_destiny_moment$momentManager;
 

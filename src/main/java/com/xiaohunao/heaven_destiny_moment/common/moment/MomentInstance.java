@@ -4,7 +4,6 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
 import com.xiaohunao.heaven_destiny_moment.common.init.MomentRegistry;
 import com.xiaohunao.heaven_destiny_moment.common.init.MomentTypeRegistry;
-import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
@@ -51,7 +50,7 @@ public abstract class MomentInstance {
 
 
     @Nullable
-    public static MomentInstance loadStatic(ServerLevel level, CompoundTag compoundTag) {
+    public static MomentInstance loadStatic(Level level, CompoundTag compoundTag) {
         String id = compoundTag.getString("id");
         ResourceLocation resourcelocation = ResourceLocation.tryParse(id);
         if (resourcelocation == null) {
