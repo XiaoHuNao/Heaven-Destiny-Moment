@@ -15,7 +15,7 @@ public class NetworkRegister {
     @SubscribeEvent
     public static void registerPayload(final RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar(VERSION);
-        registrar.playToClient(MomentManagerSyncPayload.TYPE, MomentManagerSyncPayload.STREAM_CODEC, MomentManagerSyncPayload::clientHandle);
-        registrar.playToClient(MomentBarSyncPayload.TYPE, MomentBarSyncPayload.STREAM_CODEC, MomentBarSyncPayload::clientHandle);
+        registrar.playToClient(MomentManagerSyncPayload.TYPE, MomentManagerSyncPayload.STREAM_CODEC, MomentManagerSyncPayload::handle);
+        registrar.playToClient(MomentBarSyncPayload.TYPE, MomentBarSyncPayload.STREAM_CODEC, MomentBarSyncPayload::handle);
     }
 }
