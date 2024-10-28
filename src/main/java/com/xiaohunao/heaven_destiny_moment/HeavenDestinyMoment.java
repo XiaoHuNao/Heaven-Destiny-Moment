@@ -1,12 +1,19 @@
 package com.xiaohunao.heaven_destiny_moment;
 
 import com.mojang.logging.LogUtils;
-import com.xiaohunao.heaven_destiny_moment.common.init.MomentRegistry;
-import com.xiaohunao.heaven_destiny_moment.common.init.MomentTypeRegistry;
+import com.xiaohunao.heaven_destiny_moment.client.gui.hud.MomentBarOverlay;
+import com.xiaohunao.heaven_destiny_moment.common.context.amount.AmountContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.ConditionContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.EntityInfoContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.predicate.PredicateContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.reward.RewardContext;
+import com.xiaohunao.heaven_destiny_moment.common.init.MomentRegistries;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
-import com.xiaohunao.heaven_destiny_moment.common.terra_moment.init.ModMoment;
-import com.xiaohunao.heaven_destiny_moment.common.terra_moment.init.ModMomentTypes;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -14,8 +21,11 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.registries.*;
 import org.slf4j.Logger;
+
+import java.util.Map;
 
 @Mod(HeavenDestinyMoment.MODID)
 public class HeavenDestinyMoment {
@@ -23,19 +33,15 @@ public class HeavenDestinyMoment {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public HeavenDestinyMoment(IEventBus modEventBus, ModContainer modContainer) {
-        modEventBus.addListener(this::registerRegistries);
+        loadClasses();
 
-        MomentTypeRegistry.MOMENT_TYPE.register(modEventBus);
-        MomentRegistry.MOMENT.register(modEventBus);
+//        MomentRegistry.MOMENT.register(modEventBus);
 
-        ModMoment.MOMENT.register(modEventBus);
-        ModMomentTypes.MOMENT_TYPE.register(modEventBus);
+
+        modEventBus.addListener(MomentRegistries::registerRegistries);
+        modEventBus.addListener(MomentRegistries::registerDataPackRegistries);
     }
 
-    public void registerRegistries(NewRegistryEvent event) {
-        event.register(MomentTypeRegistry.REGISTRY);
-        event.register(MomentRegistry.REGISTRY);
-    }
 
     public static ResourceLocation asResource(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
@@ -45,9 +51,17 @@ public class HeavenDestinyMoment {
         return MODID + "." + path;
     }
 
-    @SubscribeEvent
-    public void onDataPackRegistryNewRegistry(DataPackRegistryEvent.NewRegistry event) {
-        event.dataPackRegistry(MomentRegistry.KEY, Moment.DATA_CODEC);
+    public static <T> ResourceKey<T> asResourceKey(ResourceKey<? extends Registry<T>> registryKey, String path) {
+        return ResourceKey.create(registryKey, HeavenDestinyMoment.asResource(path));
+    }
+
+    public static void loadClasses() {
+        Moment.register();
+        AmountContext.register();
+        ConditionContext.register();
+        EntityInfoContext.register();
+        PredicateContext.register();
+        RewardContext.register();
     }
 
 
@@ -55,6 +69,10 @@ public class HeavenDestinyMoment {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
+        }
+        @SubscribeEvent
+        public static void registerOverlay(RegisterGuiLayersEvent event) {
+            event.registerAboveAll(HeavenDestinyMoment.asResource("moment_bar"), new MomentBarOverlay());
         }
     }
 }

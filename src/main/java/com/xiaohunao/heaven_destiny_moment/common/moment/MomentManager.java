@@ -16,6 +16,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MomentManager extends SavedData {
     private static final String NAME = HeavenDestinyMoment.MODID + "_moment_manager";
@@ -57,20 +58,32 @@ public class MomentManager extends SavedData {
         ListTag listTag = tag.getList("moment", Tag.TAG_COMPOUND);
         listTag.forEach(compoundTag -> {
             manager.addMoment(level,MomentInstance.loadStatic(level, (CompoundTag) compoundTag));
-            PacketDistributor.sendToPlayersInDimension(level, new MomentManagerSyncPayload((CompoundTag) compoundTag));
+            PacketDistributor.sendToPlayersInDimension(level,new MomentManagerSyncPayload((CompoundTag) compoundTag));
         });
         return manager;
     }
-    public void addMoment(ServerLevel level,MomentInstance instance) {
-        runMoment.put(instance.getID(), instance);
-        PacketDistributor.sendToPlayersInDimension(level, new MomentManagerSyncPayload(instance.serializeNBT()));
-        setDirty();
-    }
 
     public void tick() {
+        CopyOnWriteArrayList<MomentInstance> momentInstances = new CopyOnWriteArrayList<>(runMoment.values());
+        momentInstances.forEach(instance -> {
+            if (instance.shouldEnd()) {
+                removeMoment(instance.getID());
+            }
+            instance.baseTick();
+        });
     }
 
     public Map<UUID, MomentInstance> getRunMoment() {
         return this.runMoment;
+    }
+
+    public void removeMoment(UUID uuid) {
+        runMoment.remove(uuid);
+    }
+
+    public void addMoment(ServerLevel level,MomentInstance instance) {
+        runMoment.put(instance.getID(), instance);
+        PacketDistributor.sendToPlayersInDimension(level,new MomentManagerSyncPayload(instance.serializeNBT()));
+        setDirty();
     }
 }

@@ -1,4 +1,4 @@
-package com.xiaohunao.heaven_destiny_moment.common.event;
+package com.xiaohunao.heaven_destiny_moment.common.event.subscriber;
 
 
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
@@ -7,7 +7,6 @@ import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 @EventBusSubscriber
 public class LevelEventSubscriber {

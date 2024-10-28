@@ -1,7 +1,7 @@
 package com.xiaohunao.heaven_destiny_moment.common.moment;
 
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
@@ -17,7 +17,7 @@ public class MomentType<T extends MomentInstance> {
     }
 
     @Nullable
-    public T create(Level level, Moment moment) {
+    public T create(Level level, ResourceKey<Moment> moment) {
         return this.factory.create(level,moment);
     }
 
@@ -27,7 +27,7 @@ public class MomentType<T extends MomentInstance> {
 
     @FunctionalInterface
     public interface MomentSupplier<T extends MomentInstance> {
-        T create(Level level,Moment moment);
+        T create(Level level,ResourceKey<Moment> moment);
     }
 
     public static final class Builder<T extends MomentInstance> {

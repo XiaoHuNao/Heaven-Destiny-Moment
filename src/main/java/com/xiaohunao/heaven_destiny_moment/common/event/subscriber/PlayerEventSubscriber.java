@@ -1,15 +1,12 @@
-package com.xiaohunao.heaven_destiny_moment.common.event;
+package com.xiaohunao.heaven_destiny_moment.common.event.subscriber;
 
-import com.xiaohunao.heaven_destiny_moment.common.init.MomentRegistry;
-import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
-import net.minecraft.server.level.ServerLevel;
+
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 
 @EventBusSubscriber
@@ -22,6 +19,13 @@ public class PlayerEventSubscriber {
         if (level.isClientSide() || hand != InteractionHand.MAIN_HAND) {
             return;
         }
+
+//        Moment.CODEC.encodeStart(JsonOps.INSTANCE, ModMoment.BLOOD_MOON.get()).result().ifPresent(jsonElement -> {
+//            System.out.println(jsonElement);
+//        });
+//        if (level instanceof ServerLevel serverLevel) {
+//            MomentInstance.create(serverLevel, ModMoment.BLOOD_MOON.get());
+//        }
     }
 
 }
