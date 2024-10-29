@@ -35,6 +35,7 @@ public class MomentRegistries {
     public static void registerRegistries(NewRegistryEvent event) {
         event.register(MOMENT_TYPE);
         event.register(BAR_RENDER_TYPE);
+        event.register(COVERAGE);
 
     }
 
