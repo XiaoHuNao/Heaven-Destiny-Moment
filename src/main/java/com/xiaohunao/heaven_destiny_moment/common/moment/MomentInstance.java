@@ -8,6 +8,8 @@ import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
 import com.xiaohunao.heaven_destiny_moment.common.event.MomentEvent;
 import com.xiaohunao.heaven_destiny_moment.common.init.ModMoments;
 import com.xiaohunao.heaven_destiny_moment.common.init.MomentRegistries;
+import com.xiaohunao.heaven_destiny_moment.common.moment.coverage.Coverage;
+import com.xiaohunao.heaven_destiny_moment.common.moment.coverage.ICoverage;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -38,6 +40,7 @@ public abstract class MomentInstance {
     private final Moment moment;
     private final UUID uuid;
     protected final MomentBar bar;
+//    private final ICoverage<?> coverage;
 
 
     private long tick;
@@ -50,6 +53,7 @@ public abstract class MomentInstance {
         this.type = type;
         this.level = level;
         this.momentKey = momentKey;
+//        this.coverage = coverage;
         this.moment = Objects.requireNonNull(registryChecked(momentKey, level)).get(momentKey);
         this.bar = new MomentBar(uuid, momentKey);
     }
@@ -84,6 +88,8 @@ public abstract class MomentInstance {
                 try {
                     Tag tag = compoundTag.get("moment");
                     Pair<ResourceKey<Moment>, Tag> result = ResourceKey.codec(MomentRegistries.Keys.MOMENT).decode(NbtOps.INSTANCE, tag).getOrThrow();
+//                    ICoverage<?> coverage = MomentRegistries.COVERAGE.get(ResourceLocation.tryParse(compoundTag.getString("coverage")));
+//                    return momentType.create(level,result.getFirst(),coverage);
                     return momentType.create(level,result.getFirst());
                 } catch (Throwable throwable) {
                     LOGGER.error("Failed to create MomentInstance {}", id, throwable);
@@ -125,6 +131,7 @@ public abstract class MomentInstance {
     private void serializeMetadata(CompoundTag compoundTag) {
         compoundTag.putString("id",MomentInstance.getRegistryName(type).toString());
         compoundTag.put("moment",ResourceKey.codec(MomentRegistries.Keys.MOMENT).encodeStart(NbtOps.INSTANCE, momentKey).getOrThrow());
+//        compoundTag.putString("coverage", Objects.requireNonNull(MomentRegistries.COVERAGE.getKey(coverage)).toLanguageKey());
     }
 
 

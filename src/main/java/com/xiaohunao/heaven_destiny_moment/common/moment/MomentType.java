@@ -1,6 +1,8 @@
 package com.xiaohunao.heaven_destiny_moment.common.moment;
 
 import com.google.common.collect.ImmutableSet;
+import com.xiaohunao.heaven_destiny_moment.common.moment.coverage.Coverage;
+import com.xiaohunao.heaven_destiny_moment.common.moment.coverage.ICoverage;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 

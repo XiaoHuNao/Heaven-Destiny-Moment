@@ -21,14 +21,25 @@ public class TimeConditionContext extends ConditionContext {
     private static final BiMap<Integer, String> TIME_MAP = HashBiMap.create();
 
     private final int time;
+    private int end = 0;
     private final int flag;
 
     public TimeConditionContext(int time, int flag) {
         this.time = time;
         this.flag = flag;
     }
+    public TimeConditionContext(int start, int end, int flag) {
+        this.time = start;
+        this.end = end;
+        this.flag = flag;
+    }
     public TimeConditionContext(String time, int flag) {
         this.time = TIME_MAP.inverse().get(time);
+        this.flag = flag;
+    }
+    public TimeConditionContext(String start, String end, int flag) {
+        this.time = TIME_MAP.inverse().get(start);
+        this.end = TIME_MAP.inverse().get(end);
         this.flag = flag;
     }
 
@@ -42,18 +53,14 @@ public class TimeConditionContext extends ConditionContext {
 
     @Override
     public boolean test(MomentInstance MomentInstance, Level level, BlockPos pos, Player player) {
-         return switch (flag) {
-            case 0 -> level.getDayTime() % 24000 == time;
-            case 1 -> level.getDayTime() % 24000 > time;
-            case 2 -> level.getDayTime() % 24000 < time;
-            case 3 -> level.getDayTime() % 24000 >= time;
-            case 4 -> level.getDayTime() % 24000 <= time;
-             case 5 -> {
-                 int startTime = time;
-                 int endTime = flag;
-                 long currentTime = level.getDayTime() % 24000;
-                 yield startTime <= endTime ? currentTime >= startTime && currentTime <= endTime : currentTime >= startTime || currentTime <= endTime;
-             }
+        long dayTime = level.getDayTime() % 24000;
+        return switch (flag) {
+             case 0 -> dayTime == time;
+             case 1 -> dayTime > time;
+             case 2 -> dayTime < time;
+             case 3 -> dayTime >= time;
+             case 4 -> dayTime <= time;
+             case 5 -> time >= dayTime && dayTime <= end;
             default -> false;
         };
     }
