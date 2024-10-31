@@ -9,6 +9,7 @@ import com.xiaohunao.heaven_destiny_moment.common.context.predicate.PredicateCon
 import com.xiaohunao.heaven_destiny_moment.common.context.reward.RewardContext;
 import com.xiaohunao.heaven_destiny_moment.common.init.MomentRegistries;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
+import com.xiaohunao.heaven_destiny_moment.common.moment.area.Area;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -57,6 +58,7 @@ public class HeavenDestinyMoment {
 
     public static void loadClasses() {
         Moment.register();
+        Area.register();
         AmountContext.register();
         ConditionContext.register();
         EntityInfoContext.register();
