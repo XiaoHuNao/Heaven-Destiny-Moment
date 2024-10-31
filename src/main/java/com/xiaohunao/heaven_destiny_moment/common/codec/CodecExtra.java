@@ -3,14 +3,8 @@ package com.xiaohunao.heaven_destiny_moment.common.codec;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 
-import java.util.*;
+import java.util.Set;
 
 public class CodecExtra {
     //ComponentSerialization

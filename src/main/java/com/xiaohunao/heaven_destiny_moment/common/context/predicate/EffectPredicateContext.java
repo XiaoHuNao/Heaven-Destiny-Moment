@@ -2,7 +2,6 @@ package com.xiaohunao.heaven_destiny_moment.common.context.predicate;
 
 import com.mojang.serialization.Codec;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
-import com.xiaohunao.heaven_destiny_moment.common.codec.CodecExtra;
 import com.xiaohunao.heaven_destiny_moment.common.context.WeightedContext;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;

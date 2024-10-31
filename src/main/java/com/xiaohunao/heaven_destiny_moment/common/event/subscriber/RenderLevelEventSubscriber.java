@@ -12,8 +12,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 
-import java.util.List;
-
 @EventBusSubscriber
 public class RenderLevelEventSubscriber {
     @SubscribeEvent

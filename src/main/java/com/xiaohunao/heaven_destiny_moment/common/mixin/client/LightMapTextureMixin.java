@@ -1,8 +1,6 @@
 package com.xiaohunao.heaven_destiny_moment.common.mixin.client;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettingsContext;
-import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LightTexture;

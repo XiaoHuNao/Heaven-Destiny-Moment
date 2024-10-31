@@ -1,8 +1,6 @@
 package com.xiaohunao.heaven_destiny_moment.client.gui.bar.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
-import com.xiaohunao.heaven_destiny_moment.client.gui.hud.MomentBarOverlay;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.BossEvent;
 

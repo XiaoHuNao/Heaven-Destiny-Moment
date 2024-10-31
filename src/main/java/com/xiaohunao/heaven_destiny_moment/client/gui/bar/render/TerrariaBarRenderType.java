@@ -1,17 +1,7 @@
 package com.xiaohunao.heaven_destiny_moment.client.gui.bar.render;
 
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
-import com.xiaohunao.heaven_destiny_moment.client.gui.hud.MomentBarOverlay;
-import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
-import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-
-import java.util.Map;
-import java.util.UUID;
 
 public class TerrariaBarRenderType implements IBarRenderType{
     @Override

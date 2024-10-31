@@ -6,10 +6,7 @@ import com.mojang.logging.LogUtils;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
 import com.xiaohunao.heaven_destiny_moment.common.event.MomentEvent;
-import com.xiaohunao.heaven_destiny_moment.common.init.ModMoments;
 import com.xiaohunao.heaven_destiny_moment.common.init.MomentRegistries;
-import com.xiaohunao.heaven_destiny_moment.common.moment.coverage.Coverage;
-import com.xiaohunao.heaven_destiny_moment.common.moment.coverage.ICoverage;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -25,7 +22,6 @@ import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
