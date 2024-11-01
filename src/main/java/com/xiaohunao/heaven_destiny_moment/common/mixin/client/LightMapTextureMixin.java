@@ -15,6 +15,5 @@ public abstract class LightMapTextureMixin {
     @Inject(method = "updateLightTexture", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/LightTexture;blockLightRedFlicker:F"))
     private void doOurLightMap(float p_109882_, CallbackInfo ci, @Local ClientLevel clientlevel, @Local Vector3f vector3f) {
         MomentManager momentManager = MomentManager.of(clientlevel);
-//        System.out.println("LightTexture :" + momentManager.getRunMoment());
     }
 }

@@ -6,6 +6,7 @@ import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettingsContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentDataContext;
 import com.xiaohunao.heaven_destiny_moment.common.moment.area.Area;
 import com.xiaohunao.heaven_destiny_moment.common.moment.moment.DefaultMoment;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -31,14 +32,15 @@ public abstract class Moment implements IMoment {
 
     public Moment(ResourceLocation barRenderType,Area<?> area, MomentDataContext momentDataContext, ClientSettingsContext clientSettingsContext) {
         this.barRenderType = barRenderType;
+        this.area = area;
         this.momentDataContext = momentDataContext;
         this.clientSettingsContext = clientSettingsContext;
     }
 
 
     public abstract MomentInstance newMomentInstance(Level level,ResourceKey<Moment> momentResourceKey);
-    public boolean isInArea(ServerLevel level, Player player) {
-        return area.contains(level, player);
+    public boolean isInArea(ServerLevel level, BlockPos blockPos) {
+        return area.contains(level, blockPos);
     }
 
     public ResourceLocation getBarRenderType() {

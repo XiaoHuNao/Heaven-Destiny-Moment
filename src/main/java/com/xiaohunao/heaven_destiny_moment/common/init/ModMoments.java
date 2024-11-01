@@ -24,9 +24,9 @@ public class ModMoments {
         HolderGetter<Structure> structureHolderGetter = context.lookup(Registries.STRUCTURE);
 
         HolderSet<Structure> holderSet = HolderUtils.getHolderSet(structureHolderGetter, BuiltinStructures.SWAMP_HUT,BuiltinStructures.ANCIENT_CITY);
-        context.register(BLOOD_MOON, new DefaultMoment(HeavenDestinyMoment.asResource("terra"),
-                new LocationArea(LocationPredicate.Builder.location().setStructures(holderSet).build()),
-                MomentDataContext.EMPTY, ClientSettingsContext.EMPTY)
-        );
+//        context.register(BLOOD_MOON, new DefaultMoment(HeavenDestinyMoment.asResource("terra"),
+//                new LocationArea(LocationPredicate.Builder.location().setStructures(holderSet).build()),
+//                MomentDataContext.EMPTY, ClientSettingsContext.EMPTY)
+//        );
     }
 }

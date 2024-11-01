@@ -2,6 +2,7 @@ package com.xiaohunao.heaven_destiny_moment.common.moment.area;
 
 import com.xiaohunao.heaven_destiny_moment.common.codec.CodecMap;
 import com.xiaohunao.heaven_destiny_moment.common.codec.CodecProvider;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 
@@ -13,5 +14,5 @@ public abstract class Area<T> implements CodecProvider<Area<?>> {
 
     }
 
-    public abstract boolean contains(ServerLevel level, Player player);
+    public abstract boolean contains(ServerLevel level, BlockPos blockPos);
 }

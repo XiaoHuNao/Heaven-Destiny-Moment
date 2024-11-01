@@ -12,9 +12,7 @@ import net.minecraft.world.entity.player.Player;
 
 public class LocationArea extends Area<LocationPredicate> {
     public static final ResourceLocation ID = HeavenDestinyMoment.asResource("location");
-    public static final Codec<LocationArea> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            LocationPredicate.CODEC.fieldOf("location").forGetter(LocationArea::getLocationPredicate)
-    ).apply(instance, LocationArea::new));
+    public static final Codec<LocationArea> CODEC = LocationPredicate.CODEC.xmap(LocationArea::new,LocationArea::getLocationPredicate);
     public static final LocationArea EMPTY = new LocationArea(LocationPredicate.Builder.location().build());
 
     private final LocationPredicate locationPredicate;
@@ -24,8 +22,7 @@ public class LocationArea extends Area<LocationPredicate> {
     }
 
     @Override
-    public boolean contains(ServerLevel level, Player player) {
-        BlockPos blockPos = player.blockPosition();
+    public boolean contains(ServerLevel level, BlockPos blockPos) {
         return locationPredicate.matches(level,blockPos.getX(),blockPos.getY(),blockPos.getZ());
     }
 

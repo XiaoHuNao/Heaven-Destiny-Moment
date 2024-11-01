@@ -21,6 +21,7 @@ public class MomentManager extends SavedData {
     private static final String NAME = HeavenDestinyMoment.MODID + "_moment_manager";
 
     private final Map<UUID, MomentInstance> runMoment = Maps.newHashMap();
+    private final Map<UUID, MomentInstance> playerMoment = Maps.newHashMap();
 
     private static MomentManager clientMonger;
 

@@ -7,19 +7,22 @@ import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
 import com.xiaohunao.heaven_destiny_moment.common.event.MomentEvent;
 import com.xiaohunao.heaven_destiny_moment.common.init.MomentRegistries;
+import com.xiaohunao.heaven_destiny_moment.common.moment.area.LocationArea;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.nbt.*;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Set;
@@ -36,12 +39,12 @@ public abstract class MomentInstance {
     private final Moment moment;
     private final UUID uuid;
     protected final MomentBar bar;
-//    private final ICoverage<?> coverage;
-
 
     private long tick;
     private MomentState state;
     protected Set<UUID> players = Sets.newHashSet();
+    //是否有玩家未在范围内
+    protected boolean isPlayerInArea = true;
 
 
     protected MomentInstance(MomentType<?> type, Level level, ResourceKey<Moment> momentKey) {
@@ -49,18 +52,22 @@ public abstract class MomentInstance {
         this.type = type;
         this.level = level;
         this.momentKey = momentKey;
-//        this.coverage = coverage;
         this.moment = Objects.requireNonNull(registryChecked(momentKey, level)).get(momentKey);
         this.bar = new MomentBar(uuid, momentKey);
     }
 
-    public static void create(ServerLevel level, ResourceKey<Moment> momentKey) {
+    public static boolean create(ResourceKey<Moment> momentKey, ServerLevel level, BlockPos blockPos) {
         Moment moment = Objects.requireNonNull(registryChecked(momentKey, level)).get(momentKey);
         if (moment != null) {
-            MomentInstance momentInstance = moment.newMomentInstance(level,momentKey);
-            MomentManager.of(level).addMoment(level,momentInstance);
-        }
+            if (moment.getCoverage() instanceof LocationArea && !moment.isInArea(level, blockPos)) {
+                return false;
+            }
 
+            MomentInstance momentInstance = moment.newMomentInstance(level, momentKey);
+            MomentManager.of(level).addMoment(level, momentInstance);
+            return true;
+        }
+        return false;
     }
     private static Registry<Moment> registryChecked(ResourceKey<Moment> momentKey, Level level) {
         Registry<Moment> registry = level.registryAccess().registryOrThrow(MomentRegistries.Keys.MOMENT);
@@ -112,7 +119,11 @@ public abstract class MomentInstance {
         serializeMetadata(compoundTag);
         compoundTag.putLong("tick",tick);
         compoundTag.putString("state", state.name());
+        compoundTag.putBoolean("isPlayerInArea", isPlayerInArea);
 
+        ListTag tags = new ListTag();
+        players.forEach(uuid -> tags.add(StringTag.valueOf(uuid.toString())));
+        compoundTag.put("players", tags);
 
         return compoundTag;
 
@@ -120,6 +131,7 @@ public abstract class MomentInstance {
     public void deserializeNBT(CompoundTag compoundTag) {
         this.tick = compoundTag.getLong("tick");
         this.state = MomentState.valueOf(compoundTag.getString("state"));
+        this.isPlayerInArea = compoundTag.getBoolean("isPlayerInArea");
 
         ListTag tags = compoundTag.getList("players", Tag.TAG_STRING);
         tags.forEach(tag -> players.add(UUID.fromString(tag.getAsString())));
@@ -127,7 +139,6 @@ public abstract class MomentInstance {
     private void serializeMetadata(CompoundTag compoundTag) {
         compoundTag.putString("id",MomentInstance.getRegistryName(type).toString());
         compoundTag.put("moment",ResourceKey.codec(MomentRegistries.Keys.MOMENT).encodeStart(NbtOps.INSTANCE, momentKey).getOrThrow());
-//        compoundTag.putString("coverage", Objects.requireNonNull(MomentRegistries.COVERAGE.getKey(coverage)).toLanguageKey());
     }
 
 
@@ -147,16 +158,36 @@ public abstract class MomentInstance {
         return state == MomentState.END;
     }
 
-    public void baseTick() {
+    public final void baseTick() {
         tick++;
         if (tick == 0){
             setState(MomentState.READY);
         }
-
-        NeoForge.EVENT_BUS.post(new MomentEvent.Tick(this));
         updatePlayers();
-        tick();
+        checkPlayerIsInArea();
+        if (isPlayerInArea) {
+            NeoForge.EVENT_BUS.post(new MomentEvent.Tick(this));
+            tick();
+        }
+
     }
+
+    private void checkPlayerIsInArea() {
+        players.stream()
+                .map(level::getPlayerByUUID)
+                .filter(player -> Objects.nonNull(player) && !level.isClientSide)
+                .filter(player -> !moment.isInArea((ServerLevel) level, player.blockPosition()))
+                .forEach(player -> {
+                    isPlayerInArea = false;
+                    //超出区域的玩家的提醒方法
+                    sendPlayerOutOfAreaMessage(player);
+                });
+
+    }
+    private void sendPlayerOutOfAreaMessage(Player player) {
+        player.sendSystemMessage(Component.literal("你已经超出了指定区域！"));
+    }
+
     public void tick() {
 
     }

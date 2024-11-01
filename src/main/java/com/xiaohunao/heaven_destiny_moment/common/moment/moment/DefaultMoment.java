@@ -22,7 +22,7 @@ public class DefaultMoment extends Moment {
             MomentDataContext.CODEC.optionalFieldOf("moment_data_context", MomentDataContext.EMPTY).forGetter(Moment::getMomentDataContext),
             ClientSettingsContext.CODEC.optionalFieldOf("clientSettingsContext", ClientSettingsContext.EMPTY).forGetter(Moment::getClientSettingsContext)
      ).apply(instance, DefaultMoment::new));
-    public static final ResourceLocation ID = HeavenDestinyMoment.asResource("blood_moon");
+    public static final ResourceLocation ID = HeavenDestinyMoment.asResource("default");
 
     public DefaultMoment(ResourceLocation barRenderType,Area<?> area, MomentDataContext momentDataContext, ClientSettingsContext clientSettingsContext) {
         super(barRenderType, area, momentDataContext, clientSettingsContext);

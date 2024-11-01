@@ -8,6 +8,7 @@ import com.xiaohunao.heaven_destiny_moment.common.moment.area.Area;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.resources.ResourceKey;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 import net.neoforged.neoforge.registries.RegistryBuilder;
@@ -16,8 +17,6 @@ public class MomentRegistries {
     public static final Registry<MomentType<?>> MOMENT_TYPE = new RegistryBuilder<>(Keys.MOMENT_TYPE).create();
     public static final Registry<IBarRenderType> BAR_RENDER_TYPE = new RegistryBuilder<>(Keys.BAR_RENDER_TYPE).create();
     public static final Registry<Area<?>> AREA = new RegistryBuilder<>(Keys.COVERAGE).create();
-
-
 
     public static final class Keys {
         public static final ResourceKey<Registry<Moment>> MOMENT = ResourceKey.createRegistryKey(HeavenDestinyMoment.asResource("moment"));
@@ -34,8 +33,8 @@ public class MomentRegistries {
         event.register(MOMENT_TYPE);
         event.register(BAR_RENDER_TYPE);
         event.register(AREA);
-
     }
+
 
     public static void registerDataPackRegistries(DataPackRegistryEvent.NewRegistry event) {
         event.dataPackRegistry(Keys.MOMENT, Moment.CODEC, Moment.CODEC);

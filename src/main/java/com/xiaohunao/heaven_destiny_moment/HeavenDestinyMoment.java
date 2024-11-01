@@ -7,6 +7,7 @@ import com.xiaohunao.heaven_destiny_moment.common.context.condition.ConditionCon
 import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.EntityInfoContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.predicate.PredicateContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.reward.RewardContext;
+import com.xiaohunao.heaven_destiny_moment.common.init.ModMomentTypes;
 import com.xiaohunao.heaven_destiny_moment.common.init.MomentRegistries;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.area.Area;
@@ -30,9 +31,7 @@ public class HeavenDestinyMoment {
 
     public HeavenDestinyMoment(IEventBus modEventBus, ModContainer modContainer) {
         loadClasses();
-
-//        MomentRegistry.MOMENT.register(modEventBus);
-
+        ModMomentTypes.MOMENT_TYPE.register(modEventBus);
 
         modEventBus.addListener(MomentRegistries::registerRegistries);
         modEventBus.addListener(MomentRegistries::registerDataPackRegistries);
