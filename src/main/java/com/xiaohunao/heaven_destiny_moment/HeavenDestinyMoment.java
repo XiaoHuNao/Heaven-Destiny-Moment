@@ -34,7 +34,7 @@ public class HeavenDestinyMoment {
         ModMomentTypes.MOMENT_TYPE.register(modEventBus);
 
         modEventBus.addListener(MomentRegistries::registerRegistries);
-        modEventBus.addListener(MomentRegistries::registerDataPackRegistries);
+//        modEventBus.addListener(MomentRegistries::registerDataPackRegistries);
     }
 
 
