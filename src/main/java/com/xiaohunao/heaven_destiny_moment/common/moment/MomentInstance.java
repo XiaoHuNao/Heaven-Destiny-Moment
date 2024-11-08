@@ -7,10 +7,7 @@ import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
 import com.xiaohunao.heaven_destiny_moment.common.event.MomentEvent;
 import com.xiaohunao.heaven_destiny_moment.common.init.MomentRegistries;
-import com.xiaohunao.heaven_destiny_moment.common.moment.area.LocationArea;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
-import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -22,7 +19,6 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Set;
@@ -43,7 +39,6 @@ public abstract class MomentInstance {
     private long tick;
     private MomentState state;
     protected Set<UUID> players = Sets.newHashSet();
-    //是否有玩家未在范围内
     protected boolean isPlayerInArea = true;
 
 
@@ -53,23 +48,19 @@ public abstract class MomentInstance {
         this.level = level;
         this.momentKey = momentKey;
         this.moment = Objects.requireNonNull(registryChecked(momentKey, level)).get(momentKey);
-        this.bar = new MomentBar(uuid, momentKey);
+        this.bar = new MomentBar(uuid, moment.getBarRenderType());
     }
 
-    public static boolean create(ResourceKey<Moment> momentKey, ServerLevel level, BlockPos blockPos) {
-        Moment moment = Objects.requireNonNull(registryChecked(momentKey, level)).get(momentKey);
+    public static boolean create(ResourceKey<Moment> momentKey, ServerLevel level) {
+        Moment moment = registryChecked(momentKey, level).get(momentKey);
         if (moment != null) {
-            if (moment.getCoverage() instanceof LocationArea && !moment.isInArea(level, blockPos)) {
-                return false;
-            }
-
             MomentInstance momentInstance = moment.newMomentInstance(level, momentKey);
             MomentManager.of(level).addMoment(level, momentInstance);
             return true;
         }
         return false;
     }
-    private static Registry<Moment> registryChecked(ResourceKey<Moment> momentKey, Level level) {
+    public static Registry<Moment> registryChecked(ResourceKey<Moment> momentKey, Level level) {
         Registry<Moment> registry = level.registryAccess().registryOrThrow(MomentRegistries.Keys.MOMENT);
         if (registry.getHolder(momentKey).isEmpty()) {
             HeavenDestinyMoment.LOGGER.error("Moment {} not found in registry", momentKey.location());
@@ -90,10 +81,7 @@ public abstract class MomentInstance {
             return MomentRegistries.MOMENT_TYPE.getOptional(resourcelocation).map((momentType) -> {
                 try {
                     Tag tag = compoundTag.get("moment");
-                    Pair<ResourceKey<Moment>, Tag> result = ResourceKey.codec(MomentRegistries.Keys.MOMENT).decode(NbtOps.INSTANCE, tag).getOrThrow();
-//                    ICoverage<?> coverage = MomentRegistries.COVERAGE.get(ResourceLocation.tryParse(compoundTag.getString("coverage")));
-//                    return momentType.create(level,result.getFirst(),coverage);
-                    return momentType.create(level,result.getFirst());
+                    return momentType.create(level,ResourceKey.codec(MomentRegistries.Keys.MOMENT).decode(NbtOps.INSTANCE, tag).getOrThrow().getFirst());
                 } catch (Throwable throwable) {
                     LOGGER.error("Failed to create MomentInstance {}", id, throwable);
                     return null;
@@ -118,7 +106,9 @@ public abstract class MomentInstance {
 
         serializeMetadata(compoundTag);
         compoundTag.putLong("tick",tick);
-        compoundTag.putString("state", state.name());
+        if (state != null) {
+            compoundTag.putString("state", state.name());
+        }
         compoundTag.putBoolean("isPlayerInArea", isPlayerInArea);
 
         ListTag tags = new ListTag();
@@ -130,7 +120,9 @@ public abstract class MomentInstance {
     }
     public void deserializeNBT(CompoundTag compoundTag) {
         this.tick = compoundTag.getLong("tick");
-        this.state = MomentState.valueOf(compoundTag.getString("state"));
+        if (compoundTag.contains("state")) {
+            this.state = MomentState.valueOf(compoundTag.getString("state"));
+        }
         this.isPlayerInArea = compoundTag.getBoolean("isPlayerInArea");
 
         ListTag tags = compoundTag.getList("players", Tag.TAG_STRING);
@@ -179,13 +171,12 @@ public abstract class MomentInstance {
                 .filter(player -> !moment.isInArea((ServerLevel) level, player.blockPosition()))
                 .forEach(player -> {
                     isPlayerInArea = false;
-                    //超出区域的玩家的提醒方法
                     sendPlayerOutOfAreaMessage(player);
                 });
 
     }
     private void sendPlayerOutOfAreaMessage(Player player) {
-        player.sendSystemMessage(Component.literal("你已经超出了指定区域！"));
+//        player.sendSystemMessage(Component.literal("你已经超出了指定区域！"));
     }
 
     public void tick() {

@@ -3,88 +3,87 @@ package com.xiaohunao.heaven_destiny_moment.common.context.condition;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
+import com.xiaohunao.heaven_destiny_moment.common.init.ModContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
-public class TimeConditionContext extends ConditionContext {
+import java.util.Optional;
+
+public record TimeConditionContext(Optional<Long> min,Optional<Long> max) implements IConditionContext {
     public static final ResourceLocation ID = HeavenDestinyMoment.asResource("time");
-    public static final Codec<TimeConditionContext> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.INT.fieldOf("time").forGetter(TimeConditionContext::getTime),
-            Codec.INT.fieldOf("flag").forGetter(TimeConditionContext::getFlag)
+    public static final MapCodec<TimeConditionContext> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        Codec.LONG.optionalFieldOf("min").forGetter(TimeConditionContext::min),
+        Codec.LONG.optionalFieldOf("max").forGetter(TimeConditionContext::max)
     ).apply(instance, TimeConditionContext::new));
 
-    private static final BiMap<Integer, String> TIME_MAP = HashBiMap.create();
+    private static final BiMap<Long, String> TIME_MAP = HashBiMap.create();
 
-    private final int time;
-    private int end = 0;
-    private final int flag;
-
-    public TimeConditionContext(int time, int flag) {
-        this.time = time;
-        this.flag = flag;
+    public static TimeConditionContext exactly(long value) {
+        return new TimeConditionContext(Optional.of(value), Optional.of(value));
     }
-    public TimeConditionContext(int start, int end, int flag) {
-        this.time = start;
-        this.end = end;
-        this.flag = flag;
-    }
-    public TimeConditionContext(String time, int flag) {
-        this.time = TIME_MAP.inverse().get(time);
-        this.flag = flag;
-    }
-    public TimeConditionContext(String start, String end, int flag) {
-        this.time = TIME_MAP.inverse().get(start);
-        this.end = TIME_MAP.inverse().get(end);
-        this.flag = flag;
+    public static TimeConditionContext exactly(String value) {
+        return TimeConditionContext.exactly(TIME_MAP.inverse().get(value));
     }
 
-    public int getTime() {
-        return time;
+    public static TimeConditionContext between(long min, long max) {
+        return new TimeConditionContext(Optional.of(min), Optional.of(max));
+    }
+    public static TimeConditionContext between(String min, String max) {
+        return TimeConditionContext.between(TIME_MAP.inverse().get(min), TIME_MAP.inverse().get(max));
     }
 
-    public int getFlag() {
-        return flag;
+    public static TimeConditionContext atLeast(long min) {
+        return new TimeConditionContext(Optional.of(min), Optional.empty());
+    }
+    public static TimeConditionContext atLeast(String min) {
+        return TimeConditionContext.atLeast(TIME_MAP.inverse().get(min));
     }
 
-    @Override
-    public boolean test(MomentInstance MomentInstance, Level level, BlockPos pos, Player player) {
-        long dayTime = level.getDayTime() % 24000;
-        return switch (flag) {
-             case 0 -> dayTime == time;
-             case 1 -> dayTime > time;
-             case 2 -> dayTime < time;
-             case 3 -> dayTime >= time;
-             case 4 -> dayTime <= time;
-             case 5 -> time >= dayTime && dayTime <= end;
-            default -> false;
-        };
+    public static TimeConditionContext atMost(long max) {
+        return new TimeConditionContext(Optional.empty(), Optional.of(max));
+    }
+    public static TimeConditionContext atMost(String max) {
+        return TimeConditionContext.atMost(TIME_MAP.inverse().get(max));
+    }
+
+    public boolean matches(long value) {
+
+        if (this.min.isPresent() && this.min.get() > value) {
+            return false;
+        }
+        return this.max.isEmpty() || this.max.get() > value;
     }
 
     @Override
-    public Codec<? extends ConditionContext> getCodec() {
-        return CODEC;
+    public boolean matches(MomentInstance instance, BlockPos pos) {
+        Level level = instance.getLevel();
+        return this.matches(level.getDayTime());
     }
 
+    @Override
+    public MapCodec<? extends IConditionContext> codec() {
+        return ModContextRegister.TIME_CONDITION.get();
+    }
 
 
     static {
-        TIME_MAP.put(0, "Sunrise");
-        TIME_MAP.put(1000, "Day");
-        TIME_MAP.put(12000, "Sunset");
-        TIME_MAP.put(23000, "Night");
-        TIME_MAP.put(6000, "Midnight");
-        TIME_MAP.put(14000, "FullMoon");
-        TIME_MAP.put(38000, "WaningGibbous");
-        TIME_MAP.put(62000, "ThirdQuarter");
-        TIME_MAP.put(86000, "WaningCrescent");
-        TIME_MAP.put(110000, "NewMoon");
-        TIME_MAP.put(134000, "WaxingCrescent");
-        TIME_MAP.put(158000, "FirstQuarter");
-        TIME_MAP.put(182000, "WaxingGibbous");
+        TIME_MAP.put(0L, "Sunrise");
+        TIME_MAP.put(1000L, "Day");
+        TIME_MAP.put(12000L, "Sunset");
+        TIME_MAP.put(23000L, "Night");
+        TIME_MAP.put(6000L, "Midnight");
+        TIME_MAP.put(14000L, "FullMoon");
+        TIME_MAP.put(38000L, "WaningGibbous");
+        TIME_MAP.put(62000L, "ThirdQuarter");
+        TIME_MAP.put(86000L, "WaningCrescent");
+        TIME_MAP.put(110000L, "NewMoon");
+        TIME_MAP.put(134000L, "WaxingCrescent");
+        TIME_MAP.put(158000L, "FirstQuarter");
+        TIME_MAP.put(182000L, "WaxingGibbous");
     }
 }

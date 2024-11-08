@@ -8,6 +8,7 @@ import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.network.MomentBarSyncPayload;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -19,7 +20,7 @@ import java.util.function.Function;
 public class MomentBar {
     public static final Codec<MomentBar> CODEC = RecordCodecBuilder.create(inst ->
             inst.group(UUIDUtil.CODEC.fieldOf("uuid").forGetter(MomentBar::getID),
-                    ResourceKey.codec(MomentRegistries.Keys.MOMENT).fieldOf("moment").forGetter(MomentBar::getMoment),
+                    ResourceLocation.CODEC.fieldOf("type").forGetter(MomentBar::getType),
                     Codec.FLOAT.fieldOf("progress").forGetter(MomentBar::getProgress),
                     Codec.STRING.xmap(BossEvent.BossBarColor::valueOf, BossEvent.BossBarColor::name).fieldOf("color").forGetter(MomentBar::getColor))
             .apply(inst, MomentBar::new)
@@ -27,20 +28,20 @@ public class MomentBar {
 
 
     private final UUID uuid;
-    private final ResourceKey<Moment> moment;
+    private final ResourceLocation type;
     private final Set<ServerPlayer> players = Sets.newHashSet();
     private float progress = 1.0F;
     private BossEvent.BossBarColor color = BossEvent.BossBarColor.YELLOW;
 
 
-    public MomentBar(UUID uuid, ResourceKey<Moment> moment) {
+    public MomentBar(UUID uuid, ResourceLocation type) {
         this.uuid = uuid;
-        this.moment = moment;
+        this.type = type;
     }
 
-    public MomentBar(UUID uuid, ResourceKey<Moment> moment, float progress, BossEvent.BossBarColor color) {
+    public MomentBar(UUID uuid, ResourceLocation type, float progress, BossEvent.BossBarColor color) {
         this.uuid = uuid;
-        this.moment = moment;
+        this.type = type;
         this.progress = progress;
         this.color = color;
     }
@@ -66,8 +67,8 @@ public class MomentBar {
         return uuid;
     }
 
-    public ResourceKey<Moment> getMoment() {
-        return moment;
+    public ResourceLocation getType() {
+        return type;
     }
 
     public Set<ServerPlayer> getPlayers() {

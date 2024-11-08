@@ -1,24 +1,66 @@
 package com.xiaohunao.heaven_destiny_moment.common.context.entity_info;
 
+import com.google.common.collect.Maps;
+import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
-import com.xiaohunao.heaven_destiny_moment.common.codec.CodecMap;
-import com.xiaohunao.heaven_destiny_moment.common.codec.CodecProvider;
-import com.xiaohunao.heaven_destiny_moment.common.context.amount.AmountContext;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
+import com.xiaohunao.heaven_destiny_moment.common.context.amount.IAmountContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.amount.IntegerAmountContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.amount.RandomAmountContext;
+import com.xiaohunao.heaven_destiny_moment.common.init.ModContextRegister;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
+import net.neoforged.neoforge.attachment.AttachmentType;
 
-public abstract class EntityInfoContext implements CodecProvider<EntityInfoContext> {
-    public static final CodecMap<EntityInfoContext> CODEC = new CodecMap<>("EntityInfo");
+import java.util.Map;
 
-    public static void register() {
-        CODEC.register(DefaultEntityInfoContext.ID, DefaultEntityInfoContext.CODEC);
-        CODEC.register(EntityInfoWithPredicate.ID, EntityInfoWithPredicate.CODEC);
+public record EntityInfoContext(EntityType<?> entityType, IAmountContext amount) implements IEntityInfoContext {
+    public static final ResourceLocation ID = HeavenDestinyMoment.asResource("entity_info");
+    public static final MapCodec<EntityInfoContext> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("entity_type").forGetter(EntityInfoContext::getEntityType),
+            IAmountContext.CODEC.fieldOf("amount").forGetter(EntityInfoContext::getAmount)
+    ).apply(instance, EntityInfoContext::new));
+
+
+    @Override
+    public EntityType<?> getEntityType() {
+        return entityType;
     }
 
-    public abstract EntityType<?> getEntityType();
+    @Override
+    public int getSpawnAmount() {
+        return amount.getAmount();
+    }
 
-    public abstract int getSpawnAmount();
+    @Override
+    public IAmountContext getAmount() {
+        return amount;
+    }
 
-    public abstract AmountContext getAmount();
+    @Override
+    public MapCodec<? extends IEntityInfoContext> codec() {
+        return ModContextRegister.ENTITY_INFO.get();
+    }
 
-    public abstract Codec<? extends EntityInfoContext> getCodec();
+    public static class Builder {
+        private final EntityType<?> entityType;
+        private final IAmountContext amount;
+        private final Map<AttachmentType<?>, JsonElement> attachments = Maps.newHashMap();
+
+        private Builder(EntityType<?> entityType,int min,int max) {
+            this.entityType = entityType;
+            this.amount = new RandomAmountContext(min, max);
+        }
+        private Builder(EntityType<?> entityType,int amount) {
+            this.entityType = entityType;
+            this.amount = new IntegerAmountContext(amount);
+        }
+        public EntityInfoContext build() {
+            return new EntityInfoContext(entityType, amount);
+        }
+
+    }
 }

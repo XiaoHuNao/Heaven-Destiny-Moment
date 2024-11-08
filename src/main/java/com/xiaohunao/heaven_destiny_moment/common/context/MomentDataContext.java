@@ -6,9 +6,9 @@ import com.google.common.collect.Sets;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.common.codec.CodecExtra;
-import com.xiaohunao.heaven_destiny_moment.common.context.condition.ConditionContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.EntityInfoContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.reward.RewardContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.IConditionContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.IEntityInfoContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.reward.IRewardContext;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -18,24 +18,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public record MomentDataContext(int readyTime, Set<RewardContext> rewards, Set<ConditionContext> conditions,
-                                List<List<EntityInfoContext>> waves, MobSpawnSettingsContext mobSpawnSettingsContext) {
+public record MomentDataContext(int readyTime, Set<IRewardContext> rewards, Set<IConditionContext> conditions,
+                                List<List<IEntityInfoContext>> waves, MobSpawnSettingsContext mobSpawnSettingsContext) {
     public static final MomentDataContext EMPTY = new MomentDataContext(0, Sets.newHashSet(), Sets.newHashSet(), Lists.newArrayList(), MobSpawnSettingsContext.EMPTY);
 
     public static final Codec<MomentDataContext> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.INT.optionalFieldOf("ready_time", 0).forGetter(MomentDataContext::readyTime),
-            CodecExtra.setOf(RewardContext.CODEC).optionalFieldOf("rewards", Sets.newHashSet()).forGetter(MomentDataContext::rewards),
-            CodecExtra.setOf(ConditionContext.CODEC).optionalFieldOf("conditions", Sets.newHashSet()).forGetter(MomentDataContext::conditions),
-            Codec.list(Codec.list(EntityInfoContext.CODEC)).optionalFieldOf("waves", Lists.newArrayList()).forGetter(MomentDataContext::waves),
+            CodecExtra.setOf(IRewardContext.CODEC).optionalFieldOf("rewards", Sets.newHashSet()).forGetter(MomentDataContext::rewards),
+            CodecExtra.setOf(IConditionContext.CODEC).optionalFieldOf("conditions", Sets.newHashSet()).forGetter(MomentDataContext::conditions),
+            Codec.list(Codec.list(IEntityInfoContext.CODEC)).optionalFieldOf("waves", Lists.newArrayList()).forGetter(MomentDataContext::waves),
             MobSpawnSettingsContext.CODEC.optionalFieldOf("mob_spawn_settings", MobSpawnSettingsContext.EMPTY).forGetter(MomentDataContext::mobSpawnSettingsContext)
     ).apply(instance, MomentDataContext::new));
 
 
+
+
+
     public static class Builder {
         private int readyTime = 0;
-        private Set<RewardContext> rewards = Sets.newHashSet();
-        private Set<ConditionContext> conditions = Sets.newHashSet();
-        private List<List<EntityInfoContext>> waves = Lists.newArrayList();
+        private Set<IRewardContext> rewards = Sets.newHashSet();
+        private Set<IConditionContext> conditions = Sets.newHashSet();
+        private List<List<IEntityInfoContext>> waves = Lists.newArrayList();
         private boolean allowOriginalBiomeSpawnSettings = false;
         private boolean forceSurfaceSpawning = false;
         private boolean ignoreLightLevel = false;
@@ -49,12 +52,12 @@ public record MomentDataContext(int readyTime, Set<RewardContext> rewards, Set<C
             return new MomentDataContext(readyTime, rewards, conditions, waves, new MobSpawnSettingsContext(allowOriginalBiomeSpawnSettings, forceSurfaceSpawning, ignoreLightLevel, mobSpawnSettings.build(), spawnCategoryMultiplier, mobSpawnListContext));
         }
 
-        public Builder addReward(RewardContext... reward) {
+        public Builder addReward(IRewardContext... reward) {
             rewards.addAll(List.of(reward));
             return this;
         }
 
-        public Builder addCondition(ConditionContext... condition) {
+        public Builder addCondition(IConditionContext... condition) {
             conditions.addAll(List.of(condition));
             return this;
         }

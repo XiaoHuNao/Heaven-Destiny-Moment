@@ -17,20 +17,14 @@ import org.slf4j.Logger;
 
 public abstract class Moment implements IMoment {
     private static final Logger LOGGER = LogUtils.getLogger();
-    public static final CodecMap<Moment> CODEC = new CodecMap<>("moment");
-
-    public static void register() {
-        CODEC.register(DefaultMoment.ID, DefaultMoment.CODEC);
-    }
-
 
     private ResourceLocation barRenderType;
-    private Area<?> area;
+    private Area area;
     private MomentDataContext momentDataContext;
     private ClientSettingsContext clientSettingsContext;
 
 
-    public Moment(ResourceLocation barRenderType,Area<?> area, MomentDataContext momentDataContext, ClientSettingsContext clientSettingsContext) {
+    public Moment(ResourceLocation barRenderType,Area area, MomentDataContext momentDataContext, ClientSettingsContext clientSettingsContext) {
         this.barRenderType = barRenderType;
         this.area = area;
         this.momentDataContext = momentDataContext;
@@ -40,7 +34,7 @@ public abstract class Moment implements IMoment {
 
     public abstract MomentInstance newMomentInstance(Level level,ResourceKey<Moment> momentResourceKey);
     public boolean isInArea(ServerLevel level, BlockPos blockPos) {
-        return area.contains(level, blockPos);
+        return area.matches(level, blockPos);
     }
 
     public ResourceLocation getBarRenderType() {
@@ -54,7 +48,7 @@ public abstract class Moment implements IMoment {
     public ClientSettingsContext getClientSettingsContext() {
         return clientSettingsContext;
     }
-    public Area<?> getCoverage() {
+    public Area getCoverage() {
         return area;
     }
 }

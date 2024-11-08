@@ -1,18 +1,17 @@
 package com.xiaohunao.heaven_destiny_moment.common.moment.area;
 
-import com.xiaohunao.heaven_destiny_moment.common.codec.CodecMap;
-import com.xiaohunao.heaven_destiny_moment.common.codec.CodecProvider;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.xiaohunao.heaven_destiny_moment.common.init.MomentRegistries;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.player.Player;
 
-public abstract class Area<T> implements CodecProvider<Area<?>> {
-    public final static CodecMap<Area<?>> CODEC = new CodecMap<>("Area");
+import java.util.function.Function;
 
-    public static void register() {
-        CODEC.register(LocationArea.ID, LocationArea.CODEC);
+public interface Area {
+    Codec<Area> CODEC = Codec.lazyInitialized(() -> MomentRegistries.Suppliers.AREA_CODEC.get().byNameCodec()).dispatch(Area::codec, Function.identity());
 
-    }
+    MapCodec<? extends Area> codec();
 
-    public abstract boolean contains(ServerLevel level, BlockPos blockPos);
+    boolean matches(ServerLevel level, BlockPos pos);
 }

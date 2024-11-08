@@ -1,19 +1,21 @@
 package com.xiaohunao.heaven_destiny_moment.common.context.reward;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.common.context.WeightedContext;
+import com.xiaohunao.heaven_destiny_moment.common.init.ModContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-public class ItemRewardContext extends RewardContext {
+public class ItemRewardContext implements IRewardContext {
     public static final ResourceLocation ID = HeavenDestinyMoment.asResource("item");
-    public static final Codec<ItemRewardContext> CODEC = WeightedContext.codec(ItemStack.CODEC)
+    public static final MapCodec<ItemRewardContext> CODEC = MapCodec.assumeMapUnsafe(WeightedContext.codec(ItemStack.CODEC)
             .fieldOf("items")
             .xmap(ItemRewardContext::new, ItemRewardContext::getItem)
-            .codec();
+            .codec());
     public WeightedContext<ItemStack> reward = WeightedContext.create();
 
 
@@ -43,8 +45,8 @@ public class ItemRewardContext extends RewardContext {
     }
 
     @Override
-    public Codec<? extends RewardContext> getCodec() {
-        return CODEC;
+    public MapCodec<? extends IRewardContext> codec() {
+        return ModContextRegister.ITEM_REWARD.get();
     }
 
 }

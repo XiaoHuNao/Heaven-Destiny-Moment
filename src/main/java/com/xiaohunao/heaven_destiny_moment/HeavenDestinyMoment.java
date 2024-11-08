@@ -2,16 +2,16 @@ package com.xiaohunao.heaven_destiny_moment;
 
 import com.mojang.logging.LogUtils;
 import com.xiaohunao.heaven_destiny_moment.client.gui.hud.MomentBarOverlay;
-import com.xiaohunao.heaven_destiny_moment.common.context.amount.AmountContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.condition.ConditionContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.EntityInfoContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.predicate.PredicateContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.reward.RewardContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.IEntityInfoContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.reward.IRewardContext;
+import com.xiaohunao.heaven_destiny_moment.common.init.ModBarRenderTypes;
+import com.xiaohunao.heaven_destiny_moment.common.init.ModContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.init.ModMomentTypes;
 import com.xiaohunao.heaven_destiny_moment.common.init.MomentRegistries;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.area.Area;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
@@ -30,11 +30,12 @@ public class HeavenDestinyMoment {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public HeavenDestinyMoment(IEventBus modEventBus, ModContainer modContainer) {
-        loadClasses();
         ModMomentTypes.MOMENT_TYPE.register(modEventBus);
+        ModBarRenderTypes.BAR_RENDER_TYPE.register(modEventBus);
+        ModContextRegister.register(modEventBus);
 
         modEventBus.addListener(MomentRegistries::registerRegistries);
-//        modEventBus.addListener(MomentRegistries::registerDataPackRegistries);
+        modEventBus.addListener(MomentRegistries::registerDataPackRegistries);
     }
 
 
@@ -49,17 +50,9 @@ public class HeavenDestinyMoment {
     public static <T> ResourceKey<T> asResourceKey(ResourceKey<? extends Registry<T>> registryKey, String path) {
         return ResourceKey.create(registryKey, HeavenDestinyMoment.asResource(path));
     }
-
-    public static void loadClasses() {
-        Moment.register();
-        Area.register();
-        AmountContext.register();
-        ConditionContext.register();
-        EntityInfoContext.register();
-        PredicateContext.register();
-        RewardContext.register();
+    public static <T> ResourceKey<Registry<T>> asResourceKey(String path) {
+        return ResourceKey.createRegistryKey(HeavenDestinyMoment.asResource(path));
     }
-
 
     @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents {

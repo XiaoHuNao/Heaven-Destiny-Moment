@@ -81,9 +81,9 @@ public class MomentManager extends SavedData {
         runMoment.remove(uuid);
     }
 
-    public void addMoment(ServerLevel level,MomentInstance instance) {
+    public void addMoment(ServerLevel serverLevel,MomentInstance instance) {
         runMoment.put(instance.getID(), instance);
-        PacketDistributor.sendToPlayersInDimension(level,new MomentManagerSyncPayload(instance.serializeNBT()));
+        PacketDistributor.sendToPlayersInDimension(serverLevel,new MomentManagerSyncPayload(instance.serializeNBT()));
         setDirty();
     }
 }

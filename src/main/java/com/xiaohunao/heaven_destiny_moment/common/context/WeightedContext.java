@@ -2,11 +2,17 @@ package com.xiaohunao.heaven_destiny_moment.common.context;
 
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.xiaohunao.heaven_destiny_moment.common.context.reward.XpRewardContext;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.random.Weight;
 import net.minecraft.util.random.WeightedEntry;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 public class WeightedContext<T> {
     private final int totalWeight;
@@ -60,7 +66,9 @@ public class WeightedContext<T> {
     public List<WeightedEntry.Wrapper<T>> unwrap() {
         return this.list;
     }
+
     public static <T> Codec<WeightedContext<T>> codec(Codec<T> codec) {
         return WeightedEntry.Wrapper.codec(codec).listOf().xmap(WeightedContext::new, WeightedContext::unwrap);
     }
+
 }

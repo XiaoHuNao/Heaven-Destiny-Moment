@@ -2,6 +2,7 @@ package com.xiaohunao.heaven_destiny_moment.common.mixin.client;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
+import com.xiaohunao.heaven_destiny_moment.common.utils.ColorUtils;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LightTexture;
 import org.joml.Vector3f;
@@ -15,5 +16,6 @@ public abstract class LightMapTextureMixin {
     @Inject(method = "updateLightTexture", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/LightTexture;blockLightRedFlicker:F"))
     private void doOurLightMap(float p_109882_, CallbackInfo ci, @Local ClientLevel clientlevel, @Local Vector3f vector3f) {
         MomentManager momentManager = MomentManager.of(clientlevel);
+        vector3f.set(ColorUtils.colorToVector3f(0x00292b));
     }
 }

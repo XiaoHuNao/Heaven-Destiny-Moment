@@ -1,37 +1,48 @@
 package com.xiaohunao.heaven_destiny_moment.common.moment.area;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
-import net.minecraft.advancements.critereon.LocationPredicate;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.LocationConditionContext;
+import com.xiaohunao.heaven_destiny_moment.common.init.ModContextRegister;
+import net.minecraft.advancements.critereon.*;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.BooleanSupplier;
+import java.util.stream.Stream;
 
 
-public class LocationArea extends Area<LocationPredicate> {
+public record LocationArea(LocationConditionContext locationConditionContext) implements Area {
     public static final ResourceLocation ID = HeavenDestinyMoment.asResource("location");
-    public static final Codec<LocationArea> CODEC = LocationPredicate.CODEC.xmap(LocationArea::new,LocationArea::getLocationPredicate);
-    public static final LocationArea EMPTY = new LocationArea(LocationPredicate.Builder.location().build());
+    public static final MapCodec<LocationArea> CODEC = LocationConditionContext.CODEC.xmap(LocationArea::new, LocationArea::locationConditionContext);
 
-    private final LocationPredicate locationPredicate;
+    public static final LocationArea EMPTY = new LocationArea(LocationConditionContext.Builder.location().build());
 
-    public LocationArea(LocationPredicate locationPredicate) {
-        this.locationPredicate = locationPredicate;
+
+    @Override
+    public MapCodec<? extends Area> codec() {
+        return ModContextRegister.LOCATION_AREA.get();
     }
 
     @Override
-    public boolean contains(ServerLevel level, BlockPos blockPos) {
-        return locationPredicate.matches(level,blockPos.getX(),blockPos.getY(),blockPos.getZ());
-    }
-
-    @Override
-    public Codec<? extends Area<?>> getCodec() {
-        return CODEC;
-    }
-
-    public LocationPredicate getLocationPredicate() {
-        return locationPredicate;
+    public boolean matches(ServerLevel level, BlockPos pos) {
+        return locationConditionContext.matches(level,pos);
     }
 }

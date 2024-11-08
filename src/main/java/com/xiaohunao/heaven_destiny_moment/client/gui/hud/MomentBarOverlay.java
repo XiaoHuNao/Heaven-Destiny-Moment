@@ -27,17 +27,13 @@ public class MomentBarOverlay implements  LayeredDraw.Layer{
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         for (int i = 0; i < barMap.values().size(); i++) {
             MomentBar bar = (MomentBar)barMap.values().toArray()[i];
-            ResourceKey<Moment> momentResourceKey = bar.getMoment();
             ClientLevel clientLevel = Minecraft.getInstance().level;
             if (clientLevel == null) {
                 return;
             }
-            Moment moment = clientLevel.registryAccess().registryOrThrow(MomentRegistries.Keys.MOMENT).get(momentResourceKey);
-            if (moment != null){
-                IBarRenderType value = MomentRegistries.BAR_RENDER_TYPE.get(moment.getBarRenderType());
-                if (value != null) {
-                    value.renderBar(guiGraphics,bar, i);
-                }
+            IBarRenderType value = MomentRegistries.BAR_RENDER_TYPE.get(bar.getType());
+            if (value != null) {
+                value.renderBar(guiGraphics,bar, i);
             }
         }
 
