@@ -6,7 +6,9 @@ import com.mojang.logging.LogUtils;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
 import com.xiaohunao.heaven_destiny_moment.common.event.MomentEvent;
+import com.xiaohunao.heaven_destiny_moment.common.event.PlayerEnterExitMomentAreaEvent;
 import com.xiaohunao.heaven_destiny_moment.common.init.MomentRegistries;
+import com.xiaohunao.heaven_destiny_moment.common.moment.area.Area;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
@@ -29,17 +31,18 @@ public abstract class MomentInstance {
     private static final Logger LOGGER = LogUtils.getLogger();
 
 
-    protected final Level level;
-    protected final MomentType<?> type;
+    private final Level level;
+    private final MomentType<?> type;
     private final ResourceKey<Moment> momentKey;
     private final Moment moment;
     private final UUID uuid;
-    protected final MomentBar bar;
+    private final MomentBar bar;
 
     private long tick;
     private MomentState state;
-    protected Set<UUID> players = Sets.newHashSet();
-    protected boolean isPlayerInArea = true;
+    private boolean isPlayerInArea = true;
+    private final Set<UUID> players = Sets.newHashSet();
+    private final Set<UUID> inAreaPlayers = Sets.newHashSet();
 
 
     protected MomentInstance(MomentType<?> type, Level level, ResourceKey<Moment> momentKey) {
@@ -156,27 +159,12 @@ public abstract class MomentInstance {
             setState(MomentState.READY);
         }
         updatePlayers();
-        checkPlayerIsInArea();
+        updatePlayerIsInArea();
         if (isPlayerInArea) {
             NeoForge.EVENT_BUS.post(new MomentEvent.Tick(this));
             tick();
         }
 
-    }
-
-    private void checkPlayerIsInArea() {
-        players.stream()
-                .map(level::getPlayerByUUID)
-                .filter(player -> Objects.nonNull(player) && !level.isClientSide)
-                .filter(player -> !moment.isInArea((ServerLevel) level, player.blockPosition()))
-                .forEach(player -> {
-                    isPlayerInArea = false;
-                    sendPlayerOutOfAreaMessage(player);
-                });
-
-    }
-    private void sendPlayerOutOfAreaMessage(Player player) {
-//        player.sendSystemMessage(Component.literal("你已经超出了指定区域！"));
     }
 
     public void tick() {
@@ -210,5 +198,38 @@ public abstract class MomentInstance {
         bar.getPlayers().forEach(player -> {
             this.players.add(player.getUUID());
         });
+    }
+
+    private void updatePlayerIsInArea() {
+        if (level.isClientSide()) {
+            return;
+        }
+        players.stream()
+                .map(level::getPlayerByUUID)
+                .filter(Objects::nonNull)
+                .forEach(player -> {
+                    boolean inArea = moment.isInArea((ServerLevel) level, player.blockPosition());
+                    boolean uuidContains = inAreaPlayers.contains(player.getUUID());
+                    if (inArea && !uuidContains) {
+                        onPlayerEnterArea((ServerPlayer)player);
+                    } else if (!inArea && uuidContains) {
+                        onPlayerExitArea((ServerPlayer)player);
+                    }
+                });
+    }
+
+    private void onPlayerExitArea(ServerPlayer player) {
+        inAreaPlayers.remove(player.getUUID());
+        NeoForge.EVENT_BUS.post(new PlayerEnterExitMomentAreaEvent.Exit(player, moment.getArea()));
+    }
+
+    private void onPlayerEnterArea(ServerPlayer player) {
+        inAreaPlayers.add(player.getUUID());
+        NeoForge.EVENT_BUS.post(new PlayerEnterExitMomentAreaEvent.Enter(player, moment.getArea()));
+    }
+
+
+    public Moment getMoment() {
+        return moment;
     }
 }

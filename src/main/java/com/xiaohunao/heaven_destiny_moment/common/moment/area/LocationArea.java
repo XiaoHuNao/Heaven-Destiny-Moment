@@ -45,4 +45,5 @@ public record LocationArea(LocationConditionContext locationConditionContext) im
     public boolean matches(ServerLevel level, BlockPos pos) {
         return locationConditionContext.matches(level,pos);
     }
+
 }

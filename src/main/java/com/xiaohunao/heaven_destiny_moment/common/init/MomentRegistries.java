@@ -24,6 +24,7 @@ import java.util.function.Supplier;
 public class MomentRegistries {
     public static final Registry<MomentType<?>> MOMENT_TYPE = new RegistryBuilder<>(Keys.MOMENT_TYPE).create();
     public static final Registry<IBarRenderType> BAR_RENDER_TYPE = new RegistryBuilder<>(Keys.BAR_RENDER_TYPE).create();
+
     public static final Registry<MapCodec<? extends Area>> AREA_CODEC = new RegistryBuilder<>(Keys.AREA_CODEC).create();
     public static final Registry<MapCodec<? extends Moment>> MOMENT_CODEC = new RegistryBuilder<>(Keys.MOMENT_CODEC).create();
     public static final Registry<MapCodec<? extends IAmountContext>> AMOUNT_CODEC = new RegistryBuilder<>(Keys.AMOUNT_CODEC).create();
@@ -34,6 +35,7 @@ public class MomentRegistries {
     public static final class Keys {
         public static final ResourceKey<Registry<MomentType<?>>> MOMENT_TYPE = HeavenDestinyMoment.asResourceKey("moment_type");
         public static final ResourceKey<Registry<IBarRenderType>> BAR_RENDER_TYPE = HeavenDestinyMoment.asResourceKey("bar_render_type");
+
         public static final ResourceKey<Registry<MapCodec<? extends Area>>> AREA_CODEC = HeavenDestinyMoment.asResourceKey("area_codec");
         public static final ResourceKey<Registry<MapCodec<? extends Moment>>> MOMENT_CODEC = HeavenDestinyMoment.asResourceKey("moment_codec");
         public static final ResourceKey<Registry<MapCodec<? extends IAmountContext>>> AMOUNT_CODEC = HeavenDestinyMoment.asResourceKey("amount_codec");

@@ -14,22 +14,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class WeightedContext<T> {
-    private final int totalWeight;
-    private final List<WeightedEntry.Wrapper<T>> list;
-
-    private WeightedContext(List<WeightedEntry.Wrapper<T>> list) {
-        this.list = Lists.newArrayList(list);
-        this.totalWeight = calculateTotalWeight(list);
-    }
-
-    public static <T> WeightedContext<T> create() {
-        return new WeightedContext<>(Lists.newLinkedList());
-    }
-    public WeightedContext<T> add(T t, int weight) {
-        list.add(WeightedEntry.wrap(t, weight));
-        return this;
-    }
+public record WeightedContext<T>(int totalWeight,List<WeightedEntry.Wrapper<T>> list) {
+//    public static <T> WeightedContext<T> create() {
+//        return new WeightedContext<>(Lists.newLinkedList());
+//    }
+//    public WeightedContext<T> add(T t, int weight) {
+//        list.add(WeightedEntry.wrap(t, weight));
+//        return this;
+//    }
 
     private static int calculateTotalWeight(List<? extends WeightedEntry> entries) {
         long total = 0;
@@ -68,7 +60,17 @@ public class WeightedContext<T> {
     }
 
     public static <T> Codec<WeightedContext<T>> codec(Codec<T> codec) {
-        return WeightedEntry.Wrapper.codec(codec).listOf().xmap(WeightedContext::new, WeightedContext::unwrap);
+        return WeightedEntry.Wrapper.codec(codec).listOf()
+                .xmap(wrappers -> new WeightedContext<>(calculateTotalWeight(wrappers), wrappers), WeightedContext::unwrap);
+    }
+
+    public static class Builder<T> {
+        private final List<WeightedEntry.Wrapper<T>> list = Lists.newArrayList();
+        
+        public Builder add(T t, int weight) {
+            list.add(WeightedEntry.wrap(t, weight));
+            return this;
+        }
     }
 
 }

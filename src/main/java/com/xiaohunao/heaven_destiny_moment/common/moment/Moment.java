@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.xiaohunao.heaven_destiny_moment.common.codec.CodecMap;
 import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettingsContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentDataContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.TipSettingsContext;
 import com.xiaohunao.heaven_destiny_moment.common.moment.area.Area;
 import com.xiaohunao.heaven_destiny_moment.common.moment.moment.DefaultMoment;
 import net.minecraft.core.BlockPos;
@@ -18,19 +19,20 @@ import org.slf4j.Logger;
 public abstract class Moment implements IMoment {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private ResourceLocation barRenderType;
-    private Area area;
-    private MomentDataContext momentDataContext;
-    private ClientSettingsContext clientSettingsContext;
+    private final ResourceLocation barRenderType;
+    private final Area area;
+    private final MomentDataContext momentDataContext;
+    private final TipSettingsContext tipSettingsContext;
+    private final ClientSettingsContext clientSettingsContext;
 
 
-    public Moment(ResourceLocation barRenderType,Area area, MomentDataContext momentDataContext, ClientSettingsContext clientSettingsContext) {
+    public Moment(ResourceLocation barRenderType, Area area, MomentDataContext momentDataContext, TipSettingsContext tipSettingsContext, ClientSettingsContext clientSettingsContext) {
         this.barRenderType = barRenderType;
         this.area = area;
         this.momentDataContext = momentDataContext;
+        this.tipSettingsContext = tipSettingsContext;
         this.clientSettingsContext = clientSettingsContext;
     }
-
 
     public abstract MomentInstance newMomentInstance(Level level,ResourceKey<Moment> momentResourceKey);
     public boolean isInArea(ServerLevel level, BlockPos blockPos) {
@@ -48,7 +50,12 @@ public abstract class Moment implements IMoment {
     public ClientSettingsContext getClientSettingsContext() {
         return clientSettingsContext;
     }
-    public Area getCoverage() {
+
+    public TipSettingsContext getTipSettingsContext() {
+        return tipSettingsContext;
+    }
+    public Area getArea() {
         return area;
     }
+
 }

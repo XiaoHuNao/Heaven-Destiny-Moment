@@ -1,6 +1,8 @@
 package com.xiaohunao.heaven_destiny_moment.common.moment;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.common.mixed.MomentManagerContainer;
 import com.xiaohunao.heaven_destiny_moment.common.network.MomentManagerSyncPayload;
@@ -12,7 +14,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -20,8 +26,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class MomentManager extends SavedData {
     private static final String NAME = HeavenDestinyMoment.MODID + "_moment_manager";
 
-    private final Map<UUID, MomentInstance> runMoment = Maps.newHashMap();
-    private final Map<UUID, MomentInstance> playerMoment = Maps.newHashMap();
+    private final Map<UUID, MomentInstance> runMoments = Maps.newHashMap();
+    private MomentInstance onlyMoment = null;
+    private final Multimap<UUID,MomentInstance> playerMoments = HashMultimap.create();
 
     private static MomentManager clientMonger;
 
@@ -48,7 +55,7 @@ public class MomentManager extends SavedData {
     @Override
     public CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider provider) {
         ListTag listTag = new ListTag();
-        runMoment.values().forEach(momentInstance -> listTag.add(momentInstance.serializeNBT()));
+        runMoments.values().forEach(momentInstance -> listTag.add(momentInstance.serializeNBT()));
         compoundTag.put("moment", listTag);
         return compoundTag;
     }
@@ -64,7 +71,7 @@ public class MomentManager extends SavedData {
     }
 
     public void tick() {
-        CopyOnWriteArrayList<MomentInstance> momentInstances = new CopyOnWriteArrayList<>(runMoment.values());
+        CopyOnWriteArrayList<MomentInstance> momentInstances = new CopyOnWriteArrayList<>(runMoments.values());
         momentInstances.forEach(instance -> {
             if (instance.shouldEnd()) {
                 removeMoment(instance.getID());
@@ -74,16 +81,41 @@ public class MomentManager extends SavedData {
     }
 
     public Map<UUID, MomentInstance> getRunMoment() {
-        return this.runMoment;
+        return this.runMoments;
     }
 
     public void removeMoment(UUID uuid) {
-        runMoment.remove(uuid);
+        runMoments.remove(uuid);
     }
 
-    public void addMoment(ServerLevel serverLevel,MomentInstance instance) {
-        runMoment.put(instance.getID(), instance);
+    public boolean addMoment(ServerLevel serverLevel,MomentInstance instance) {
+        UUID uuid = instance.getID();
+        boolean hasClientSettings = !instance.getMoment().getClientSettingsContext().isEmpty();
+
+        if (runMoments.containsKey(uuid)) {
+            return false;
+        }
+
+        if (hasClientSettings) {
+            if (onlyMoment != null) {
+                return false;
+            } else {
+                onlyMoment = instance;
+            }
+        }
+
+        runMoments.put(uuid, instance);
         PacketDistributor.sendToPlayersInDimension(serverLevel,new MomentManagerSyncPayload(instance.serializeNBT()));
         setDirty();
+        return true;
+    }
+
+    @Nullable
+    public MomentInstance getOnlyMoment() {
+        return onlyMoment;
+    }
+
+    public Collection<MomentInstance> getPlayerMoment(UUID playerUUID) {
+        return playerMoments.get(playerUUID);
     }
 }

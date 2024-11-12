@@ -10,43 +10,30 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-public class ItemRewardContext implements IRewardContext {
-    public static final ResourceLocation ID = HeavenDestinyMoment.asResource("item");
+import java.util.Map;
+
+public record ItemRewardContext(WeightedContext<ItemStack> reward) implements IRewardContext {
     public static final MapCodec<ItemRewardContext> CODEC = MapCodec.assumeMapUnsafe(WeightedContext.codec(ItemStack.CODEC)
             .fieldOf("items")
-            .xmap(ItemRewardContext::new, ItemRewardContext::getItem)
+            .xmap(ItemRewardContext::new, ItemRewardContext::reward)
             .codec());
-    public WeightedContext<ItemStack> reward = WeightedContext.create();
 
-
-    public ItemRewardContext(WeightedContext<ItemStack> reward) {
-        this.reward = reward;
-    }
-
-    public ItemRewardContext(ItemStack stack, int weight) {
-        addItem(stack, weight);
-    }
-    public ItemRewardContext(ItemStack stack) {
-        addItem(stack, 1);
-    }
-
-    public WeightedContext<ItemStack> getItem() {
-        return reward;
-    }
-
+    @Override
     public void createReward(MomentInstance moment, Player player) {
         reward.getRandomValue(moment.getLevel().random).ifPresent(item -> {
             player.getInventory().add(item);
         });
     }
 
-    public void addItem(ItemStack stack, int weight){
-        reward.add(stack,weight);
-    }
-
     @Override
     public MapCodec<? extends IRewardContext> codec() {
         return ModContextRegister.ITEM_REWARD.get();
+    }
+
+    public static class Builder {
+        private final WeightedContext.Builder<ItemStack> builder = new WeightedContext.Builder<>();
+
+
     }
 
 }

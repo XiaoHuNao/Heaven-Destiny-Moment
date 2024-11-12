@@ -10,23 +10,24 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.sounds.SoundEvent;
 
 import java.util.Map;
+import java.util.Optional;
 
-public record TipSettingsContext(Map<MomentState, Holder<SoundEvent>> soundEventMap, Map<MomentState, Component> tipMap) {
-    public static final TipSettingsContext EMPTY = new TipSettingsContext(Maps.newHashMap(), Maps.newHashMap());
+public record TipSettingsContext(Optional<Map<MomentState, Holder<SoundEvent>>> soundEvents, Optional<Map<MomentState, Component>> texts) {
+    public static final TipSettingsContext EMPTY = new TipSettingsContext(Optional.empty(),Optional.empty());
 
     public static final Codec<TipSettingsContext> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.unboundedMap(MomentState.CODEC, SoundEvent.CODEC).optionalFieldOf("soundEventMap", Maps.newHashMap()).forGetter(TipSettingsContext::soundEventMap),
-            Codec.unboundedMap(MomentState.CODEC, ComponentSerialization.CODEC).optionalFieldOf("tipMap",Maps.newHashMap()).forGetter(TipSettingsContext::tipMap)
+            Codec.unboundedMap(MomentState.CODEC, SoundEvent.CODEC).optionalFieldOf("soundEvents").forGetter(TipSettingsContext::soundEvents),
+            Codec.unboundedMap(MomentState.CODEC, ComponentSerialization.CODEC).optionalFieldOf("texts").forGetter(TipSettingsContext::texts)
     ).apply(instance, TipSettingsContext::new));
 
     public void addTip(MomentState momentState, Component component) {
-        tipMap.put(momentState, component.copy());
+        texts.ifPresent(momentStateComponentMap -> momentStateComponentMap.put(momentState, component));
     }
     public void addTip(MomentState momentState, Component component,int color) {
         addTip(momentState, component.copy().withStyle(style -> style.withColor(color)));
     }
     public void addSound(MomentState momentState, Holder<SoundEvent> soundEvent) {
-        soundEventMap.put(momentState, soundEvent);
+        soundEvents.ifPresent(momentStateComponentMap -> momentStateComponentMap.put(momentState, soundEvent));
     }
 
 }
