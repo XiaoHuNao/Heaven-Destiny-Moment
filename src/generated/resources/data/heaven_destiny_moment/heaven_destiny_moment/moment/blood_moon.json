@@ -2,33 +2,6 @@
   "type": "heaven_destiny_moment:default",
   "area": {
     "type": "heaven_destiny_moment:location",
-    "biomes": [
-      "minecraft:badlands"
-    ],
-    "block": {
-      "blocks": "minecraft:diamond_block"
-    },
-    "canSeeSky": false,
-    "dimension": [
-      "minecraft:the_end",
-      "minecraft:overworld"
-    ],
-    "fluid": {
-      "fluids": "minecraft:lava"
-    },
-    "light": {
-      "light": {
-        "max": 5,
-        "min": 2
-      }
-    },
-    "position": {
-      "y": {
-        "max": 50.0,
-        "min": 10.0
-      }
-    },
-    "smokey": true,
     "structures": [
       "minecraft:swamp_hut",
       "minecraft:ancient_city"

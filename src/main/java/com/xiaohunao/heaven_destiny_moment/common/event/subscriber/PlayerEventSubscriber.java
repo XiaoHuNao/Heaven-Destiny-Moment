@@ -43,14 +43,14 @@ public class PlayerEventSubscriber {
 
 
         if (level instanceof ServerLevel serverLevel) {
-//            MomentInstance.create(ModMoments.BLOOD_MOON, serverLevel);
-            Registry<Moment> moments = serverLevel.registryAccess().registryOrThrow(MomentRegistries.Keys.MOMENT);
-            System.out.println(moments);
+            MomentInstance.create(ModMoments.BLOOD_MOON, serverLevel);
+//            Registry<Moment> moments = serverLevel.registryAccess().registryOrThrow(MomentRegistries.Keys.MOMENT);
+//            System.out.println(moments);
 
         }
         if (level instanceof ClientLevel clientLevel){
-            Registry<Moment> moments = clientLevel.registryAccess().registryOrThrow(MomentRegistries.Keys.MOMENT);
-            System.out.println(moments);
+//            Registry<Moment> moments = clientLevel.registryAccess().registryOrThrow(MomentRegistries.Keys.MOMENT);
+//            System.out.println(moments);
         }
 
 

@@ -1,6 +1,7 @@
 package com.xiaohunao.heaven_destiny_moment.common.event.subscriber;
 
 import com.xiaohunao.heaven_destiny_moment.common.event.MomentEvent;
+import com.xiaohunao.heaven_destiny_moment.common.event.PlayerMomentAreaEvent;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -49,4 +50,14 @@ public class MomentEventSubscriber {
         MomentInstance momentInstance = event.getMomentInstance();
 //        momentInstance.playTip();
     }
+
+    @SubscribeEvent
+    public static void onPlayerMomentAreaEnter(PlayerMomentAreaEvent.Enter event) {
+
+    }
+    @SubscribeEvent
+    public static void onPlayerMomentAreaExit(PlayerMomentAreaEvent.Exit event) {
+
+    }
+
 }

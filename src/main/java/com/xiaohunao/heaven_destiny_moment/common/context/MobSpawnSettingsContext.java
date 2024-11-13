@@ -3,28 +3,30 @@ package com.xiaohunao.heaven_destiny_moment.common.context;
 import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.LocationConditionContext;
 import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-public record MobSpawnSettingsContext(boolean allowOriginalBiomeSpawnSettings, boolean forceSurfaceSpawning, boolean ignoreLightLevel,
-                                      MobSpawnSettings spawnInfo, Map<MobCategory, Double> spawnCategoryMultiplier,
-                                      MobSpawnListContext mobSpawnListContext) {
+public record MobSpawnSettingsContext(Optional<Boolean> allowOriginalBiomeSpawnSettings, Optional<Boolean> forceSurfaceSpawning, Optional<Boolean> ignoreLightLevel,
+                                      Optional<MobSpawnSettings> spawnInfo, Optional<Map<MobCategory, Double>> spawnCategoryMultiplier,
+                                      Optional<MobSpawnListContext> mobSpawnListContext) {
     //SpawnPlacements  这里寻找生物生成的规则
 
-    public static final MobSpawnSettingsContext EMPTY = new MobSpawnSettingsContext(true,false,false,MobSpawnSettings.EMPTY, Maps.newHashMap(), MobSpawnListContext.EMPTY);
+    public static final MobSpawnSettingsContext EMPTY = new MobSpawnSettingsContext(Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty());
 
     public static final Codec<MobSpawnSettingsContext> CODEC = RecordCodecBuilder.create(builder ->
             builder.group(
-                    Codec.BOOL.optionalFieldOf("allow_original_biome_spawn_settings",true).orElse(false).forGetter(MobSpawnSettingsContext::allowOriginalBiomeSpawnSettings),
-                    Codec.BOOL.optionalFieldOf("force_surface_spawning",false).orElse(false).forGetter(MobSpawnSettingsContext::forceSurfaceSpawning),
-                    Codec.BOOL.optionalFieldOf("ignoreLightLevel",false).orElse(false).forGetter(MobSpawnSettingsContext::ignoreLightLevel),
-                    MobSpawnSettings.CODEC.codec().optionalFieldOf("mob_spawn_settings",MobSpawnSettings.EMPTY).forGetter(MobSpawnSettingsContext::spawnInfo),
-                    Codec.unboundedMap(MobCategory.CODEC, Codec.DOUBLE).optionalFieldOf("spawn_category_multiplier",Maps.newHashMap()).forGetter(MobSpawnSettingsContext::spawnCategoryMultiplier),
-                    MobSpawnListContext.CODEC.optionalFieldOf("mob_spawn_black_white_list_settings", MobSpawnListContext.EMPTY).forGetter(MobSpawnSettingsContext::mobSpawnListContext)
+                    Codec.BOOL.optionalFieldOf("allow_original_biome_spawn_settings").forGetter(MobSpawnSettingsContext::allowOriginalBiomeSpawnSettings),
+                    Codec.BOOL.optionalFieldOf("force_surface_spawning").forGetter(MobSpawnSettingsContext::forceSurfaceSpawning),
+                    Codec.BOOL.optionalFieldOf("ignoreLightLevel").forGetter(MobSpawnSettingsContext::ignoreLightLevel),
+                    MobSpawnSettings.CODEC.codec().optionalFieldOf("mob_spawn_settings").forGetter(MobSpawnSettingsContext::spawnInfo),
+                    Codec.unboundedMap(MobCategory.CODEC, Codec.DOUBLE).optionalFieldOf("spawn_category_multiplier").forGetter(MobSpawnSettingsContext::spawnCategoryMultiplier),
+                    MobSpawnListContext.CODEC.optionalFieldOf("mob_spawn_black_white_list_settings").forGetter(MobSpawnSettingsContext::mobSpawnListContext)
             ).apply(builder, MobSpawnSettingsContext::new)
     );
 
@@ -33,31 +35,69 @@ public record MobSpawnSettingsContext(boolean allowOriginalBiomeSpawnSettings, b
     }
 
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-
-        MobSpawnSettingsContext that = (MobSpawnSettingsContext) obj;
-
-        if (allowOriginalBiomeSpawnSettings != that.allowOriginalBiomeSpawnSettings) return false;
-        if (forceSurfaceSpawning != that.forceSurfaceSpawning) return false;
-        if (ignoreLightLevel != that.ignoreLightLevel) return false;
-        return spawnInfo.equals(that.spawnInfo);
-    }
-
-    public Double getSpawnMultiplier(MobCategory mobCategory) {
-        return spawnCategoryMultiplier.getOrDefault(mobCategory, 1.0D);
-    }
 
     public WeightedRandomList<MobSpawnSettings.SpawnerData> filterList(MobCategory mobCategory, List<MobSpawnSettings.SpawnerData> originalBiomeSpawnSettings) {
-        originalBiomeSpawnSettings.addAll(spawnInfo.spawners.get(mobCategory).unwrap());
+        spawnInfo.ifPresent(mobSpawnSettings -> {
+            originalBiomeSpawnSettings.addAll(mobSpawnSettings.spawners.get(mobCategory).unwrap());
 
-        if (mobSpawnListContext.isBlackList()) {
-            originalBiomeSpawnSettings.removeIf(spawnerData -> mobSpawnListContext.contains(spawnerData.type));
-        } else {
-            originalBiomeSpawnSettings.removeIf(spawnerData -> !mobSpawnListContext.contains(spawnerData.type));
-        }
+            mobSpawnListContext.ifPresent(mobSpawnListContext -> {
+                if (mobSpawnListContext.isBlackList()) {
+                    originalBiomeSpawnSettings.removeIf(spawnerData -> mobSpawnListContext.contains(spawnerData.type));
+                } else {
+                    originalBiomeSpawnSettings.removeIf(spawnerData -> !mobSpawnListContext.contains(spawnerData.type));
+                }
+            });
+        });
         return WeightedRandomList.create(originalBiomeSpawnSettings);
     }
+
+    public static class Builder {
+        private Optional<Boolean> allowOriginalBiomeSpawnSettings = Optional.empty();
+        private Optional<Boolean> forceSurfaceSpawning = Optional.empty();
+        private Optional<Boolean> ignoreLightLevel = Optional.empty();
+        private Optional<MobSpawnSettings> spawnInfo = Optional.empty();
+        private Optional<Map<MobCategory, Double>> spawnCategoryMultiplier = Optional.empty();
+        private Optional<MobSpawnListContext> mobSpawnListContext = Optional.empty();
+
+
+        public static Builder settings() {
+            return new Builder();
+        }
+
+        public Builder allowOriginalBiomeSpawnSettings(boolean allowOriginalBiomeSpawnSettings) {
+            this.allowOriginalBiomeSpawnSettings = Optional.of(allowOriginalBiomeSpawnSettings);
+            return this;
+        }
+
+        public Builder forceSurfaceSpawning(boolean forceSurfaceSpawning) {
+            this.forceSurfaceSpawning = Optional.of(forceSurfaceSpawning);
+            return this;
+        }
+
+        public Builder ignoreLightLevel(boolean ignoreLightLevel) {
+            this.ignoreLightLevel = Optional.of(ignoreLightLevel);
+            return this;
+        }
+
+        public Builder spawnInfo(MobSpawnSettings spawnInfo) {
+            this.spawnInfo = Optional.of(spawnInfo);
+            return this;
+        }
+
+        public Builder spawnCategoryMultiplier(Map<MobCategory, Double> spawnCategoryMultiplier) {
+            this.spawnCategoryMultiplier = Optional.of(spawnCategoryMultiplier);
+            return this;
+        }
+
+        public Builder mobSpawnListContext(MobSpawnListContext mobSpawnListContext) {
+            this.mobSpawnListContext = Optional.of(mobSpawnListContext);
+            return this;
+        }
+
+        public MobSpawnSettingsContext build() {
+            return new MobSpawnSettingsContext(allowOriginalBiomeSpawnSettings, forceSurfaceSpawning, ignoreLightLevel, spawnInfo, spawnCategoryMultiplier, mobSpawnListContext);
+        }
+    }
+
+
 }

@@ -20,14 +20,39 @@ public record TipSettingsContext(Optional<Map<MomentState, Holder<SoundEvent>>> 
             Codec.unboundedMap(MomentState.CODEC, ComponentSerialization.CODEC).optionalFieldOf("texts").forGetter(TipSettingsContext::texts)
     ).apply(instance, TipSettingsContext::new));
 
-    public void addTip(MomentState momentState, Component component) {
-        texts.ifPresent(momentStateComponentMap -> momentStateComponentMap.put(momentState, component));
-    }
-    public void addTip(MomentState momentState, Component component,int color) {
-        addTip(momentState, component.copy().withStyle(style -> style.withColor(color)));
-    }
-    public void addSound(MomentState momentState, Holder<SoundEvent> soundEvent) {
-        soundEvents.ifPresent(momentStateComponentMap -> momentStateComponentMap.put(momentState, soundEvent));
-    }
 
+
+    public static class Builder {
+        private Optional<Map<MomentState, Component>> texts = Optional.empty();
+        private Optional<Map<MomentState, Holder<SoundEvent>>> soundEvents = Optional.empty();
+
+        public Builder addTip(MomentState momentState, Component component) {
+            if (texts.isEmpty()){
+                texts = Optional.of(Maps.newHashMap());
+            }
+            texts.get().put(momentState,component);
+            return this;
+        }
+
+        public Builder addTip(MomentState momentState, Component component,int color) {
+            if (texts.isEmpty()){
+                texts = Optional.of(Maps.newHashMap());
+            }
+            texts.get().put(momentState,component.copy().withStyle(style -> style.withColor(color)));
+            return this;
+        }
+
+        public Builder addSound(MomentState momentState, Holder<SoundEvent> soundEvent) {
+            if (soundEvents.isEmpty()){
+                soundEvents = Optional.of(Maps.newHashMap());
+            }
+            soundEvents.get().put(momentState,soundEvent);
+            return this;
+        }
+
+        public TipSettingsContext build() {
+            return new TipSettingsContext(soundEvents, texts);
+        }
+
+    }
 }

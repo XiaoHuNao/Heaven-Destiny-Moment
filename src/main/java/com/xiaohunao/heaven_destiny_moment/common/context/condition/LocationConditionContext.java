@@ -65,7 +65,7 @@ public record LocationConditionContext(Optional<LocationPredicate.PositionPredic
 
     private boolean checkCondition(BooleanSupplier condition, String failureMessage, Object detail) {
         if (!condition.getAsBoolean()) {
-            log.warn("{} at {}", failureMessage, detail);
+//            log.warn("{} at {}", failureMessage, detail);
             return false;
         }
         return true;

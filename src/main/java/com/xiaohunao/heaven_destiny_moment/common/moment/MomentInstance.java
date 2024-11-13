@@ -1,28 +1,27 @@
 package com.xiaohunao.heaven_destiny_moment.common.moment;
 
 import com.google.common.collect.Sets;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
 import com.xiaohunao.heaven_destiny_moment.common.event.MomentEvent;
-import com.xiaohunao.heaven_destiny_moment.common.event.PlayerEnterExitMomentAreaEvent;
+import com.xiaohunao.heaven_destiny_moment.common.event.PlayerMomentAreaEvent;
 import com.xiaohunao.heaven_destiny_moment.common.init.MomentRegistries;
-import com.xiaohunao.heaven_destiny_moment.common.moment.area.Area;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.*;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -40,7 +39,6 @@ public abstract class MomentInstance {
 
     private long tick;
     private MomentState state;
-    private boolean isPlayerInArea = true;
     private final Set<UUID> players = Sets.newHashSet();
     private final Set<UUID> inAreaPlayers = Sets.newHashSet();
 
@@ -112,7 +110,6 @@ public abstract class MomentInstance {
         if (state != null) {
             compoundTag.putString("state", state.name());
         }
-        compoundTag.putBoolean("isPlayerInArea", isPlayerInArea);
 
         ListTag tags = new ListTag();
         players.forEach(uuid -> tags.add(StringTag.valueOf(uuid.toString())));
@@ -126,7 +123,6 @@ public abstract class MomentInstance {
         if (compoundTag.contains("state")) {
             this.state = MomentState.valueOf(compoundTag.getString("state"));
         }
-        this.isPlayerInArea = compoundTag.getBoolean("isPlayerInArea");
 
         ListTag tags = compoundTag.getList("players", Tag.TAG_STRING);
         tags.forEach(tag -> players.add(UUID.fromString(tag.getAsString())));
@@ -160,10 +156,8 @@ public abstract class MomentInstance {
         }
         updatePlayers();
         updatePlayerIsInArea();
-        if (isPlayerInArea) {
-            NeoForge.EVENT_BUS.post(new MomentEvent.Tick(this));
-            tick();
-        }
+        NeoForge.EVENT_BUS.post(new MomentEvent.Tick(this));
+        tick();
 
     }
 
@@ -220,16 +214,18 @@ public abstract class MomentInstance {
 
     private void onPlayerExitArea(ServerPlayer player) {
         inAreaPlayers.remove(player.getUUID());
-        NeoForge.EVENT_BUS.post(new PlayerEnterExitMomentAreaEvent.Exit(player, moment.getArea()));
+        NeoForge.EVENT_BUS.post(new PlayerMomentAreaEvent.Exit(player, moment.getArea()));
     }
 
     private void onPlayerEnterArea(ServerPlayer player) {
         inAreaPlayers.add(player.getUUID());
-        NeoForge.EVENT_BUS.post(new PlayerEnterExitMomentAreaEvent.Enter(player, moment.getArea()));
+        NeoForge.EVENT_BUS.post(new PlayerMomentAreaEvent.Enter(player, moment.getArea()));
     }
 
 
-    public Moment getMoment() {
-        return moment;
+    public Optional<Moment> getMoment() {
+        return Optional.ofNullable(moment);
     }
+
+    public abstract void finalizeSpawn(LivingEntity livingEntity);
 }

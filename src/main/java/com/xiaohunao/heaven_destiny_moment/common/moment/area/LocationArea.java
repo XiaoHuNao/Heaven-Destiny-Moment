@@ -30,7 +30,6 @@ import java.util.stream.Stream;
 
 
 public record LocationArea(LocationConditionContext locationConditionContext) implements Area {
-    public static final ResourceLocation ID = HeavenDestinyMoment.asResource("location");
     public static final MapCodec<LocationArea> CODEC = LocationConditionContext.CODEC.xmap(LocationArea::new, LocationArea::locationConditionContext);
 
     public static final LocationArea EMPTY = new LocationArea(LocationConditionContext.Builder.location().build());
@@ -46,4 +45,11 @@ public record LocationArea(LocationConditionContext locationConditionContext) im
         return locationConditionContext.matches(level,pos);
     }
 
+    public static class Builder {
+
+
+        public Area build() {
+            return null;
+        }
+    }
 }

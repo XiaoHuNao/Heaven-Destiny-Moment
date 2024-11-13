@@ -90,19 +90,19 @@ public class MomentManager extends SavedData {
 
     public boolean addMoment(ServerLevel serverLevel,MomentInstance instance) {
         UUID uuid = instance.getID();
-        boolean hasClientSettings = !instance.getMoment().getClientSettingsContext().isEmpty();
-
-        if (runMoments.containsKey(uuid)) {
-            return false;
-        }
-
-        if (hasClientSettings) {
-            if (onlyMoment != null) {
-                return false;
-            } else {
-                onlyMoment = instance;
-            }
-        }
+//        boolean hasClientSettings = !instance.getMoment().getClientSettingsContext().isEmpty();
+//
+//        if (runMoments.containsKey(uuid)) {
+//            return false;
+//        }
+//
+//        if (hasClientSettings) {
+//            if (onlyMoment != null) {
+//                return false;
+//            } else {
+//                onlyMoment = instance;
+//            }
+//        }
 
         runMoments.put(uuid, instance);
         PacketDistributor.sendToPlayersInDimension(serverLevel,new MomentManagerSyncPayload(instance.serializeNBT()));
@@ -117,5 +117,9 @@ public class MomentManager extends SavedData {
 
     public Collection<MomentInstance> getPlayerMoment(UUID playerUUID) {
         return playerMoments.get(playerUUID);
+    }
+
+    public Map<UUID, MomentInstance> getRunMoments() {
+        return runMoments;
     }
 }

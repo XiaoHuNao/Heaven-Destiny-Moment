@@ -5,7 +5,12 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "heaven_destiny_moment.refmap.json",
   "mixins": [
-    "LevelMixin"
+    "LevelMixin",
+    "LocalMobCapCalculatorMixin",
+    "MonsterMixin",
+    "NaturalSpawnerMixin",
+    "NaturalSpawnerSpawnStateMixin",
+    "PathfinderMobMixin"
   ],
   "client": [
     "client.LightMapTextureMixin"
