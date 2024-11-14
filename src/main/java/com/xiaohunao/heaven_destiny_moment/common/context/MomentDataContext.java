@@ -1,7 +1,6 @@
 package com.xiaohunao.heaven_destiny_moment.common.context;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -9,10 +8,6 @@ import com.xiaohunao.heaven_destiny_moment.common.codec.CodecExtra;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.IConditionContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.IEntityInfoContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.reward.IRewardContext;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.level.biome.MobSpawnSettings;
 
 import java.util.*;
 
@@ -61,7 +56,7 @@ public record MomentDataContext(Optional<Integer> readyTime, Optional<Set<IRewar
             conditions.get().addAll(List.of(condition));
             return this;
         }
-        public Builder addIEntity(IEntityInfoContext... wave) {
+        public Builder addEntity(IEntityInfoContext... wave) {
             if (waves.isEmpty()){
                 waves = Optional.of(Lists.newArrayList());
             }

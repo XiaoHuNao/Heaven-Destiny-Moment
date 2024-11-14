@@ -1,27 +1,24 @@
 package com.xiaohunao.heaven_destiny_moment.common.context.entity_info;
 
-import com.google.common.collect.Maps;
-import com.google.gson.JsonElement;
-import com.mojang.serialization.Codec;
+import com.google.common.collect.Lists;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.common.context.amount.IAmountContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.amount.IntegerAmountContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.amount.RandomAmountContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.attachable.IAttachable;
 import com.xiaohunao.heaven_destiny_moment.common.init.ModContextRegister;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
-import net.neoforged.neoforge.attachment.AttachmentType;
 
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 
-public record EntityInfoContext(EntityType<?> entityType, IAmountContext amount) implements IEntityInfoContext {
-    public static final ResourceLocation ID = HeavenDestinyMoment.asResource("entity_info");
+public record EntityInfoContext(EntityType<?> entityType, IAmountContext amount,Optional<List<IAttachable>> attaches) implements IEntityInfoContext {
     public static final MapCodec<EntityInfoContext> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("entity_type").forGetter(EntityInfoContext::getEntityType),
-            IAmountContext.CODEC.fieldOf("amount").forGetter(EntityInfoContext::getAmount)
+            IAmountContext.CODEC.fieldOf("amount").forGetter(EntityInfoContext::getAmount),
+            IAttachable.CODEC.listOf().optionalFieldOf("attaches").forGetter(EntityInfoContext::attaches)
     ).apply(instance, EntityInfoContext::new));
 
 
@@ -48,19 +45,27 @@ public record EntityInfoContext(EntityType<?> entityType, IAmountContext amount)
     public static class Builder {
         private final EntityType<?> entityType;
         private final IAmountContext amount;
-        private final Map<AttachmentType<?>, JsonElement> attachments = Maps.newHashMap();
+        private Optional<List<IAttachable>> attaches;
 
-        private Builder(EntityType<?> entityType,int min,int max) {
+        public Builder(EntityType<?> entityType, int min, int max) {
             this.entityType = entityType;
             this.amount = new RandomAmountContext(min, max);
         }
-        private Builder(EntityType<?> entityType,int amount) {
+
+        public Builder(EntityType<?> entityType, int amount) {
             this.entityType = entityType;
             this.amount = new IntegerAmountContext(amount);
         }
-        public EntityInfoContext build() {
-            return new EntityInfoContext(entityType, amount);
+        public Builder addAttachable(IAttachable... attachable){
+            if (attaches.isEmpty()){
+                attaches = Optional.of(Lists.newArrayList());
+            }
+            attaches.get().addAll(List.of(attachable));
+            return this;
         }
 
+        public EntityInfoContext build() {
+            return new EntityInfoContext(entityType, amount,attaches);
+        }
     }
 }

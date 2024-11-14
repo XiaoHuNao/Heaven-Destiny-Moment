@@ -4,8 +4,10 @@ import com.mojang.serialization.MapCodec;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.render.IBarRenderType;
 import com.xiaohunao.heaven_destiny_moment.common.context.amount.IAmountContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.attachable.IAttachable;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.IConditionContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.IEntityInfoContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.equippable_slot.IEquippableSlot;
 import com.xiaohunao.heaven_destiny_moment.common.context.reward.IRewardContext;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentType;
@@ -31,6 +33,8 @@ public class MomentRegistries {
     public static final Registry<MapCodec<? extends IConditionContext>> CONDITION_CODEC = new RegistryBuilder<>(Keys.CONDITION_CODEC).create();
     public static final Registry<MapCodec<? extends IEntityInfoContext>> ENTITY_INFO_CODEC = new RegistryBuilder<>(Keys.ENTITY_INFO_CODEC).create();
     public static final Registry<MapCodec<? extends IRewardContext>> REWARD_CODEC = new RegistryBuilder<>(Keys.REWARD_CODEC).create();
+    public static final Registry<MapCodec<? extends IAttachable>> ATTACHABLE_CODEC = new RegistryBuilder<>(Keys.ATTACHABLE_CODEC).create();
+    public static final Registry<MapCodec<? extends IEquippableSlot>> EQUIPPABLE_SLOT_CODEC = new RegistryBuilder<>(Keys.EQUIPPABLE_SLOT_CODEC).create();
 
     public static final class Keys {
         public static final ResourceKey<Registry<MomentType<?>>> MOMENT_TYPE = HeavenDestinyMoment.asResourceKey("moment_type");
@@ -42,9 +46,12 @@ public class MomentRegistries {
         public static final ResourceKey<Registry<MapCodec<? extends IConditionContext>>> CONDITION_CODEC = HeavenDestinyMoment.asResourceKey("condition_codec");
         public static final ResourceKey<Registry<MapCodec<? extends IEntityInfoContext>>> ENTITY_INFO_CODEC = HeavenDestinyMoment.asResourceKey("entity_info_codec");
         public static final ResourceKey<Registry<MapCodec<? extends IRewardContext>>> REWARD_CODEC = HeavenDestinyMoment.asResourceKey("reward_codec");
+        public static final ResourceKey<Registry<MapCodec<? extends IAttachable>>> ATTACHABLE_CODEC = HeavenDestinyMoment.asResourceKey("attachable_codec");
+        public static final ResourceKey<Registry<MapCodec<? extends IEquippableSlot>>> EQUIPPABLE_SLOT_CODEC = HeavenDestinyMoment.asResourceKey("equippable_slot_codec");
 
 
         public static final ResourceKey<Registry<Moment>> MOMENT = HeavenDestinyMoment.asResourceKey("moment");
+
     }
     public static final class Suppliers {
         public static final Supplier<Registry<MapCodec<? extends Area>>> AREA_CODEC = supplyRegistry(Keys.AREA_CODEC);
@@ -53,6 +60,8 @@ public class MomentRegistries {
         public static final Supplier<Registry<MapCodec<? extends IConditionContext>>> CONDITION_CODEC = supplyRegistry(Keys.CONDITION_CODEC);
         public static final Supplier<Registry<MapCodec<? extends IEntityInfoContext>>> ENTITY_INFO_CODEC = supplyRegistry(Keys.ENTITY_INFO_CODEC);
         public static final Supplier<Registry<MapCodec<? extends IRewardContext>>> REWARD_CODEC = supplyRegistry(Keys.REWARD_CODEC);
+        public static final Supplier<Registry<MapCodec<? extends IAttachable>>> ATTACHABLE_CODEC = supplyRegistry(Keys.ATTACHABLE_CODEC);
+        public static final Supplier<Registry<MapCodec<? extends IEquippableSlot>>> EQUIPPABLE_SLOT_CODEC = supplyRegistry(Keys.EQUIPPABLE_SLOT_CODEC);
     }
 
 
@@ -69,6 +78,8 @@ public class MomentRegistries {
         event.register(CONDITION_CODEC);
         event.register(ENTITY_INFO_CODEC);
         event.register(REWARD_CODEC);
+        event.register(ATTACHABLE_CODEC);
+        event.register(EQUIPPABLE_SLOT_CODEC);
     }
 
 

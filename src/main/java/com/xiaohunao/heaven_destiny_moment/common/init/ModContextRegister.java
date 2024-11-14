@@ -5,11 +5,15 @@ import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.common.context.amount.IAmountContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.amount.IntegerAmountContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.amount.RandomAmountContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.attachable.CommonAttachable;
+import com.xiaohunao.heaven_destiny_moment.common.context.attachable.IAttachable;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.IConditionContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.LocationConditionContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.TimeConditionContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.EntityInfoContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.IEntityInfoContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.equippable_slot.IEquippableSlot;
+import com.xiaohunao.heaven_destiny_moment.common.context.equippable_slot.VanillaEquippableSlot;
 import com.xiaohunao.heaven_destiny_moment.common.context.reward.*;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.area.Area;
@@ -26,6 +30,8 @@ public class ModContextRegister {
     public static final DeferredRegister<MapCodec<? extends IConditionContext>> CONDITION_CODEC = DeferredRegister.create(MomentRegistries.Keys.CONDITION_CODEC, HeavenDestinyMoment.MODID);
     public static final DeferredRegister<MapCodec<? extends IEntityInfoContext>> ENTITY_INFO_CODEC = DeferredRegister.create(MomentRegistries.Keys.ENTITY_INFO_CODEC, HeavenDestinyMoment.MODID);
     public static final DeferredRegister<MapCodec<? extends IRewardContext>> REWARD_CODEC = DeferredRegister.create(MomentRegistries.Keys.REWARD_CODEC, HeavenDestinyMoment.MODID);
+    public static final DeferredRegister<MapCodec<? extends IEquippableSlot>> EQUIPPABLE_SLOT_CODEC = DeferredRegister.create(MomentRegistries.Keys.EQUIPPABLE_SLOT_CODEC, HeavenDestinyMoment.MODID);
+    public static final DeferredRegister<MapCodec<? extends IAttachable>> ATTACHABLE_CODEC = DeferredRegister.create(MomentRegistries.Keys.ATTACHABLE_CODEC, HeavenDestinyMoment.MODID);
 
 
     public static final DeferredHolder<MapCodec<? extends Area>, MapCodec<? extends Area>> LOCATION_AREA = AREA_CODEC.register("location",() -> LocationArea.CODEC);
@@ -48,6 +54,10 @@ public class ModContextRegister {
     public static final DeferredHolder<MapCodec<? extends IRewardContext>, MapCodec<? extends IRewardContext>> ITEM_REWARD = REWARD_CODEC.register("item",() -> ItemRewardContext.CODEC);
 
 
+    public static final DeferredHolder<MapCodec<? extends IAttachable>, MapCodec<? extends IAttachable>> COMMON_ATTACHABLE = ATTACHABLE_CODEC.register("common",() -> CommonAttachable.CODEC);
+
+
+    public static final DeferredHolder<MapCodec<? extends IEquippableSlot>, MapCodec<? extends IEquippableSlot>> VANILLA_EQUIPPABLE_SLOT = EQUIPPABLE_SLOT_CODEC.register("vanilla",() -> VanillaEquippableSlot.CODEC);
 
     public static void register(IEventBus modEventBus) {
         AMOUNT_CODEC.register(modEventBus);
