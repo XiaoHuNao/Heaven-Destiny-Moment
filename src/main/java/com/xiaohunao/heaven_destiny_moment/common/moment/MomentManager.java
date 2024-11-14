@@ -14,8 +14,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.neoforge.network.PacketDistributor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -28,13 +26,13 @@ public class MomentManager extends SavedData {
 
     private final Map<UUID, MomentInstance> runMoments = Maps.newHashMap();
     private MomentInstance onlyMoment = null;
-    private final Multimap<UUID,MomentInstance> playerMoments = HashMultimap.create();
+    private final Multimap<UUID, MomentInstance> playerMoments = HashMultimap.create();
 
     private static MomentManager clientMonger;
 
 
     public static MomentManager of(Level level) {
-        MomentManagerContainer container = (MomentManagerContainer)level;
+        MomentManagerContainer container = (MomentManagerContainer) level;
         MomentManager momentManager = container.heaven_destiny_moment$getMomentManager();
         if (level instanceof ServerLevel serverLevel) {
             if (momentManager == null) {
@@ -43,7 +41,7 @@ public class MomentManager extends SavedData {
                 container.heaven_destiny_moment$setMomentManager(momentManager);
             }
             return momentManager;
-        }else {
+        } else {
             if (clientMonger == null) {
                 clientMonger = new MomentManager();
             }
@@ -60,12 +58,12 @@ public class MomentManager extends SavedData {
         return compoundTag;
     }
 
-    public static MomentManager load(ServerLevel level,CompoundTag tag, HolderLookup.Provider lookupProvider) {
+    public static MomentManager load(ServerLevel level, CompoundTag tag, HolderLookup.Provider lookupProvider) {
         MomentManager manager = new MomentManager();
         ListTag listTag = tag.getList("moment", Tag.TAG_COMPOUND);
         listTag.forEach(compoundTag -> {
-            manager.addMoment(level,MomentInstance.loadStatic(level, (CompoundTag) compoundTag));
-            PacketDistributor.sendToPlayersInDimension(level,new MomentManagerSyncPayload((CompoundTag) compoundTag));
+            manager.addMoment(level, MomentInstance.loadStatic(level, (CompoundTag) compoundTag));
+            PacketDistributor.sendToPlayersInDimension(level, new MomentManagerSyncPayload((CompoundTag) compoundTag));
         });
         return manager;
     }
@@ -88,7 +86,7 @@ public class MomentManager extends SavedData {
         runMoments.remove(uuid);
     }
 
-    public boolean addMoment(ServerLevel serverLevel,MomentInstance instance) {
+    public boolean addMoment(ServerLevel serverLevel, MomentInstance instance) {
         UUID uuid = instance.getID();
 //        boolean hasClientSettings = !instance.getMoment().getClientSettingsContext().isEmpty();
 //
@@ -105,7 +103,7 @@ public class MomentManager extends SavedData {
 //        }
 
         runMoments.put(uuid, instance);
-        PacketDistributor.sendToPlayersInDimension(serverLevel,new MomentManagerSyncPayload(instance.serializeNBT()));
+        PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(instance.serializeNBT()));
         setDirty();
         return true;
     }

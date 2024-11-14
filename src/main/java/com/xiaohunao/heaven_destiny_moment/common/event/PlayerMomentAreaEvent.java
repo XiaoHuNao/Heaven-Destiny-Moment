@@ -5,7 +5,7 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 public abstract class PlayerMomentAreaEvent extends PlayerEvent {
-    private Area area;
+    private final Area area;
 
     public PlayerMomentAreaEvent(Player player, Area area) {
         super(player);
@@ -21,8 +21,8 @@ public abstract class PlayerMomentAreaEvent extends PlayerEvent {
             super(player, area);
         }
     }
-    public static class Exit extends PlayerMomentAreaEvent {
 
+    public static class Exit extends PlayerMomentAreaEvent {
         public Exit(Player player, Area area) {
             super(player, area);
         }

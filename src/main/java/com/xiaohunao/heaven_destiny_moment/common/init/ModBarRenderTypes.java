@@ -12,5 +12,4 @@ public class ModBarRenderTypes {
 
     public static final DeferredHolder<IBarRenderType, TerrariaBarRenderType> TERRA = BAR_RENDER_TYPE.register("terra", TerrariaBarRenderType::new);
     public static final DeferredHolder<IBarRenderType, DefaultBarRenderType> DEFAULT = BAR_RENDER_TYPE.register("default", DefaultBarRenderType::new);
-
 }

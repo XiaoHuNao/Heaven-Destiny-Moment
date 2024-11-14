@@ -53,6 +53,7 @@ public class MomentRegistries {
         public static final ResourceKey<Registry<Moment>> MOMENT = HeavenDestinyMoment.asResourceKey("moment");
 
     }
+
     public static final class Suppliers {
         public static final Supplier<Registry<MapCodec<? extends Area>>> AREA_CODEC = supplyRegistry(Keys.AREA_CODEC);
         public static final Supplier<Registry<MapCodec<? extends Moment>>> MOMENT_CODEC = supplyRegistry(Keys.MOMENT_CODEC);
@@ -65,8 +66,7 @@ public class MomentRegistries {
     }
 
 
-    public static final RegistrySetBuilder REGISTRY_SET_BUILDER = new RegistrySetBuilder()
-            .add(MomentRegistries.Keys.MOMENT, ModMoments::bootstrap);
+    public static final RegistrySetBuilder REGISTRY_SET_BUILDER = new RegistrySetBuilder().add(MomentRegistries.Keys.MOMENT, ModMoments::bootstrap);
 
 
     public static void registerRegistries(NewRegistryEvent event) {
@@ -84,7 +84,7 @@ public class MomentRegistries {
 
 
     public static void registerDataPackRegistries(DataPackRegistryEvent.NewRegistry event) {
-        event.dataPackRegistry(Keys.MOMENT, Moment.CODEC,Moment.CODEC);
+        event.dataPackRegistry(Keys.MOMENT, Moment.CODEC, Moment.CODEC);
     }
 
     static <T> Supplier<T> supplyRegistry(ResourceKey<T> key) {

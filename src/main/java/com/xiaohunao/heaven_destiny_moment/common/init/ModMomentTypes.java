@@ -12,5 +12,5 @@ public class ModMomentTypes {
 
 
     public static final DeferredHolder<MomentType<?>, MomentType<DefaultInstance>> DEFAULT = MOMENT_TYPE.register("default",
-            () -> MomentType.Builder.of(DefaultInstance::new, DefaultMoment.class).build());
+            () -> MomentType.builder(DefaultInstance::new, DefaultMoment.class).build());
 }
