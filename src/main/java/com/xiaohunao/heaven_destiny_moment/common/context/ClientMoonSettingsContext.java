@@ -20,9 +20,9 @@ public record ClientMoonSettingsContext(Optional<Integer> moonColor, Optional<Fl
 
 
     public static class Builder {
-        private Optional<Integer> moonColor;
-        private Optional<Float> moonSize;
-        private Optional<ResourceLocation> moonTexture;
+        private Optional<Integer> moonColor = Optional.empty();
+        private Optional<Float> moonSize = Optional.empty();
+        private Optional<ResourceLocation> moonTexture = Optional.empty();
 
         public Builder moonColor(int moonColor) {
             this.moonColor = Optional.of(moonColor);

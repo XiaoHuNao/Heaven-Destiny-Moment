@@ -163,9 +163,10 @@ public abstract class MomentInstance {
         }
         updatePlayers();
         updatePlayerIsInArea();
-        NeoForge.EVENT_BUS.post(new MomentEvent.Tick(this));
-        tick();
-        // Tick.Post ?
+        if (!players.isEmpty()) {
+            NeoForge.EVENT_BUS.post(new MomentEvent.Tick(this));
+            tick();
+        }
     }
 
     public void tick() {
@@ -188,9 +189,14 @@ public abstract class MomentInstance {
         final Set<ServerPlayer> oldPlayers = Sets.newHashSet(bar.getPlayers());
         final Set<ServerPlayer> newPlayers = Sets.newHashSet(((ServerLevel) level).getPlayers(validPlayer()));
         players.clear();
+
         newPlayers.stream()
                 .filter(player -> !oldPlayers.contains(player))
-                .forEach(bar::addPlayer);
+                .forEach(serverPlayer -> {
+                    if (MomentManager.of(level).addPlayerToMoment(serverPlayer,this)) {
+                        bar.addPlayer(serverPlayer);
+                    }
+                });
         oldPlayers.stream()
                 .filter(player -> !newPlayers.contains(player))
                 .forEach(bar::removePlayer);

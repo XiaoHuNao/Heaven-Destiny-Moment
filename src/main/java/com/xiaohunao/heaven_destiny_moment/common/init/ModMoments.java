@@ -27,19 +27,9 @@ public class ModMoments {
 
 
     public static void bootstrap(BootstrapContext<Moment> context) {
-//        context.register(BLOOD_MOON, new DefaultMoment(HeavenDestinyMoment.asResource("terra"),
-//                new LocationArea(LocationConditionContext.Builder.location().setStructures(List.of(BuiltinStructures.SWAMP_HUT, BuiltinStructures.ANCIENT_CITY))
-//                        .setBiomes(List.of(Biomes.BADLANDS))
-//                        .setDimension(List.of(Level.END,Level.OVERWORLD))
-//                        .setY(MinMaxBounds.Doubles.between(10,50))
-//                        .setBlock(BlockPredicate.Builder.block().of(Blocks.DIAMOND_BLOCK))
-//                        .setCanSeeSky(false)
-//                        .setFluid(FluidPredicate.Builder.fluid().of(Fluids.LAVA))
-//                        .setLight(LightPredicate.Builder.light().setComposite(MinMaxBounds.Ints.between(2,5)))
-//                        .setSmokey(true)
-//                        .build()
-//                ),
-//                MomentDataContext.EMPTY, TipSettingsContext.EMPTY, ClientSettingsContext.EMPTY)
-//        );
+        context.register(BLOOD_MOON, new DefaultMoment(HeavenDestinyMoment.asResource("terra"),
+                LocationArea.EMPTY, MomentDataContext.EMPTY, TipSettingsContext.EMPTY, new ClientSettingsContext.Builder().environmentColor(0xff0400).build()
+
+        ));
     }
 }

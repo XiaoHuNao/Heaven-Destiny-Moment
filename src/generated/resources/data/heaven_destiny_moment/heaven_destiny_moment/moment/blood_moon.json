@@ -1,10 +1,6 @@
 {
   "type": "heaven_destiny_moment:default",
-  "area": {
-    "type": "heaven_destiny_moment:location",
-    "structures": [
-      "minecraft:swamp_hut",
-      "minecraft:ancient_city"
-    ]
+  "clientSettingsContext": {
+    "environmentColor": 16712704
   }
 }
