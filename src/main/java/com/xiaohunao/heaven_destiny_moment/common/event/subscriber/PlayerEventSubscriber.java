@@ -21,7 +21,7 @@ public class PlayerEventSubscriber {
         if (hand != InteractionHand.MAIN_HAND) return;
 
         if (level instanceof ServerLevel serverLevel) {
-            MomentInstance.create(ModMoments.BLOOD_MOON, serverLevel);
+//            MomentInstance.create(ModMoments.BLOOD_MOON, serverLevel);
 //            Registry<Moment> moments = serverLevel.registryAccess().registryOrThrow(MomentRegistries.Keys.MOMENT);
 //            System.out.println(moments);
         } else {

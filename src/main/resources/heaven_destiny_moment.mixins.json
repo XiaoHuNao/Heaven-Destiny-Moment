@@ -13,6 +13,7 @@
     "PathfinderMobMixin"
   ],
   "client": [
+    "client.LevelRendererMixin",
     "client.LightMapTextureMixin"
   ],
   "injectors": {
