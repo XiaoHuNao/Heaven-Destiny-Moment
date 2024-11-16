@@ -10,7 +10,8 @@
     "MonsterMixin",
     "NaturalSpawnerMixin",
     "NaturalSpawnerSpawnStateMixin",
-    "PathfinderMobMixin"
+    "PathfinderMobMixin",
+    "SlimeMixin"
   ],
   "client": [
     "client.LevelRendererMixin",

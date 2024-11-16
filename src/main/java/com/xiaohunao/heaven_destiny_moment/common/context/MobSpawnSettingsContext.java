@@ -12,17 +12,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public record MobSpawnSettingsContext(Optional<Boolean> allowOriginalBiomeSpawnSettings, Optional<Boolean> forceSurfaceSpawning, Optional<Boolean> ignoreLightLevel,
+public record MobSpawnSettingsContext(Optional<Boolean> allowOriginalBiomeSpawnSettings, Optional<Boolean> forceSurfaceSpawning,Optional<Boolean> slimesSpawnEverywhere, Optional<Boolean> ignoreLightLevel,
                                       Optional<MobSpawnSettings> spawnInfo, Optional<Map<MobCategory, Double>> spawnCategoryMultiplier,
                                       Optional<MobSpawnListContext> mobSpawnListContext) {
     //SpawnPlacements  这里寻找生物生成的规则
 
-    public static final MobSpawnSettingsContext EMPTY = new MobSpawnSettingsContext(Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty());
+    public static final MobSpawnSettingsContext EMPTY = new MobSpawnSettingsContext(Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty());
 
     public static final Codec<MobSpawnSettingsContext> CODEC = RecordCodecBuilder.create(builder ->
             builder.group(
                     Codec.BOOL.optionalFieldOf("allow_original_biome_spawn_settings").forGetter(MobSpawnSettingsContext::allowOriginalBiomeSpawnSettings),
                     Codec.BOOL.optionalFieldOf("force_surface_spawning").forGetter(MobSpawnSettingsContext::forceSurfaceSpawning),
+                    Codec.BOOL.optionalFieldOf("slimes_spawn_everywhere").forGetter(MobSpawnSettingsContext::slimesSpawnEverywhere),
                     Codec.BOOL.optionalFieldOf("ignoreLightLevel").forGetter(MobSpawnSettingsContext::ignoreLightLevel),
                     MobSpawnSettings.CODEC.codec().optionalFieldOf("mob_spawn_settings").forGetter(MobSpawnSettingsContext::spawnInfo),
                     Codec.unboundedMap(MobCategory.CODEC, Codec.DOUBLE).optionalFieldOf("spawn_category_multiplier").forGetter(MobSpawnSettingsContext::spawnCategoryMultiplier),
@@ -54,6 +55,7 @@ public record MobSpawnSettingsContext(Optional<Boolean> allowOriginalBiomeSpawnS
     public static class Builder {
         private Optional<Boolean> allowOriginalBiomeSpawnSettings = Optional.empty();
         private Optional<Boolean> forceSurfaceSpawning = Optional.empty();
+        private Optional<Boolean> slimesSpawnEverywhere = Optional.empty();
         private Optional<Boolean> ignoreLightLevel = Optional.empty();
         private Optional<MobSpawnSettings> spawnInfo = Optional.empty();
         private Optional<Map<MobCategory, Double>> spawnCategoryMultiplier = Optional.empty();
@@ -64,18 +66,22 @@ public record MobSpawnSettingsContext(Optional<Boolean> allowOriginalBiomeSpawnS
             return new Builder();
         }
 
-        public Builder allowOriginalBiomeSpawnSettings(boolean allowOriginalBiomeSpawnSettings) {
-            this.allowOriginalBiomeSpawnSettings = Optional.of(allowOriginalBiomeSpawnSettings);
+        public Builder allowOriginalBiomeSpawnSettings() {
+            this.allowOriginalBiomeSpawnSettings = Optional.of(true);
             return this;
         }
 
-        public Builder forceSurfaceSpawning(boolean forceSurfaceSpawning) {
-            this.forceSurfaceSpawning = Optional.of(forceSurfaceSpawning);
+        public Builder forceSurfaceSpawning() {
+            this.forceSurfaceSpawning = Optional.of(true);
             return this;
         }
 
-        public Builder ignoreLightLevel(boolean ignoreLightLevel) {
-            this.ignoreLightLevel = Optional.of(ignoreLightLevel);
+        public Builder slimesSpawnEverywhere(){
+            this.forceSurfaceSpawning = Optional.of(true);
+        }
+
+        public Builder ignoreLightLevel() {
+            this.ignoreLightLevel = Optional.of(true);
             return this;
         }
 
@@ -95,7 +101,8 @@ public record MobSpawnSettingsContext(Optional<Boolean> allowOriginalBiomeSpawnS
         }
 
         public MobSpawnSettingsContext build() {
-            return new MobSpawnSettingsContext(allowOriginalBiomeSpawnSettings, forceSurfaceSpawning, ignoreLightLevel, spawnInfo, spawnCategoryMultiplier, mobSpawnListContext);
+            return new MobSpawnSettingsContext(allowOriginalBiomeSpawnSettings, forceSurfaceSpawning, slimesSpawnEverywhere,
+                    ignoreLightLevel, spawnInfo, spawnCategoryMultiplier, mobSpawnListContext);
         }
     }
 
