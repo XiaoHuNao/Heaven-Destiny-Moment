@@ -1,9 +1,7 @@
 package com.xiaohunao.heaven_destiny_moment.common.context;
 
-import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.xiaohunao.heaven_destiny_moment.common.context.condition.LocationConditionContext;
 import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -78,6 +76,7 @@ public record MobSpawnSettingsContext(Optional<Boolean> allowOriginalBiomeSpawnS
 
         public Builder slimesSpawnEverywhere(){
             this.forceSurfaceSpawning = Optional.of(true);
+            return this;
         }
 
         public Builder ignoreLightLevel() {
