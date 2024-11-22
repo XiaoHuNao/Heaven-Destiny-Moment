@@ -12,6 +12,7 @@ import com.xiaohunao.heaven_destiny_moment.common.context.condition.LocationCond
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.TimeConditionContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.EntityInfoContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.IEntityInfoContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.SlimeInfoContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.equippable_slot.IEquippableSlot;
 import com.xiaohunao.heaven_destiny_moment.common.context.equippable_slot.VanillaEquippableSlot;
 import com.xiaohunao.heaven_destiny_moment.common.context.reward.*;
@@ -46,6 +47,7 @@ public class ModContextRegister {
     public static final DeferredHolder<MapCodec<? extends IConditionContext>, MapCodec<? extends IConditionContext>> LOCATION_CONDITION = CONDITION_CODEC.register("location", () -> LocationConditionContext.CODEC);
 
     public static final DeferredHolder<MapCodec<? extends IEntityInfoContext>, MapCodec<? extends IEntityInfoContext>> ENTITY_INFO = ENTITY_INFO_CODEC.register("entity_info", () -> EntityInfoContext.CODEC);
+    public static final DeferredHolder<MapCodec<? extends IEntityInfoContext>, MapCodec<? extends IEntityInfoContext>> SLIME_INFO = ENTITY_INFO_CODEC.register("slime_info", () -> SlimeInfoContext.CODEC);
 
 
     public static final DeferredHolder<MapCodec<? extends IRewardContext>, MapCodec<? extends IRewardContext>> XP_REWARD = REWARD_CODEC.register("xp", () -> XpRewardContext.CODEC);

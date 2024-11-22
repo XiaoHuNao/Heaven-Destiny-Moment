@@ -3,7 +3,9 @@ package com.xiaohunao.heaven_destiny_moment.common.mixin;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
-import com.xiaohunao.heaven_destiny_moment.common.context.MobSpawnSettingsContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.BiomeEntitySpawnSettings;
+import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettingsContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.MobSpawnRule;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentDataContext;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
@@ -37,18 +39,10 @@ public class NaturalSpawnerMixin {
             instance.getMoment()
                     .filter(moment -> moment.isInArea(serverLevel, pos))
                     .map(Moment::getMomentDataContext)
-                    .flatMap(MomentDataContext::mobSpawnSettingsContext)
-                    .ifPresent(mobSpawnSettingsContext -> {
-                        mobSpawnSettingsContext.allowOriginalBiomeSpawnSettings().ifPresent(allowOriginalBiome -> {
-                            if (allowOriginalBiome) {
-                                List<MobSpawnSettings.SpawnerData> unwrap = new ArrayList<>(cir.getReturnValue().unwrap());
-                                cir.setReturnValue(mobSpawnSettingsContext.filterList(mobCategory, unwrap));
-                            } else {
-                                mobSpawnSettingsContext.spawnInfo().ifPresent(mobSpawnSettings -> {
-                                    cir.setReturnValue(mobSpawnSettings.getMobs(mobCategory));
-                                });
-                            }
-                        });
+                    .flatMap(MomentDataContext::entitySpawnSettingsContext)
+                    .ifPresent(entitySpawnSettingsContext -> {
+                        List<MobSpawnSettings.SpawnerData> unwrap = new ArrayList<>(cir.getReturnValue().unwrap());
+                        cir.setReturnValue(entitySpawnSettingsContext.adjustmentBiomeEntitySpawnSettings(mobCategory,unwrap));
                     });
         }
     }
@@ -78,33 +72,39 @@ public class NaturalSpawnerMixin {
             instance.getMoment()
                     .filter(moment -> moment.isInArea((ServerLevel) level, pos))
                     .map(Moment::getMomentDataContext)
-                    .flatMap(MomentDataContext::mobSpawnSettingsContext)
-                    .ifPresent(mobSpawnSettingsContext -> {
-                        mobSpawnSettingsContext.allowOriginalBiomeSpawnSettings().ifPresent(allowOriginalBiome -> {
-                            if (allowOriginalBiome) {
-                                MobSpawnSettings mobSettings = cir.getReturnValue().getMobSettings();
-                                Map<MobCategory, WeightedRandomList<MobSpawnSettings.SpawnerData>> spawners = Maps.newHashMap(mobSettings.spawners);
-
-                                mobSpawnSettingsContext.spawnInfo().ifPresent(mobSpawnSettings -> {
-                                    spawners.forEach(((mobCategory, weightedRandomList) -> {
-                                        List<MobSpawnSettings.SpawnerData> unwrap = Lists.newArrayList(weightedRandomList.unwrap());
-                                        spawners.put(mobCategory, mobSpawnSettingsContext.filterList(mobCategory, unwrap));
-                                    }));
-
-
-                                    Map<EntityType<?>, MobSpawnSettings.MobSpawnCost> mobSpawnCosts = Maps.newHashMap(mobSettings.mobSpawnCosts);
-                                    mobSpawnCosts.forEach(((entityType, mobSpawnCost) -> {
-                                        mobSpawnCosts.put(entityType, mobSpawnSettings.mobSpawnCosts.get(entityType));
-                                    }));
-                                    float oldCreatureProbability = mobSettings.getCreatureProbability();
-                                    float newCreatureProbability = mobSpawnSettings.getCreatureProbability();
-                                    MobSpawnSettings newMobSpawnSettings = new MobSpawnSettings(Math.max(oldCreatureProbability, newCreatureProbability), spawners, mobSpawnCosts);
-                                    fakeBiome.mobSpawnSettings(newMobSpawnSettings);
-                                });
-                            } else {
-                                mobSpawnSettingsContext.spawnInfo().ifPresent(fakeBiome::mobSpawnSettings);
+                    .flatMap(MomentDataContext::entitySpawnSettingsContext)
+                    .ifPresent(entitySpawnSettingsContext -> {
+                        MobSpawnSettings mobSettings = cir.getReturnValue().getMobSettings();
+                        entitySpawnSettingsContext.biomeEntitySpawnSettings().flatMap(BiomeEntitySpawnSettings::biomeMobSpawnSettings).ifPresent(mobSpawnSettings ->{
+                            Map<MobCategory, WeightedRandomList<MobSpawnSettings.SpawnerData>> spawners = Maps.newHashMap(mobSettings.spawners);
+                            Map<MobCategory, WeightedRandomList<MobSpawnSettings.SpawnerData>> newSpawners = Maps.newHashMap();
+                            for (Map.Entry<MobCategory, WeightedRandomList<MobSpawnSettings.SpawnerData>> entry : spawners.entrySet()) {
+                                MobCategory mobCategory = entry.getKey();
+                                WeightedRandomList<MobSpawnSettings.SpawnerData> weightedRandomList = entry.getValue();
+                                List<MobSpawnSettings.SpawnerData> unwrap = Lists.newArrayList(weightedRandomList.unwrap());
+                                newSpawners.put(mobCategory,entitySpawnSettingsContext.adjustmentBiomeEntitySpawnSettings(mobCategory, unwrap));
                             }
+
+
+                            Map<EntityType<?>, MobSpawnSettings.MobSpawnCost> mobSpawnCosts = Maps.newHashMap(mobSettings.mobSpawnCosts);
+                            for (Map.Entry<EntityType<?>, MobSpawnSettings.MobSpawnCost> entry : mobSpawnCosts.entrySet()) {
+                                EntityType<?> entityType = entry.getKey();
+                                MobSpawnSettings.MobSpawnCost mobSpawnCost = entry.getValue();
+                                mobSpawnCosts.put(entityType, mobSpawnSettings.mobSpawnCosts.get(entityType));
+                            }
+
+
+                            float oldCreatureProbability = mobSettings.getCreatureProbability();
+                            float newCreatureProbability = mobSpawnSettings.getCreatureProbability();
+                            MobSpawnSettings newMobSpawnSettings = new MobSpawnSettings(Math.max(oldCreatureProbability, newCreatureProbability), newSpawners, mobSpawnCosts);
+                            fakeBiome.mobSpawnSettings(newMobSpawnSettings);
                         });
+
+                        if (fakeBiome.mobSpawnSettings == null){
+                            fakeBiome.mobSpawnSettings(mobSettings);
+                        }
+
+
                         fakeBiome.generationSettings(BiomeGenerationSettings.EMPTY);
                         cir.setReturnValue(fakeBiome.build());
                     });
@@ -124,8 +124,9 @@ public class NaturalSpawnerMixin {
             instance.getMoment()
                     .filter(moment -> moment.isInArea((ServerLevel) level, returnValue))
                     .map(Moment::getMomentDataContext)
-                    .flatMap(MomentDataContext::mobSpawnSettingsContext)
-                    .flatMap(MobSpawnSettingsContext::forceSurfaceSpawning)
+                    .flatMap(MomentDataContext::entitySpawnSettingsContext)
+                    .flatMap(EntitySpawnSettingsContext::rule)
+                    .flatMap(MobSpawnRule::forceSurfaceSpawning)
                     .ifPresent(mobSpawnSettingsContext -> {
                         Player closestPlayer = level.getNearestPlayer(returnValue.getX(), returnValue.getY(), returnValue.getZ(), -1.0, false);
                         if (closestPlayer != null) {

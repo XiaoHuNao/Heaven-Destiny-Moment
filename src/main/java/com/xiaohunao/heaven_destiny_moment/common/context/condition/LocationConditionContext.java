@@ -155,17 +155,21 @@ public record LocationConditionContext(Optional<LocationPredicate.PositionPredic
         public static Builder inStructure(ResourceKey<Structure>... structure) {
             return location().setStructures(List.of(structure));
         }
+
         @SafeVarargs
         public static Builder inBiome(ResourceKey<Biome>... biome) {
             return location().setBiomes(List.of(biome));
         }
+
         @SafeVarargs
         public static Builder inDimension(ResourceKey<Level>... dimension) {
             return location().setDimension(List.of(dimension));
         }
+
         public static Builder atYLocation(MinMaxBounds.Doubles y) {
             return location().setY(y);
         }
+
         public Builder setX(MinMaxBounds.Doubles x) {
             this.x = x;
             return this;
@@ -185,13 +189,32 @@ public record LocationConditionContext(Optional<LocationPredicate.PositionPredic
             this.structures = Optional.of(structures);
             return this;
         }
+
+        @SafeVarargs
+        public final Builder setStructures(ResourceKey<Structure>... structures) {
+            this.structures = Optional.of(List.of(structures));
+            return this;
+        }
+
         public Builder setBiomes(List<ResourceKey<Biome>> biomes) {
             this.biomes = Optional.of(biomes);
             return this;
         }
 
+        @SafeVarargs
+        public final Builder setBiomes(ResourceKey<Biome>... biomes) {
+            this.biomes = Optional.of(List.of(biomes));
+            return this;
+        }
+
         public Builder setDimension(List<ResourceKey<Level>> dimension) {
             this.dimension = Optional.of(dimension);
+            return this;
+        }
+
+        @SafeVarargs
+        public final Builder setDimension(ResourceKey<Level>... dimension) {
+            this.dimension = Optional.of(List.of(dimension));
             return this;
         }
 

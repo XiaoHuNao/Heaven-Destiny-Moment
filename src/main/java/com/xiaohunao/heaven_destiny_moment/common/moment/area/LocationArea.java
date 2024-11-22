@@ -3,8 +3,20 @@ package com.xiaohunao.heaven_destiny_moment.common.moment.area;
 import com.mojang.serialization.MapCodec;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.LocationConditionContext;
 import com.xiaohunao.heaven_destiny_moment.common.init.ModContextRegister;
+import net.minecraft.advancements.critereon.BlockPredicate;
+import net.minecraft.advancements.critereon.FluidPredicate;
+import net.minecraft.advancements.critereon.LightPredicate;
+import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.structure.Structure;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 
 public record LocationArea(LocationConditionContext locationConditionContext) implements Area {
@@ -24,10 +36,8 @@ public record LocationArea(LocationConditionContext locationConditionContext) im
     }
 
     public static class Builder {
-
-
-        public Area build() {
-            return null;
+        public Area build(Function<LocationConditionContext.Builder,LocationConditionContext> function) {
+            return new LocationArea(function.apply(new LocationConditionContext.Builder()));
         }
     }
 }

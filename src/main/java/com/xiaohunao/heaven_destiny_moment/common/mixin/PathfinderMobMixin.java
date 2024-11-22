@@ -1,6 +1,7 @@
 package com.xiaohunao.heaven_destiny_moment.common.mixin;
 
-import com.xiaohunao.heaven_destiny_moment.common.context.MobSpawnSettingsContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettingsContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.MobSpawnRule;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentDataContext;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
@@ -26,8 +27,9 @@ public class PathfinderMobMixin {
             instance.getMoment()
                     .filter(moment -> moment.isInArea(serverLevel, mob.blockPosition()))
                     .map(Moment::getMomentDataContext)
-                    .flatMap(MomentDataContext::mobSpawnSettingsContext)
-                    .flatMap(MobSpawnSettingsContext::ignoreLightLevel)
+                    .flatMap(MomentDataContext::entitySpawnSettingsContext)
+                    .flatMap(EntitySpawnSettingsContext::rule)
+                    .flatMap(MobSpawnRule::ignoreLightLevel)
                     .ifPresent(cir::setReturnValue);
         }
     }

@@ -1,6 +1,7 @@
 package com.xiaohunao.heaven_destiny_moment.common.mixin;
 
-import com.xiaohunao.heaven_destiny_moment.common.context.MobSpawnSettingsContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettingsContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.MobSpawnRule;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentDataContext;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
@@ -31,8 +32,9 @@ public class SlimeMixin {
                 instance.getMoment()
                         .filter(moment -> moment.isInArea(serverLevel, pos))
                         .map(Moment::getMomentDataContext)
-                        .flatMap(MomentDataContext::mobSpawnSettingsContext)
-                        .flatMap(MobSpawnSettingsContext::slimesSpawnEverywhere)
+                        .flatMap(MomentDataContext::entitySpawnSettingsContext)
+                        .flatMap(EntitySpawnSettingsContext::rule)
+                        .flatMap(MobSpawnRule::slimesSpawnEverywhere)
                         .ifPresent(slimesSpawnEverywhere -> {
                             boolean origin = pos.getY() > 50 &&
 //                                    pos.getY() < 70 &&

@@ -20,24 +20,25 @@ public record ClientMoonSettingsContext(Optional<Integer> moonColor, Optional<Fl
 
 
     public static class Builder {
-        private Optional<Integer> moonColor = Optional.empty();
-        private Optional<Float> moonSize = Optional.empty();
-        private Optional<ResourceLocation> moonTexture = Optional.empty();
+        private Integer moonColor;
+        private Float moonSize;
+        private ResourceLocation moonTexture;
+
+        public ClientMoonSettingsContext build() {
+            return new ClientMoonSettingsContext(Optional.ofNullable(moonColor), Optional.ofNullable(moonSize), Optional.ofNullable(moonTexture));
+        }
 
         public Builder moonColor(int moonColor) {
-            this.moonColor = Optional.of(moonColor);
+            this.moonColor = moonColor;
             return this;
         }
         public Builder moonSize(float moonSize) {
-            this.moonSize = Optional.of(moonSize);
+            this.moonSize = moonSize;
             return this;
         }
         public Builder moonTexture(ResourceLocation moonTexture) {
-            this.moonTexture = Optional.of(moonTexture);
+            this.moonTexture = moonTexture;
             return this;
-        }
-        public ClientMoonSettingsContext build() {
-            return new ClientMoonSettingsContext(moonColor, moonSize, moonTexture);
         }
     }
 }

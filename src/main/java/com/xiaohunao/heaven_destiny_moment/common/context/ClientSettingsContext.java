@@ -1,5 +1,6 @@
 package com.xiaohunao.heaven_destiny_moment.common.context;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -27,32 +28,21 @@ public record ClientSettingsContext(Optional<Integer> environmentColor,
 
 
     public static class Builder {
-        private Optional<Integer> environmentColor;
-        private final ClientMoonSettingsContext.Builder clientMoonSettingsContext = new ClientMoonSettingsContext.Builder();
+        private Integer environmentColor;
+        private ClientMoonSettingsContext clientMoonSettingsContext;
 
         public Builder environmentColor(int environmentColor) {
-            this.environmentColor = Optional.of(environmentColor);
+            this.environmentColor = environmentColor;
             return this;
         }
 
-        public Builder moonSize(Float moonSize) {
-            this.clientMoonSettingsContext.moonSize(moonSize);
+        public Builder clientMoonSettingsContext(Function<ClientMoonSettingsContext.Builder,ClientMoonSettingsContext.Builder> clientMoonSettingsContext){
+            this.clientMoonSettingsContext = clientMoonSettingsContext.apply(new ClientMoonSettingsContext.Builder()).build();
             return this;
         }
-        public Builder moonTexture(ResourceLocation moonTexture) {
-            this.clientMoonSettingsContext.moonTexture(moonTexture);
-            return this;
-        }
-        public Builder moonColor(int moonColor) {
-            this.clientMoonSettingsContext.moonColor(moonColor);
-            return this;
-        }
+
         public ClientSettingsContext build() {
-            ClientMoonSettingsContext moonSettingsContext = clientMoonSettingsContext.build();
-            if (moonSettingsContext.isEmpty()){
-                return new ClientSettingsContext(environmentColor,Optional.empty());
-            }
-            return new ClientSettingsContext(environmentColor,Optional.of(moonSettingsContext));
+            return new ClientSettingsContext(Optional.ofNullable(environmentColor),Optional.ofNullable(clientMoonSettingsContext));
         }
     }
 }

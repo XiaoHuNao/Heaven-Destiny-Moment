@@ -8,6 +8,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 
 import java.util.List;
@@ -20,6 +21,11 @@ public record AttributeContext(Holder<Attribute> attribute, List<AttributeModifi
         ).apply(instance, AttributeContext::new));
 
         public void addAttribute(LivingEntity livingEntity) {
-
+             AttributeInstance attributeInstance = livingEntity.getAttribute(attribute);
+             for (AttributeModifier attributeModifier : attributeModifiers) {
+                 if (attributeInstance != null) {
+                     attributeInstance.addOrReplacePermanentModifier(attributeModifier);
+                 }
+             }
         }
 }

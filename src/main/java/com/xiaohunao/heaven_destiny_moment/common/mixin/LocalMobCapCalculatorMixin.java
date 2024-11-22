@@ -1,6 +1,7 @@
 package com.xiaohunao.heaven_destiny_moment.common.mixin;
 
-import com.xiaohunao.heaven_destiny_moment.common.context.MobSpawnSettingsContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.BiomeEntitySpawnSettings;
+import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettingsContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentDataContext;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
@@ -27,8 +28,9 @@ public class LocalMobCapCalculatorMixin {
         for (MomentInstance instance : momentManager.getRunMoments().values()) {
             instance.getMoment()
                     .map(Moment::getMomentDataContext)
-                    .flatMap(MomentDataContext::mobSpawnSettingsContext)
-                    .flatMap(MobSpawnSettingsContext::spawnCategoryMultiplier)
+                    .flatMap(MomentDataContext::entitySpawnSettingsContext)
+                    .flatMap(EntitySpawnSettingsContext::biomeEntitySpawnSettings)
+                    .flatMap(BiomeEntitySpawnSettings::spawnCategoryMultiplier)
                     .map(multiplierMap -> {
                         Object2IntMap<MobCategory> counts = mobCounts.counts;
                         final int currentCount = counts.getOrDefault(mobCategory, 0);

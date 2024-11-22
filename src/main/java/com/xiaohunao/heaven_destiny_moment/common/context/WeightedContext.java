@@ -15,14 +15,6 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public record WeightedContext<T>(int totalWeight,List<WeightedEntry.Wrapper<T>> list) {
-//    public static <T> WeightedContext<T> create() {
-//        return new WeightedContext<>(Lists.newLinkedList());
-//    }
-//    public WeightedContext<T> add(T t, int weight) {
-//        list.add(WeightedEntry.wrap(t, weight));
-//        return this;
-//    }
-
     private static int calculateTotalWeight(List<? extends WeightedEntry> entries) {
         long total = 0;
         for (WeightedEntry entry : entries) {
@@ -67,9 +59,13 @@ public record WeightedContext<T>(int totalWeight,List<WeightedEntry.Wrapper<T>> 
     public static class Builder<T> {
         private final List<WeightedEntry.Wrapper<T>> list = Lists.newArrayList();
         
-        public Builder add(T t, int weight) {
+        public Builder<T> add(T t, int weight) {
             list.add(WeightedEntry.wrap(t, weight));
             return this;
+        }
+
+        public WeightedContext<T> build(){
+            return new WeightedContext<>(calculateTotalWeight(list), list);
         }
     }
 

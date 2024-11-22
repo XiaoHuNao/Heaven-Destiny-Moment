@@ -66,9 +66,6 @@ public class MomentRegistries {
     }
 
 
-    public static final RegistrySetBuilder REGISTRY_SET_BUILDER = new RegistrySetBuilder().add(MomentRegistries.Keys.MOMENT, ModMoments::bootstrap);
-
-
     public static void registerRegistries(NewRegistryEvent event) {
         event.register(AREA_CODEC);
         event.register(MOMENT_CODEC);

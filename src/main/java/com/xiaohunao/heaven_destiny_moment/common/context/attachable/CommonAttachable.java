@@ -48,20 +48,20 @@ public record CommonAttachable(Optional<List<MobEffectInstance>> effects, Option
     }
 
     public static class Builder {
-        Optional<List<MobEffectInstance>> effects = Optional.empty();
-        Optional<Map<IEquippableSlot, ItemStack>> equipments = Optional.empty();
-        Optional<List<AttributeContext>> attributes = Optional.empty();
+        private List<MobEffectInstance> effects;
+        private Map<IEquippableSlot, ItemStack> equipments;
+        private List<AttributeContext> attributes;
 
         public CommonAttachable build(){
-           return new CommonAttachable(effects,equipments,attributes);
+           return new CommonAttachable(Optional.ofNullable(effects),Optional.ofNullable(equipments),Optional.ofNullable(attributes));
         }
 
 
         public Builder addEffect(Holder<MobEffect> effect, int duration, int amplifier){
-            if (effects.isEmpty()){
-                effects = Optional.of(Lists.newArrayList());
+            if (effects == null){
+                effects = Lists.newArrayList();
             }
-            effects.get().add(new MobEffectInstance(effect,duration,amplifier));
+            effects.add(new MobEffectInstance(effect,duration,amplifier));
             return this;
         }
 
@@ -71,18 +71,18 @@ public record CommonAttachable(Optional<List<MobEffectInstance>> effects, Option
         }
 
         public Builder addEquipment(IEquippableSlot slot,ItemStack stack){
-            if (equipments.isEmpty()) {
-                equipments = Optional.of(Maps.newHashMap());
+            if (equipments == null) {
+                equipments = Maps.newHashMap();
             }
-            equipments.get().put(slot,stack);
+            equipments.put(slot,stack);
             return this;
         }
 
         public Builder addAttribute(Holder<Attribute> attribute, List<AttributeModifier> attributeModifiers){
-            if (attributes.isEmpty()) {
-                attributes = Optional.of(Lists.newArrayList());
+            if (attributes == null) {
+                attributes = Lists.newArrayList();
             }
-            attributes.get().add(new AttributeContext(attribute,attributeModifiers));
+            attributes.add(new AttributeContext(attribute,attributeModifiers));
             return this;
         }
     }

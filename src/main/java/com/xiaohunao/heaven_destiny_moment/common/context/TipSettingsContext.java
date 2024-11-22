@@ -23,35 +23,35 @@ public record TipSettingsContext(Optional<Map<MomentState, Holder<SoundEvent>>> 
 
 
     public static class Builder {
-        private Optional<Map<MomentState, Component>> texts = Optional.empty();
-        private Optional<Map<MomentState, Holder<SoundEvent>>> soundEvents = Optional.empty();
+        private Map<MomentState, Component> texts;
+        private Map<MomentState, Holder<SoundEvent>> soundEvents;
 
         public Builder addTip(MomentState momentState, Component component) {
-            if (texts.isEmpty()){
-                texts = Optional.of(Maps.newHashMap());
+            if (texts == null){
+                texts = Maps.newHashMap();
             }
-            texts.get().put(momentState,component);
+            texts.put(momentState,component);
             return this;
         }
 
         public Builder addTip(MomentState momentState, Component component,int color) {
-            if (texts.isEmpty()){
-                texts = Optional.of(Maps.newHashMap());
+            if (texts == null){
+                texts = Maps.newHashMap();
             }
-            texts.get().put(momentState,component.copy().withStyle(style -> style.withColor(color)));
+            texts.put(momentState,component.copy().withStyle(style -> style.withColor(color)));
             return this;
         }
 
         public Builder addSound(MomentState momentState, Holder<SoundEvent> soundEvent) {
-            if (soundEvents.isEmpty()){
-                soundEvents = Optional.of(Maps.newHashMap());
+            if (soundEvents == null){
+                soundEvents = Maps.newHashMap();
             }
-            soundEvents.get().put(momentState,soundEvent);
+            soundEvents.put(momentState,soundEvent);
             return this;
         }
 
         public TipSettingsContext build() {
-            return new TipSettingsContext(soundEvents, texts);
+            return new TipSettingsContext(Optional.ofNullable(soundEvents), Optional.ofNullable(texts));
         }
 
     }
