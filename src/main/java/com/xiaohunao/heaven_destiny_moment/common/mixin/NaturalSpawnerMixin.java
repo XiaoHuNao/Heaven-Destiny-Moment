@@ -143,17 +143,30 @@ public class NaturalSpawnerMixin {
     @ModifyReceiver(method = "spawnMobsForChunkGeneration", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/ServerLevelAccessor;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"))
     private static ServerLevelAccessor spawnMobsForChunkGeneration(ServerLevelAccessor serverLevelAccessor, Entity entity) {
-        if (entity instanceof LivingEntity livingEntity) {
-            MomentManager momentManager = MomentManager.of(serverLevelAccessor.getLevel());
-            for (MomentInstance instance : momentManager.getRunMoments().values()) {
-                instance.getMoment()
-                        .filter(moment -> moment.isInArea(serverLevelAccessor.getLevel(), entity.blockPosition()))
-                        .ifPresent(moment -> {
-                            instance.finalizeSpawn(livingEntity);
-                        });
+        MomentManager momentManager = MomentManager.of(serverLevelAccessor.getLevel());
+        for (MomentInstance instance : momentManager.getRunMoments().values()) {
+            instance.getMoment()
+                    .filter(moment -> moment.isInArea(serverLevelAccessor.getLevel(), entity.blockPosition()))
+                    .ifPresent(moment -> {
+                        instance.finalizeSpawn(entity);
+                    });
 
-            }
         }
         return serverLevelAccessor;
+    }
+
+    @ModifyReceiver(method = "spawnCategoryForPosition(Lnet/minecraft/world/entity/MobCategory;Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ChunkAccess;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/NaturalSpawner$SpawnPredicate;Lnet/minecraft/world/level/NaturalSpawner$AfterSpawnCallback;)V",
+    at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"))
+    private static ServerLevel spawnCategoryForPosition(ServerLevel serverLevel, Entity entity) {
+        MomentManager momentManager = MomentManager.of(serverLevel.getLevel());
+        for (MomentInstance instance : momentManager.getRunMoments().values()) {
+            instance.getMoment()
+                    .filter(moment -> moment.isInArea(serverLevel, entity.blockPosition()))
+                    .ifPresent(moment -> {
+                        instance.finalizeSpawn(entity);
+                    });
+
+        }
+        return serverLevel;
     }
 }

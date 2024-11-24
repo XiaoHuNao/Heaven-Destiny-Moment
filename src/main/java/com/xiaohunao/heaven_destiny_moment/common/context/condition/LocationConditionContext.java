@@ -166,6 +166,10 @@ public record LocationConditionContext(Optional<LocationPredicate.PositionPredic
             return location().setDimension(List.of(dimension));
         }
 
+        public static Builder isCanSeeSky(boolean isCanSeeSky) {
+            return location().setCanSeeSky(isCanSeeSky);
+        }
+
         public static Builder atYLocation(MinMaxBounds.Doubles y) {
             return location().setY(y);
         }

@@ -7,7 +7,7 @@ import com.xiaohunao.heaven_destiny_moment.client.gui.bar.render.TerrariaBarRend
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-public class ModBarRenderTypes {
+public class MomentBarRenderTypes {
     public static final DeferredRegister<IBarRenderType> BAR_RENDER_TYPE = DeferredRegister.create(MomentRegistries.BAR_RENDER_TYPE, HeavenDestinyMoment.MODID);
 
     public static final DeferredHolder<IBarRenderType, TerrariaBarRenderType> TERRA = BAR_RENDER_TYPE.register("terra", TerrariaBarRenderType::new);

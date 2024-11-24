@@ -14,6 +14,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -49,7 +50,7 @@ public abstract class MomentInstance {
         this.bar = new MomentBar(uuid, moment.getBarRenderType());
     }
 
-    protected MomentInstance(UUID uuid, MomentType<?> type, Level level, ResourceKey<Moment> momentKey) {
+    protected MomentInstance(MomentType<?> type, UUID uuid, Level level, ResourceKey<Moment> momentKey) {
         this.uuid = uuid;
         this.type = type;
         this.level = level;
@@ -260,5 +261,5 @@ public abstract class MomentInstance {
         return bar;
     }
 
-    public abstract void finalizeSpawn(LivingEntity livingEntity);
+    public abstract void finalizeSpawn(Entity entity);
 }

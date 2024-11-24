@@ -14,6 +14,8 @@ import com.xiaohunao.heaven_destiny_moment.common.moment.area.LocationArea;
 import com.xiaohunao.heaven_destiny_moment.common.moment.moment.instance.DefaultInstance;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 
 public class DefaultMoment extends Moment {
@@ -24,7 +26,6 @@ public class DefaultMoment extends Moment {
             TipSettingsContext.CODEC.optionalFieldOf("tips", TipSettingsContext.EMPTY).forGetter(Moment::getTipSettingsContext),
             ClientSettingsContext.CODEC.optionalFieldOf("clientSettingsContext", ClientSettingsContext.EMPTY).forGetter(Moment::getClientSettingsContext)
     ).apply(instance, DefaultMoment::new));
-    public static final ResourceLocation ID = HeavenDestinyMoment.asResource("default");
 
     public DefaultMoment(ResourceLocation barRenderType, Area area, MomentDataContext momentDataContext, TipSettingsContext tipSettingsContext, ClientSettingsContext clientSettingsContext) {
         super(barRenderType, area, momentDataContext, tipSettingsContext, clientSettingsContext);
