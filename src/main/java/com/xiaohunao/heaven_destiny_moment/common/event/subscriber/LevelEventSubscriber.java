@@ -11,8 +11,6 @@ public class LevelEventSubscriber {
     @SubscribeEvent
     public static void onLevelTick(LevelTickEvent.Post event) {
         Level level = event.getLevel();
-        if (!level.isClientSide) {
-            MomentManager.of(level).tick();
-        }
+        MomentManager.of(level).tick();
     }
 }

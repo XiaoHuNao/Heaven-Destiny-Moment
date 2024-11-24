@@ -1,5 +1,6 @@
 package com.xiaohunao.heaven_destiny_moment.common.moment;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.mojang.logging.LogUtils;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
@@ -14,15 +15,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Predicate;
 
 public abstract class MomentInstance {
@@ -37,7 +36,8 @@ public abstract class MomentInstance {
 
     private long tick = -1L;
     private MomentState state;
-    private final Set<UUID> players = Sets.newHashSet();
+    private final Set<UUID> playerUUIDs = Sets.newHashSet();
+    private final Set<Player> players = Sets.newHashSet();
     private final Set<UUID> inAreaPlayers = Sets.newHashSet();
 
     protected MomentInstance(MomentType<?> type, Level level, ResourceKey<Moment> momentKey) {
@@ -118,8 +118,8 @@ public abstract class MomentInstance {
         }
 
         ListTag tags = new ListTag();
-        players.forEach(uuid -> tags.add(StringTag.valueOf(uuid.toString())));
-        compoundTag.put("players", tags);
+        playerUUIDs.forEach(uuid -> tags.add(StringTag.valueOf(uuid.toString())));
+        compoundTag.put("player_uuids", tags);
 
         return compoundTag;
     }
@@ -130,8 +130,8 @@ public abstract class MomentInstance {
             this.state = MomentState.valueOf(compoundTag.getString("state"));
         }
 
-        ListTag tags = compoundTag.getList("players", Tag.TAG_STRING);
-        tags.forEach(tag -> players.add(UUID.fromString(tag.getAsString())));
+        ListTag tags = compoundTag.getList("player_uuids", Tag.TAG_STRING);
+        tags.forEach(tag -> playerUUIDs.add(UUID.fromString(tag.getAsString())));
     }
 
     private void serializeMetadata(CompoundTag compoundTag) {
@@ -158,11 +158,14 @@ public abstract class MomentInstance {
 
     public final void baseTick() {
         this.tick++;
+
+        updatePlayers();
+        updatePlayerIsInArea();
+
         if (tick == 0L) {
             setState(MomentState.READY);
         }
-        updatePlayers();
-        updatePlayerIsInArea();
+
         if (!players.isEmpty()) {
             NeoForge.EVENT_BUS.post(new MomentEvent.Tick(this));
             tick();
@@ -174,20 +177,31 @@ public abstract class MomentInstance {
     }
 
     public void setState(MomentState state) {
-        NeoForge.EVENT_BUS.post(MomentEvent.getEventToPost(this, state));
         this.state = state;
+        NeoForge.EVENT_BUS.post(MomentEvent.getEventToPost(this, state));
+        moment.getTipSettingsContext().playTooltip(this);
     }
 
 
-    public Predicate<ServerPlayer> validPlayer() {
+    public Predicate<Player> validPlayer() {
         return player -> !player.isSpectator();
     }
 
-    private void updatePlayers() {
-        if (level.isClientSide) return;
+    public List<Player> getPlayers(Predicate<? super Player> predicate) {
+        List<Player> list = Lists.newArrayList();
 
-        final Set<ServerPlayer> oldPlayers = Sets.newHashSet(bar.getPlayers());
-        final Set<ServerPlayer> newPlayers = Sets.newHashSet(((ServerLevel) level).getPlayers(validPlayer()));
+        for(Player player : level.players()) {
+            if (predicate.test(player)) {
+                list.add(player);
+            }
+        }
+        return list;
+    }
+
+    private void updatePlayers() {
+
+        final Set<Player> oldPlayers = Sets.newHashSet(bar.getPlayers());
+        final Set<Player> newPlayers = Sets.newHashSet((getPlayers(validPlayer())));
         players.clear();
 
         newPlayers.stream()
@@ -201,14 +215,15 @@ public abstract class MomentInstance {
                 .filter(player -> !newPlayers.contains(player))
                 .forEach(bar::removePlayer);
         bar.getPlayers().forEach(player -> {
-            players.add(player.getUUID());
+            playerUUIDs.add(player.getUUID());
+            players.add(player);
         });
     }
 
     private void updatePlayerIsInArea() {
         if (level.isClientSide) return;
 
-        players.stream().map(level::getPlayerByUUID).filter(Objects::nonNull).forEach(player -> {
+        players.stream().filter(Objects::nonNull).forEach(player -> {
             boolean inArea = moment.isInArea((ServerLevel) level, player.blockPosition());
             boolean uuidContains = inAreaPlayers.contains(player.getUUID());
             if (inArea && !uuidContains) {
@@ -231,6 +246,18 @@ public abstract class MomentInstance {
 
     public Optional<Moment> getMoment() {
         return Optional.ofNullable(moment);
+    }
+
+    public MomentState getState() {
+        return state;
+    }
+
+    public Set<Player> getPlayers() {
+        return players;
+    }
+
+    public MomentBar getBar() {
+        return bar;
     }
 
     public abstract void finalizeSpawn(LivingEntity livingEntity);

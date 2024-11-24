@@ -8,6 +8,7 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Set;
@@ -25,7 +26,7 @@ public class MomentBar {
 
     private final UUID uuid;
     private final ResourceLocation type;
-    private final Set<ServerPlayer> players = Sets.newHashSet();
+    private final Set<Player> players = Sets.newHashSet();
     private float progress = 1.0F;
     private BossEvent.BossBarColor color = BossEvent.BossBarColor.YELLOW;
 
@@ -49,14 +50,14 @@ public class MomentBar {
         }
     }
 
-    public void addPlayer(ServerPlayer serverPlayer) {
-        if (this.players.add(serverPlayer)) {
+    public void addPlayer(Player player) {
+        if (this.players.add(player)) {
             broadcast(MomentBarSyncPayload::update);
         }
     }
 
-    public void removePlayer(ServerPlayer serverPlayer) {
-        if (this.players.remove(serverPlayer)) {
+    public void removePlayer(Player player) {
+        if (this.players.remove(player)) {
             broadcast(MomentBarSyncPayload::removePlayer);
         }
     }
@@ -69,7 +70,7 @@ public class MomentBar {
         return type;
     }
 
-    public Set<ServerPlayer> getPlayers() {
+    public Set<Player> getPlayers() {
         return players;
     }
 
