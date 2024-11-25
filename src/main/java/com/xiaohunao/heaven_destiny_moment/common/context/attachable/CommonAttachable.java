@@ -7,7 +7,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.common.context.AttributeContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.equippable_slot.IEquippableSlot;
-import com.xiaohunao.heaven_destiny_moment.common.init.ModContextRegister;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -44,7 +44,7 @@ public record CommonAttachable(Optional<List<MobEffectInstance>> effects, Option
 
     @Override
     public MapCodec<? extends IAttachable> codec() {
-        return ModContextRegister.COMMON_ATTACHABLE.get();
+        return HDMContextRegister.COMMON_ATTACHABLE.get();
     }
 
     public static class Builder {

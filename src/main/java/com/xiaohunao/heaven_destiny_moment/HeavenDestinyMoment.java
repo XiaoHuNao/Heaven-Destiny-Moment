@@ -2,10 +2,7 @@ package com.xiaohunao.heaven_destiny_moment;
 
 import com.mojang.logging.LogUtils;
 import com.xiaohunao.heaven_destiny_moment.client.gui.hud.MomentBarOverlay;
-import com.xiaohunao.heaven_destiny_moment.common.init.MomentBarRenderTypes;
-import com.xiaohunao.heaven_destiny_moment.common.init.ModContextRegister;
-import com.xiaohunao.heaven_destiny_moment.common.init.MomentTypes;
-import com.xiaohunao.heaven_destiny_moment.common.init.MomentRegistries;
+import com.xiaohunao.heaven_destiny_moment.common.init.*;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -25,12 +22,13 @@ public class HeavenDestinyMoment {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public HeavenDestinyMoment(IEventBus modEventBus, ModContainer modContainer) {
-        MomentTypes.MOMENT_TYPE.register(modEventBus);
-        MomentBarRenderTypes.BAR_RENDER_TYPE.register(modEventBus);
-        ModContextRegister.register(modEventBus);
+        HDMMomentTypes.MOMENT_TYPE.register(modEventBus);
+        HDMBarRenderTypes.BAR_RENDER_TYPE.register(modEventBus);
+        HDMContextRegister.register(modEventBus);
+        HDMAttachments.TYPES.register(modEventBus);
 
-        modEventBus.addListener(MomentRegistries::registerRegistries);
-        modEventBus.addListener(MomentRegistries::registerDataPackRegistries);
+        modEventBus.addListener(HDMRegistries::registerRegistries);
+        modEventBus.addListener(HDMRegistries::registerDataPackRegistries);
     }
 
 

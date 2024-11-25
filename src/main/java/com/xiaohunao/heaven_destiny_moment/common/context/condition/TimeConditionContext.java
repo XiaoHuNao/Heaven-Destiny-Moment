@@ -6,7 +6,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
-import com.xiaohunao.heaven_destiny_moment.common.init.ModContextRegister;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -67,7 +67,7 @@ public record TimeConditionContext(Optional<Long> min,Optional<Long> max) implem
 
     @Override
     public MapCodec<? extends IConditionContext> codec() {
-        return ModContextRegister.TIME_CONDITION.get();
+        return HDMContextRegister.TIME_CONDITION.get();
     }
 
 

@@ -6,13 +6,9 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.common.context.amount.IAmountContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.attachable.IAttachable;
-import com.xiaohunao.heaven_destiny_moment.common.init.ModContextRegister;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.level.Level;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +40,7 @@ public record EntityInfoContext(EntityType<?> entityType, Optional<IAmountContex
 
     @Override
     public MapCodec<? extends IEntityInfoContext> codec() {
-        return ModContextRegister.ENTITY_INFO.get();
+        return HDMContextRegister.ENTITY_INFO.get();
     }
 
 

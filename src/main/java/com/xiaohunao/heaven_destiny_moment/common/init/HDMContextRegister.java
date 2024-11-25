@@ -24,15 +24,15 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-public class ModContextRegister {
-    public static final DeferredRegister<MapCodec<? extends Area>> AREA_CODEC = DeferredRegister.create(MomentRegistries.Keys.AREA_CODEC, HeavenDestinyMoment.MODID);
-    public static final DeferredRegister<MapCodec<? extends Moment>> MOMENT_CODEC = DeferredRegister.create(MomentRegistries.Keys.MOMENT_CODEC, HeavenDestinyMoment.MODID);
-    public static final DeferredRegister<MapCodec<? extends IAmountContext>> AMOUNT_CODEC = DeferredRegister.create(MomentRegistries.Keys.AMOUNT_CODEC, HeavenDestinyMoment.MODID);
-    public static final DeferredRegister<MapCodec<? extends IConditionContext>> CONDITION_CODEC = DeferredRegister.create(MomentRegistries.Keys.CONDITION_CODEC, HeavenDestinyMoment.MODID);
-    public static final DeferredRegister<MapCodec<? extends IEntityInfoContext>> ENTITY_INFO_CODEC = DeferredRegister.create(MomentRegistries.Keys.ENTITY_INFO_CODEC, HeavenDestinyMoment.MODID);
-    public static final DeferredRegister<MapCodec<? extends IRewardContext>> REWARD_CODEC = DeferredRegister.create(MomentRegistries.Keys.REWARD_CODEC, HeavenDestinyMoment.MODID);
-    public static final DeferredRegister<MapCodec<? extends IEquippableSlot>> EQUIPPABLE_SLOT_CODEC = DeferredRegister.create(MomentRegistries.Keys.EQUIPPABLE_SLOT_CODEC, HeavenDestinyMoment.MODID);
-    public static final DeferredRegister<MapCodec<? extends IAttachable>> ATTACHABLE_CODEC = DeferredRegister.create(MomentRegistries.Keys.ATTACHABLE_CODEC, HeavenDestinyMoment.MODID);
+public class HDMContextRegister {
+    public static final DeferredRegister<MapCodec<? extends Area>> AREA_CODEC = DeferredRegister.create(HDMRegistries.Keys.AREA_CODEC, HeavenDestinyMoment.MODID);
+    public static final DeferredRegister<MapCodec<? extends Moment>> MOMENT_CODEC = DeferredRegister.create(HDMRegistries.Keys.MOMENT_CODEC, HeavenDestinyMoment.MODID);
+    public static final DeferredRegister<MapCodec<? extends IAmountContext>> AMOUNT_CODEC = DeferredRegister.create(HDMRegistries.Keys.AMOUNT_CODEC, HeavenDestinyMoment.MODID);
+    public static final DeferredRegister<MapCodec<? extends IConditionContext>> CONDITION_CODEC = DeferredRegister.create(HDMRegistries.Keys.CONDITION_CODEC, HeavenDestinyMoment.MODID);
+    public static final DeferredRegister<MapCodec<? extends IEntityInfoContext>> ENTITY_INFO_CODEC = DeferredRegister.create(HDMRegistries.Keys.ENTITY_INFO_CODEC, HeavenDestinyMoment.MODID);
+    public static final DeferredRegister<MapCodec<? extends IRewardContext>> REWARD_CODEC = DeferredRegister.create(HDMRegistries.Keys.REWARD_CODEC, HeavenDestinyMoment.MODID);
+    public static final DeferredRegister<MapCodec<? extends IEquippableSlot>> EQUIPPABLE_SLOT_CODEC = DeferredRegister.create(HDMRegistries.Keys.EQUIPPABLE_SLOT_CODEC, HeavenDestinyMoment.MODID);
+    public static final DeferredRegister<MapCodec<? extends IAttachable>> ATTACHABLE_CODEC = DeferredRegister.create(HDMRegistries.Keys.ATTACHABLE_CODEC, HeavenDestinyMoment.MODID);
 
 
     public static final DeferredHolder<MapCodec<? extends Area>, MapCodec<? extends Area>> LOCATION_AREA = AREA_CODEC.register("location", () -> LocationArea.CODEC);

@@ -7,8 +7,8 @@ import com.xiaohunao.heaven_destiny_moment.common.moment.moment.instance.Default
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-public class MomentTypes {
-    public static final DeferredRegister<MomentType<?>> MOMENT_TYPE = DeferredRegister.create(MomentRegistries.MOMENT_TYPE,HeavenDestinyMoment.MODID);
+public class HDMMomentTypes {
+    public static final DeferredRegister<MomentType<?>> MOMENT_TYPE = DeferredRegister.create(HDMRegistries.MOMENT_TYPE,HeavenDestinyMoment.MODID);
 
 
     public static final DeferredHolder<MomentType<?>, MomentType<DefaultInstance>> DEFAULT = MOMENT_TYPE.register("default",

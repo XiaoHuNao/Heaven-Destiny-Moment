@@ -2,7 +2,7 @@ package com.xiaohunao.heaven_destiny_moment.common.context.equippable_slot;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.xiaohunao.heaven_destiny_moment.common.init.ModContextRegister;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -21,7 +21,7 @@ public record VanillaEquippableSlot(EquipmentSlot slot) implements IEquippableSl
 
     @Override
     public MapCodec<? extends IEquippableSlot> codec() {
-        return ModContextRegister.VANILLA_EQUIPPABLE_SLOT.get();
+        return HDMContextRegister.VANILLA_EQUIPPABLE_SLOT.get();
     }
 
     @Override

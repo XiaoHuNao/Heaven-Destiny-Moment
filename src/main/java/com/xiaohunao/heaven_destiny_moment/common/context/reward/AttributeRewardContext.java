@@ -5,7 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.common.context.AttributeContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.WeightedContext;
-import com.xiaohunao.heaven_destiny_moment.common.init.ModContextRegister;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -36,6 +36,6 @@ public record AttributeRewardContext(WeightedContext<AttributeContext> attribute
 
     @Override
     public MapCodec<? extends IRewardContext> codec() {
-        return ModContextRegister.ATTRIBUTE_REWARD.get();
+        return HDMContextRegister.ATTRIBUTE_REWARD.get();
     }
 }

@@ -3,7 +3,7 @@ package com.xiaohunao.heaven_destiny_moment.common.context.reward;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.xiaohunao.heaven_destiny_moment.common.init.ModContextRegister;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import net.minecraft.world.entity.player.Player;
 
@@ -23,6 +23,6 @@ public record XpRewardContext(int xp) implements IRewardContext {
 
     @Override
     public MapCodec<? extends IRewardContext> codec() {
-        return ModContextRegister.XP_REWARD.get();
+        return HDMContextRegister.XP_REWARD.get();
     }
 }

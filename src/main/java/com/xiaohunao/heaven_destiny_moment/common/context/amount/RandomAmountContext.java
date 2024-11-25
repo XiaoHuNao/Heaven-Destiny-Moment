@@ -3,7 +3,7 @@ package com.xiaohunao.heaven_destiny_moment.common.context.amount;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.xiaohunao.heaven_destiny_moment.common.init.ModContextRegister;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 
 import java.util.Random;
 
@@ -22,6 +22,6 @@ public record RandomAmountContext(int min, int max) implements IAmountContext {
     }
     @Override
     public MapCodec<? extends IAmountContext> codec() {
-        return ModContextRegister.RANDOM_AMOUNT.get();
+        return HDMContextRegister.RANDOM_AMOUNT.get();
     }
 }

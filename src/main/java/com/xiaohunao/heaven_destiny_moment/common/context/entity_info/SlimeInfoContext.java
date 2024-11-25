@@ -3,7 +3,7 @@ package com.xiaohunao.heaven_destiny_moment.common.context.entity_info;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.xiaohunao.heaven_destiny_moment.common.init.ModContextRegister;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import net.minecraft.world.entity.EntityType;
 
 
@@ -26,7 +26,7 @@ public record SlimeInfoContext(EntityInfoContext entityInfo , Integer size) impl
 
     @Override
     public MapCodec<? extends IEntityInfoContext> codec() {
-        return ModContextRegister.SLIME_INFO.get();
+        return HDMContextRegister.SLIME_INFO.get();
     }
 
     public static class Builder extends EntityInfoContext.Builder {

@@ -10,7 +10,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 @EventBusSubscriber(modid = HeavenDestinyMoment.MODID, bus = EventBusSubscriber.Bus.MOD)
-public class NetworkRegister {
+public class HDMNetworkRegister {
     public static final String VERSION = "0.0.1";
 
     @SubscribeEvent

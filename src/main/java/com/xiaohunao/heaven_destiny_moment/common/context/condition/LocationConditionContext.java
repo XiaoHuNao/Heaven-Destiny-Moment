@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
-import com.xiaohunao.heaven_destiny_moment.common.init.ModContextRegister;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import net.minecraft.advancements.critereon.*;
 import net.minecraft.core.BlockPos;
@@ -112,7 +112,7 @@ public record LocationConditionContext(Optional<LocationPredicate.PositionPredic
     }
     @Override
     public MapCodec<? extends IConditionContext> codec() {
-        return ModContextRegister.LOCATION_CONDITION.get();
+        return HDMContextRegister.LOCATION_CONDITION.get();
     }
 
     public static class Builder {

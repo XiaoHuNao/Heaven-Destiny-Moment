@@ -5,9 +5,11 @@ import com.google.common.collect.Sets;
 import com.mojang.logging.LogUtils;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
+import com.xiaohunao.heaven_destiny_moment.common.attachment.MomentKillEntityAttachment;
 import com.xiaohunao.heaven_destiny_moment.common.event.MomentEvent;
 import com.xiaohunao.heaven_destiny_moment.common.event.PlayerMomentAreaEvent;
-import com.xiaohunao.heaven_destiny_moment.common.init.MomentRegistries;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMAttachments;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceKey;
@@ -18,6 +20,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.attachment.AttachmentHolder;
 import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 
@@ -25,7 +28,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 
-public abstract class MomentInstance {
+public abstract class MomentInstance extends AttachmentHolder {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final Level level;
@@ -70,7 +73,7 @@ public abstract class MomentInstance {
     }
 
     public static Registry<Moment> registryChecked(ResourceKey<Moment> momentKey, Level level) {
-        Registry<Moment> registry = level.registryAccess().registryOrThrow(MomentRegistries.Keys.MOMENT);
+        Registry<Moment> registry = level.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
         if (registry.getHolder(momentKey).isEmpty()) {
             HeavenDestinyMoment.LOGGER.error("Moment {} not found in registry", momentKey.location());
             return null;
@@ -86,10 +89,10 @@ public abstract class MomentInstance {
             LOGGER.error("MomentInstance has invalid type: {}", id);
             return null;
         } else {
-            return MomentRegistries.MOMENT_TYPE.getOptional(resourcelocation).map(momentType -> {
+            return HDMRegistries.MOMENT_TYPE.getOptional(resourcelocation).map(momentType -> {
                 try {
                     Tag tag = compoundTag.get("moment");
-                    return momentType.create(compoundTag.getUUID("uuid"), level, ResourceKey.codec(MomentRegistries.Keys.MOMENT).decode(NbtOps.INSTANCE, tag).getOrThrow().getFirst());
+                    return momentType.create(compoundTag.getUUID("uuid"), level, ResourceKey.codec(HDMRegistries.Keys.MOMENT).decode(NbtOps.INSTANCE, tag).getOrThrow().getFirst());
                 } catch (Throwable throwable) {
                     LOGGER.error("Failed to create MomentInstance {}", id, throwable);
                     return null;
@@ -138,11 +141,11 @@ public abstract class MomentInstance {
     private void serializeMetadata(CompoundTag compoundTag) {
         compoundTag.putUUID("uuid", uuid);
         compoundTag.putString("id", MomentInstance.getRegistryName(type).toString());
-        compoundTag.put("moment", ResourceKey.codec(MomentRegistries.Keys.MOMENT).encodeStart(NbtOps.INSTANCE, momentKey).getOrThrow());
+        compoundTag.put("moment", ResourceKey.codec(HDMRegistries.Keys.MOMENT).encodeStart(NbtOps.INSTANCE, momentKey).getOrThrow());
     }
 
     public static ResourceLocation getRegistryName(MomentType<?> momentType) {
-        return MomentRegistries.MOMENT_TYPE.getKey(momentType);
+        return HDMRegistries.MOMENT_TYPE.getKey(momentType);
     }
 
     public Level getLevel() {
@@ -262,4 +265,8 @@ public abstract class MomentInstance {
     }
 
     public abstract void finalizeSpawn(Entity entity);
+
+    public void addKillCount(LivingEntity livingEntity) {
+        this.setData(HDMAttachments.MOMENT_KILL_ENTITY,getData(HDMAttachments.MOMENT_KILL_ENTITY).addKillCount(livingEntity));
+    }
 }
