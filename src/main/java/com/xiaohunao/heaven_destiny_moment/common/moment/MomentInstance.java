@@ -5,11 +5,11 @@ import com.google.common.collect.Sets;
 import com.mojang.logging.LogUtils;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
-import com.xiaohunao.heaven_destiny_moment.common.attachment.MomentKillEntityAttachment;
 import com.xiaohunao.heaven_destiny_moment.common.event.MomentEvent;
 import com.xiaohunao.heaven_destiny_moment.common.event.PlayerMomentAreaEvent;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMAttachments;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMRegistries;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceKey;
@@ -31,18 +31,18 @@ import java.util.function.Predicate;
 public abstract class MomentInstance extends AttachmentHolder {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final Level level;
-    private final MomentType<?> type;
-    private final ResourceKey<Moment> momentKey;
-    private final Moment moment;
-    private final UUID uuid;
-    private final MomentBar bar;
+    protected final Level level;
+    protected final MomentType<?> type;
+    protected final ResourceKey<Moment> momentKey;
+    protected final Moment moment;
+    protected final UUID uuid;
+    protected final MomentBar bar;
 
-    private long tick = -1L;
-    private MomentState state;
-    private final Set<UUID> playerUUIDs = Sets.newHashSet();
-    private final Set<Player> players = Sets.newHashSet();
-    private final Set<UUID> inAreaPlayers = Sets.newHashSet();
+    protected long tick = -1L;
+    protected MomentState state;
+    protected final Set<UUID> playerUUIDs = Sets.newHashSet();
+    protected final Set<Player> players = Sets.newHashSet();
+    protected final Set<UUID> inAreaPlayers = Sets.newHashSet();
 
     protected MomentInstance(MomentType<?> type, Level level, ResourceKey<Moment> momentKey) {
         this.uuid = UUID.randomUUID();
@@ -189,6 +189,10 @@ public abstract class MomentInstance extends AttachmentHolder {
 
     public Predicate<Player> validPlayer() {
         return player -> !player.isSpectator();
+    }
+
+    public boolean canSpawnEntity(ServerLevel serverLevel, Entity entity, BlockPos pos){
+        return true;
     }
 
     public List<Player> getPlayers(Predicate<? super Player> predicate) {

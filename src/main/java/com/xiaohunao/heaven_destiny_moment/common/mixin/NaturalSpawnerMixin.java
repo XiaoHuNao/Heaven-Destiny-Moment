@@ -117,6 +117,20 @@ public class NaturalSpawnerMixin {
         }
     }
 
+    @Inject(method = "isRightDistanceToPlayerAndSpawnPoint", at =@At("RETURN"), cancellable = true)
+    private static void isRightDistanceToPlayerAndSpawnPoint(ServerLevel serverLevel, ChunkAccess chunk, BlockPos.MutableBlockPos pos, double distance, CallbackInfoReturnable<Boolean> cir){
+        MomentManager momentManager = MomentManager.of(serverLevel);
+        for (MomentInstance instance : momentManager.getRunMoments().values()) {
+            instance.getMoment()
+                    .filter(moment -> moment.isInArea(serverLevel, pos))
+                    .map(Moment::getMomentDataContext)
+                    .flatMap(MomentDataContext::entitySpawnSettingsContext)
+                    .flatMap(EntitySpawnSettingsContext::rule)
+                    .flatMap(MobSpawnRule::ignoreDistance)
+                    .ifPresent(cir::setReturnValue);
+        }
+    }
+
     @Inject(method = "getRandomPosWithin", at = @At("RETURN"), cancellable = true)
     private static void forceSurface(Level level, LevelChunk levelChunk, CallbackInfoReturnable<BlockPos> cir) {
         if (level.isClientSide) {
@@ -140,7 +154,6 @@ public class NaturalSpawnerMixin {
                                 cir.setReturnValue(new BlockPos(returnValue.getX(), level.getHeight(Heightmap.Types.WORLD_SURFACE, returnValue.getX(), returnValue.getZ()) + 1, returnValue.getZ()));
                             }
                         }
-
                     });
         }
     }
@@ -161,23 +174,21 @@ public class NaturalSpawnerMixin {
 //    }
 
     @Inject(method = "spawnCategoryForPosition(Lnet/minecraft/world/entity/MobCategory;Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ChunkAccess;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/NaturalSpawner$SpawnPredicate;Lnet/minecraft/world/level/NaturalSpawner$AfterSpawnCallback;)V",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"),locals = LocalCapture.CAPTURE_FAILSOFT)
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"),locals = LocalCapture.CAPTURE_FAILSOFT, cancellable = true)
     private static void spawnCategoryForPosition(MobCategory category, ServerLevel serverLevel, ChunkAccess chunk, BlockPos pos, NaturalSpawner.SpawnPredicate filter, NaturalSpawner.AfterSpawnCallback callback, CallbackInfo ci, StructureManager structuremanager, ChunkGenerator chunkgenerator, int i, BlockState blockstate, BlockPos.MutableBlockPos blockpos$mutableblockpos, int j, int k, int l, int i1, int j1, MobSpawnSettings.SpawnerData mobspawnsettings$spawnerdata, SpawnGroupData spawngroupdata, int k1, int l1, int i2, double d0, double d1, Player player, double d2, Mob mob) {
         MomentManager momentManager = MomentManager.of(serverLevel.getLevel());
         for (MomentInstance instance : momentManager.getRunMoments().values()) {
-            instance.getMoment()
-                    .filter(moment -> moment.isInArea(serverLevel, mob.blockPosition()))
-                    .ifPresent(moment -> {
-                        MomentEntityAttachment data = mob.getData(HDMAttachments.MOMENT_ENTITY);
-                        mob.setData(HDMAttachments.MOMENT_ENTITY,data.setUid(instance.getID()));
-                        instance.finalizeSpawn(mob);
-                    });
+            if (instance.canSpawnEntity(serverLevel,mob,pos)) {
+                instance.getMoment()
+                        .filter(moment -> moment.isInArea(serverLevel, mob.blockPosition()))
+                        .ifPresent(moment -> {
+                            MomentEntityAttachment data = mob.getData(HDMAttachments.MOMENT_ENTITY);
+                            mob.setData(HDMAttachments.MOMENT_ENTITY,data.setUid(instance.getID()));
+                            instance.finalizeSpawn(mob);
+                        });
+            }else {
+                ci.cancel();
+            }
         }
     }
-
-//    @Inject(method = "spawnCategoryForPosition(Lnet/minecraft/world/entity/MobCategory;Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ChunkAccess;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/NaturalSpawner$SpawnPredicate;Lnet/minecraft/world/level/NaturalSpawner$AfterSpawnCallback;)V",
-//            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/NaturalSpawner;isValidPositionForMob(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Mob;D)Z",shift = At.Shift.AFTER),locals = LocalCapture.CAPTURE_FAILSOFT)
-//    private static void spawnCategoryForPo(MobCategory category, ServerLevel level, ChunkAccess chunk, BlockPos pos, NaturalSpawner.SpawnPredicate filter, NaturalSpawner.AfterSpawnCallback callback, CallbackInfo ci, StructureManager structuremanager, ChunkGenerator chunkgenerator, int i, BlockState blockstate, BlockPos.MutableBlockPos blockpos$mutableblockpos, int j, int k, int l, int i1, int j1, MobSpawnSettings.SpawnerData mobspawnsettings$spawnerdata, SpawnGroupData spawngroupdata, int k1, int l1, int i2, double d0, double d1, Player player, double d2, Mob mob) {
-//        ci.cancel();
-//    }
 }
