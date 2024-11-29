@@ -10,45 +10,31 @@ import net.neoforged.fml.common.EventBusSubscriber;
 public class MomentEventSubscriber {
     @SubscribeEvent
     public static void onMomentReady(MomentEvent.Ready event) {
-        MomentInstance momentInstance = event.getMomentInstance();
-//        momentInstance.playTip();
+
     }
 
     @SubscribeEvent
     public static void onMomentStart(MomentEvent.Start event) {
-        MomentInstance momentInstance = event.getMomentInstance();
-//        momentInstance.playTip();
+
     }
 
     @SubscribeEvent
     public static void onMomentOnGoing(MomentEvent.OnGoing event) {
-        MomentInstance momentInstance = event.getMomentInstance();
-//        momentInstance.playTip();
-    }
 
-    @SubscribeEvent
-    public static void onMomentCelebrating(MomentEvent.Celebrating event) {
-        MomentInstance momentInstance = event.getMomentInstance();
-//        momentInstance.playTip();
     }
 
     @SubscribeEvent
     public static void onMomentVictory(MomentEvent.Victory event) {
-        MomentInstance momentInstance = event.getMomentInstance();
-//        momentInstance.playTip();
     }
 
 
     @SubscribeEvent
     public static void onMomentLose(MomentEvent.Lose event) {
-        MomentInstance momentInstance = event.getMomentInstance();
-//        momentInstance.playTip();
     }
 
     @SubscribeEvent
     public static void onMomentEnd(MomentEvent.End event) {
-        MomentInstance momentInstance = event.getMomentInstance();
-//        momentInstance.playTip();
+
     }
 
     @SubscribeEvent

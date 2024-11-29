@@ -156,34 +156,96 @@ public abstract class MomentInstance extends AttachmentHolder {
         return uuid;
     }
 
-    public boolean shouldEnd() {
-        return state == MomentState.END;
-    }
-
     public final void baseTick() {
         this.tick++;
+        NeoForge.EVENT_BUS.post(new MomentEvent.Tick(this));
+
+        if (state == MomentState.END) return;
 
         updatePlayers();
         updatePlayerIsInArea();
+        updateMomentState();
 
+
+
+    }
+
+    private void updateMomentState() {
         if (tick == 0L) {
-            setState(MomentState.READY);
+            MomentEvent.Ready ready = (MomentEvent.Ready)setState(MomentState.READY);
+            if (!ready.isCanceled()){
+                ready();
+            }
         }
 
-        if (!players.isEmpty()) {
-            NeoForge.EVENT_BUS.post(new MomentEvent.Tick(this));
+        if (state == MomentState.READY){
+            MomentEvent.Start start = (MomentEvent.Start)setState(MomentState.START);
+            if (!start.isCanceled()){
+                start();
+                setState(MomentState.ONGOING);
+            }
+        }
+
+        if (state == MomentState.ONGOING) {
+            ongoing();
+        }
+
+        if (state == MomentState.VICTORY){
+            MomentEvent.Victory momentEvent = (MomentEvent.Victory)setState(MomentState.VICTORY);
+            if (!momentEvent.isCanceled()){
+                victory();
+            }
+            setState(MomentState.END);
+        }
+
+        if (state == MomentState.LOSE){
+            MomentEvent.Lose momentEvent = (MomentEvent.Lose)setState(MomentState.LOSE);
+            if (!momentEvent.isCanceled()) {
+                lose();
+            }
+            setState(MomentState.END);
+        }
+    }
+
+
+    private void ready() {
+        MomentManager.of(level).removeMoment(uuid);
+    }
+
+    private void start() {
+
+    }
+
+    private void ongoing() {
+        if (!players.isEmpty() && state == MomentState.ONGOING) {
             tick();
         }
+    }
+
+    private void victory() {
+        moment.getMomentDataContext().rewards().ifPresent(rewards -> {
+            players.forEach(player -> {
+                rewards.forEach(reward -> {
+                    reward.createReward(this, player);
+                });
+            });
+        });
+    }
+
+    private void lose() {
+
     }
 
     public void tick() {
 
     }
 
-    public void setState(MomentState state) {
+
+
+    public MomentEvent setState(MomentState state) {
         this.state = state;
-        NeoForge.EVENT_BUS.post(MomentEvent.getEventToPost(this, state));
         moment.getTipSettingsContext().playTooltip(this);
+        return NeoForge.EVENT_BUS.post(MomentEvent.getEventToPost(this, state));
     }
 
 
@@ -272,5 +334,9 @@ public abstract class MomentInstance extends AttachmentHolder {
 
     public void addKillCount(LivingEntity livingEntity) {
         this.setData(HDMAttachments.MOMENT_KILL_ENTITY,getData(HDMAttachments.MOMENT_KILL_ENTITY).addKillCount(livingEntity));
+    }
+
+    public void livingDeath(LivingEntity entity) {
+
     }
 }

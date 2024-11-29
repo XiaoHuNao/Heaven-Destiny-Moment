@@ -133,29 +133,29 @@ public class NaturalSpawnerMixin {
 
     @Inject(method = "getRandomPosWithin", at = @At("RETURN"), cancellable = true)
     private static void forceSurface(Level level, LevelChunk levelChunk, CallbackInfoReturnable<BlockPos> cir) {
-        if (level.isClientSide) {
-            return;
-        }
-
-        BlockPos returnValue = cir.getReturnValue();
-        MomentManager momentManager = MomentManager.of(level);
-        for (MomentInstance instance : momentManager.getRunMoments().values()) {
-            instance.getMoment()
-                    .filter(moment -> moment.isInArea((ServerLevel) level, returnValue))
-                    .map(Moment::getMomentDataContext)
-                    .flatMap(MomentDataContext::entitySpawnSettingsContext)
-                    .flatMap(EntitySpawnSettingsContext::rule)
-                    .flatMap(MobSpawnRule::forceSurfaceSpawning)
-                    .ifPresent(mobSpawnSettingsContext -> {
-                        Player closestPlayer = level.getNearestPlayer(returnValue.getX(), returnValue.getY(), returnValue.getZ(), -1.0, false);
-                        if (closestPlayer != null) {
-                            BlockPos closestPlayerPosition = closestPlayer.blockPosition();
-                            if (closestPlayerPosition.getY() > level.getHeight(Heightmap.Types.WORLD_SURFACE, closestPlayerPosition.getX(), closestPlayerPosition.getZ())) {
-                                cir.setReturnValue(new BlockPos(returnValue.getX(), level.getHeight(Heightmap.Types.WORLD_SURFACE, returnValue.getX(), returnValue.getZ()) + 1, returnValue.getZ()));
-                            }
-                        }
-                    });
-        }
+//        if (level.isClientSide) {
+//            return;
+//        }
+//
+//        BlockPos returnValue = cir.getReturnValue();
+//        MomentManager momentManager = MomentManager.of(level);
+//        for (MomentInstance instance : momentManager.getRunMoments().values()) {
+//            instance.getMoment()
+//                    .filter(moment -> moment.isInArea((ServerLevel) level, returnValue))
+//                    .map(Moment::getMomentDataContext)
+//                    .flatMap(MomentDataContext::entitySpawnSettingsContext)
+//                    .flatMap(EntitySpawnSettingsContext::rule)
+//                    .flatMap(MobSpawnRule::forceSurfaceSpawning)
+//                    .ifPresent(mobSpawnSettingsContext -> {
+//                        Player closestPlayer = level.getNearestPlayer(returnValue.getX(), returnValue.getY(), returnValue.getZ(), -1.0, false);
+//                        if (closestPlayer != null) {
+//                            BlockPos closestPlayerPosition = closestPlayer.blockPosition();
+//                            if (closestPlayerPosition.getY() > level.getHeight(Heightmap.Types.WORLD_SURFACE, closestPlayerPosition.getX(), closestPlayerPosition.getZ())) {
+//                                cir.setReturnValue(new BlockPos(returnValue.getX(), level.getHeight(Heightmap.Types.WORLD_SURFACE, returnValue.getX(), returnValue.getZ()) + 1, returnValue.getZ()));
+//                            }
+//                        }
+//                    });
+//        }
     }
 
 //    @ModifyReceiver(method = "spawnMobsForChunkGeneration", at = @At(value = "INVOKE",

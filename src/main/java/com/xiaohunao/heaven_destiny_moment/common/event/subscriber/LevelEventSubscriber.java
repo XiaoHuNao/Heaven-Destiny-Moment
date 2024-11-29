@@ -22,6 +22,7 @@ public class LevelEventSubscriber {
         LivingEntity entity = event.getEntity();
         entity.getData(HDMAttachments.MOMENT_ENTITY).getMomentInstance(entity).ifPresent(instance -> {
             instance.addKillCount(entity);
+            instance.livingDeath(entity);
         });
     }
 }

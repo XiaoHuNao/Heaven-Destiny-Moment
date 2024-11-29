@@ -3,6 +3,7 @@ package com.xiaohunao.heaven_destiny_moment.common.event;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentState;
 import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
 
 public abstract class MomentEvent extends Event {
     private final MomentInstance momentInstance;
@@ -21,13 +22,13 @@ public abstract class MomentEvent extends Event {
         }
     }
 
-    public static class Start extends MomentEvent {
+    public static class Start extends MomentEvent implements ICancellableEvent {
         public Start(MomentInstance momentInstance) {
             super(momentInstance);
         }
     }
 
-    public static class Ready extends MomentEvent {
+    public static class Ready extends MomentEvent implements ICancellableEvent {
         public Ready(MomentInstance momentInstance) {
             super(momentInstance);
         }
@@ -39,20 +40,14 @@ public abstract class MomentEvent extends Event {
         }
     }
 
-    public static class Victory extends MomentEvent {
+    public static class Victory extends MomentEvent implements ICancellableEvent {
         public Victory(MomentInstance momentInstance) {
             super(momentInstance);
         }
     }
 
-    public static class Lose extends MomentEvent {
+    public static class Lose extends MomentEvent implements ICancellableEvent {
         public Lose(MomentInstance momentInstance) {
-            super(momentInstance);
-        }
-    }
-
-    public static class Celebrating extends MomentEvent {
-        public Celebrating(MomentInstance momentInstance) {
             super(momentInstance);
         }
     }
@@ -70,7 +65,6 @@ public abstract class MomentEvent extends Event {
             case ONGOING -> new OnGoing(momentInstance);
             case VICTORY -> new Victory(momentInstance);
             case LOSE -> new Lose(momentInstance);
-            case CELEBRATING -> new Celebrating(momentInstance);
             case END -> new End(momentInstance);
             default -> throw new IllegalArgumentException("Invalid state: " + state);
         };

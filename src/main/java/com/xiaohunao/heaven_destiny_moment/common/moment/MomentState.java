@@ -10,8 +10,7 @@ public enum MomentState {
     ONGOING("ongoing", 2),
     VICTORY("victory", 3),
     LOSE("lose", 4),
-    CELEBRATING("celebrating", 5),
-    END("end", 6);
+    END("end", 5);
     public static final Codec<MomentState> CODEC = Codec.STRING.xmap(name1 -> valueOf(name1.toUpperCase(Locale.ROOT)), state -> state.name().toLowerCase(Locale.ROOT));
     private final String name;
     private final int index;

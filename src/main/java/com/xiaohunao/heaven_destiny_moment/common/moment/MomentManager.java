@@ -75,7 +75,7 @@ public class MomentManager extends SavedData {
     public void tick() {
         CopyOnWriteArrayList<MomentInstance> momentInstances = new CopyOnWriteArrayList<>(runMoments.values());
         momentInstances.forEach(instance -> {
-            if (instance.shouldEnd()) {
+            if (instance.state == MomentState.END) {
                 removeMoment(instance.getID());
             }
             instance.baseTick();
