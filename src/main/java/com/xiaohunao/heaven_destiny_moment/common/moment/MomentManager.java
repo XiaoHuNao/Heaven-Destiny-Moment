@@ -19,10 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MomentManager extends SavedData {
@@ -33,6 +30,7 @@ public class MomentManager extends SavedData {
     private final Multimap<UUID, Pair<UUID,MomentInstance>> playerMoments = HashMultimap.create();
 
     private static MomentManager clientMonger;
+    private Level level;
 
 
     public static MomentManager of(Level level) {
@@ -43,12 +41,14 @@ public class MomentManager extends SavedData {
                 momentManager = serverLevel.getDataStorage().computeIfAbsent(new Factory<>(MomentManager::new,
                         (CompoundTag compoundTag, HolderLookup.Provider tag) -> load(serverLevel, compoundTag, tag)), NAME);
                 container.heaven_destiny_moment$setMomentManager(momentManager);
+                momentManager.level = serverLevel;
             }
             return momentManager;
         } else {
             if (clientMonger == null) {
                 clientMonger = new MomentManager();
             }
+            clientMonger.level = level;
             return clientMonger;
         }
     }
@@ -66,8 +66,8 @@ public class MomentManager extends SavedData {
         MomentManager manager = new MomentManager();
         ListTag listTag = tag.getList("moment", Tag.TAG_COMPOUND);
         listTag.forEach(compoundTag -> {
-            manager.addMoment(level, MomentInstance.loadStatic(level, (CompoundTag) compoundTag));
-            PacketDistributor.sendToPlayersInDimension(level, new MomentManagerSyncPayload((CompoundTag) compoundTag));
+            manager.addMoment(level, Objects.requireNonNull(MomentInstance.loadStatic(level, (CompoundTag) compoundTag)));
+            PacketDistributor.sendToPlayersInDimension(level, new MomentManagerSyncPayload((CompoundTag) compoundTag,false));
         });
         return manager;
     }
@@ -76,7 +76,10 @@ public class MomentManager extends SavedData {
         CopyOnWriteArrayList<MomentInstance> momentInstances = new CopyOnWriteArrayList<>(runMoments.values());
         momentInstances.forEach(instance -> {
             if (instance.state == MomentState.END) {
-                removeMoment(instance.getID());
+                if (!level.isClientSide){
+                    removeMoment(instance);
+                }
+                runMoments.remove(instance.getID());
             }
             instance.baseTick();
         });
@@ -86,15 +89,16 @@ public class MomentManager extends SavedData {
         return this.runMoments;
     }
 
-    public void removeMoment(UUID uuid) {
-        runMoments.remove(uuid);
+    public void removeMoment(MomentInstance instance) {
+        runMoments.remove(instance.getID());
+        PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new MomentManagerSyncPayload(instance.serializeNBT(),false));
     }
 
     public void addMoment(ServerLevel serverLevel, MomentInstance instance) {
         UUID uuid = instance.getID();
 
         runMoments.put(uuid, instance);
-        PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(instance.serializeNBT()));
+        PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(instance.serializeNBT(),false));
         setDirty();
     }
     public boolean addPlayerToMoment(Player player, MomentInstance instance) {

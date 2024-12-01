@@ -175,6 +175,8 @@ public abstract class MomentInstance extends AttachmentHolder {
             MomentEvent.Ready ready = (MomentEvent.Ready)setState(MomentState.READY);
             if (!ready.isCanceled()){
                 ready();
+            }else {
+                setState(MomentState.END);
             }
         }
 
@@ -209,7 +211,7 @@ public abstract class MomentInstance extends AttachmentHolder {
 
 
     private void ready() {
-        MomentManager.of(level).removeMoment(uuid);
+
     }
 
     private void start() {

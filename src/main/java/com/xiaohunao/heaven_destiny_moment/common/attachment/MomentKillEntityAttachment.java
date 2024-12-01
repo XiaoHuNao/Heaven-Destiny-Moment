@@ -31,6 +31,9 @@ public final class MomentKillEntityAttachment {
     public Map<EntityType<?>, Integer> getEntityKills() {
         return entity_kills;
     }
+    public int getEntityKills(EntityType<?> entityType) {
+        return entity_kills.getOrDefault(entityType,0);
+    }
 
     public Integer getCounter() {
         return counter;

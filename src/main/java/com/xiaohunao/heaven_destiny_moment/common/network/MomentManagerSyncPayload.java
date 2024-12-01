@@ -12,11 +12,14 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
+import java.util.Optional;
 
-public record MomentManagerSyncPayload(CompoundTag runMoment) implements CustomPacketPayload {
+
+public record MomentManagerSyncPayload(CompoundTag runMoment,boolean isRemove) implements CustomPacketPayload {
     public static final Type<MomentManagerSyncPayload> TYPE = new Type<>(HeavenDestinyMoment.asResource("moment_manager_sync"));
     public static final StreamCodec<ByteBuf, MomentManagerSyncPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.fromCodec(CompoundTag.CODEC), MomentManagerSyncPayload::runMoment,
+            ByteBufCodecs.BOOL,MomentManagerSyncPayload::isRemove,
             MomentManagerSyncPayload::new
     );
 
@@ -30,8 +33,14 @@ public record MomentManagerSyncPayload(CompoundTag runMoment) implements CustomP
             if (context.player().isLocalPlayer()) {
                 Level level = context.player().level();
                 MomentManager momentManager = MomentManager.of(level);
-                MomentInstance momentInstance = MomentInstance.loadStatic(level, runMoment);
-                momentManager.getRunMoment().put(momentInstance.getID(), momentInstance);
+                Optional<MomentInstance> momentInstance = Optional.ofNullable(MomentInstance.loadStatic(level, runMoment));
+                momentInstance.ifPresent(instance -> {
+                    if (!isRemove) {
+                        momentManager.getRunMoment().put(instance.getID(), instance);
+                    } else {
+                        momentManager.getRunMoment().remove(instance.getID());
+                    }
+                });
             }
         }).exceptionally(e -> {
             context.disconnect(Component.translatable("neoforge.network.invalid_flow", e.getMessage()));
