@@ -1,24 +1,29 @@
 package com.xiaohunao.heaven_destiny_moment.common.moment;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Pair;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettingsContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.IConditionContext;
 import com.xiaohunao.heaven_destiny_moment.common.mixed.MomentManagerContainer;
 import com.xiaohunao.heaven_destiny_moment.common.network.ClientOnlyMomentSyncPayload;
 import com.xiaohunao.heaven_destiny_moment.common.network.MomentManagerSyncPayload;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -62,12 +67,17 @@ public class MomentManager extends SavedData {
         return compoundTag;
     }
 
-    public static MomentManager load(ServerLevel level, CompoundTag tag, HolderLookup.Provider lookupProvider) {
+    public static MomentManager load(ServerLevel serverLevel, CompoundTag tag, HolderLookup.Provider lookupProvider) {
         MomentManager manager = new MomentManager();
         ListTag listTag = tag.getList("moment", Tag.TAG_COMPOUND);
         listTag.forEach(compoundTag -> {
-            manager.addMoment(level, Objects.requireNonNull(MomentInstance.loadStatic(level, (CompoundTag) compoundTag)));
-            PacketDistributor.sendToPlayersInDimension(level, new MomentManagerSyncPayload((CompoundTag) compoundTag,false));
+            MomentInstance instance = MomentInstance.loadStatic(serverLevel, (CompoundTag) compoundTag);
+            if (instance != null) {
+                UUID uuid = instance.getID();
+                manager.runMoments.put(uuid, instance);
+                PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(instance.serializeNBT(),false));
+                manager.setDirty();
+            }
         });
         return manager;
     }
@@ -94,12 +104,18 @@ public class MomentManager extends SavedData {
         PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new MomentManagerSyncPayload(instance.serializeNBT(),false));
     }
 
-    public void addMoment(ServerLevel serverLevel, MomentInstance instance) {
+    public void addMoment(MomentInstance instance, ServerLevel serverLevel, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
         UUID uuid = instance.getID();
-
-        runMoments.put(uuid, instance);
-        PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(instance.serializeNBT(),false));
-        setDirty();
+        if (instance.moment != null) {
+            instance.moment.getMomentDataContext().conditions().ifPresent(conditions -> {
+                boolean conditionMatch = conditions.stream().anyMatch(condition -> condition.matches(instance, pos));
+                if (instance.canCreate(runMoments,serverLevel,pos,serverPlayer) && conditionMatch) {
+                    runMoments.put(uuid, instance);
+                    PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(instance.serializeNBT(),false));
+                    setDirty();
+                }
+            });
+        }
     }
     public boolean addPlayerToMoment(Player player, MomentInstance instance) {
         UUID playerUUID = player.getUUID();
@@ -157,6 +173,6 @@ public class MomentManager extends SavedData {
     }
 
     public Map<UUID, MomentInstance> getRunMoments() {
-        return runMoments;
+        return ImmutableMap.copyOf(runMoments);
     }
 }

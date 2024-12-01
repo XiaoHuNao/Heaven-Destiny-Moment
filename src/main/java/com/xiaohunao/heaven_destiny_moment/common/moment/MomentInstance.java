@@ -49,7 +49,7 @@ public abstract class MomentInstance extends AttachmentHolder {
         this.type = type;
         this.level = level;
         this.momentKey = momentKey;
-        this.moment = Objects.requireNonNull(registryChecked(momentKey, level)).get(momentKey);
+        this.moment = registryChecked(momentKey, level).get(momentKey);
         this.bar = new MomentBar(uuid, moment.getBarRenderType());
     }
 
@@ -62,11 +62,11 @@ public abstract class MomentInstance extends AttachmentHolder {
         this.bar = new MomentBar(uuid, moment.getBarRenderType());
     }
 
-    public static boolean create(ResourceKey<Moment> momentKey, ServerLevel level) {
-        Moment moment = registryChecked(momentKey, level).get(momentKey);
+    public static boolean create(ResourceKey<Moment> momentKey, ServerLevel serverLevel, BlockPos pos, ServerPlayer serverPlayer) {
+        Moment moment = registryChecked(momentKey, serverLevel).get(momentKey);
         if (moment != null) {
-            MomentInstance momentInstance = moment.newMomentInstance(level, momentKey);
-            MomentManager.of(level).addMoment(level, momentInstance);
+            MomentInstance momentInstance = moment.newMomentInstance(serverLevel, momentKey);
+            MomentManager.of(serverLevel).addMoment(momentInstance,serverLevel,pos,serverPlayer);
             return true;
         }
         return false;
@@ -340,5 +340,9 @@ public abstract class MomentInstance extends AttachmentHolder {
 
     public void livingDeath(LivingEntity entity) {
 
+    }
+
+    public boolean canCreate(Map<UUID, MomentInstance> runMoments, ServerLevel serverLevel, BlockPos pos,@Nullable ServerPlayer player) {
+        return true;
     }
 }
