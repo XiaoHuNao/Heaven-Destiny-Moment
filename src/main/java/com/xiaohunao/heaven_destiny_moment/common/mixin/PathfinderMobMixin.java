@@ -23,7 +23,7 @@ public class PathfinderMobMixin {
 
         MomentManager momentManager = MomentManager.of(serverLevel);
         PathfinderMob mob = (PathfinderMob) (Object) this;
-        for (MomentInstance instance : momentManager.getRunMoments().values()) {
+        for (MomentInstance<?> instance : momentManager.getRunMoments().values()) {
             instance.moment()
                     .filter(moment -> moment.isInArea(serverLevel, mob.blockPosition()))
                     .flatMap(Moment::momentDataContext)

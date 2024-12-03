@@ -40,7 +40,7 @@ public class NaturalSpawnerMixin {
     @Inject(method = "mobsAt", at = @At("RETURN"), cancellable = true)
     private static void mobsAt(ServerLevel serverLevel, StructureManager structureManager, ChunkGenerator chunkGenerator, MobCategory mobCategory, BlockPos pos, Holder<Biome> biomeHolder, CallbackInfoReturnable<WeightedRandomList<MobSpawnSettings.SpawnerData>> cir) {
         MomentManager momentManager = MomentManager.of(serverLevel);
-        for (MomentInstance instance : momentManager.getRunMoments().values()) {
+        for (MomentInstance<?> instance : momentManager.getRunMoments().values()) {
             instance.moment()
                     .filter(moment -> moment.isInArea(serverLevel, pos))
                     .flatMap(Moment::momentDataContext)
@@ -73,7 +73,7 @@ public class NaturalSpawnerMixin {
                         .build()
                 );
 
-        for (MomentInstance instance : momentManager.getRunMoments().values()) {
+        for (MomentInstance<?> instance : momentManager.getRunMoments().values()) {
             instance.moment()
                     .filter(moment -> moment.isInArea((ServerLevel) level, pos))
                     .flatMap(Moment::momentDataContext)
@@ -120,7 +120,7 @@ public class NaturalSpawnerMixin {
     @Inject(method = "isRightDistanceToPlayerAndSpawnPoint", at =@At("RETURN"), cancellable = true)
     private static void isRightDistanceToPlayerAndSpawnPoint(ServerLevel serverLevel, ChunkAccess chunk, BlockPos.MutableBlockPos pos, double distance, CallbackInfoReturnable<Boolean> cir){
         MomentManager momentManager = MomentManager.of(serverLevel);
-        for (MomentInstance instance : momentManager.getRunMoments().values()) {
+        for (MomentInstance<?> instance : momentManager.getRunMoments().values()) {
             instance.moment()
                     .filter(moment -> moment.isInArea(serverLevel, pos))
                     .flatMap(Moment::momentDataContext)
@@ -177,7 +177,7 @@ public class NaturalSpawnerMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"),locals = LocalCapture.CAPTURE_FAILSOFT, cancellable = true)
     private static void spawnCategoryForPosition(MobCategory category, ServerLevel serverLevel, ChunkAccess chunk, BlockPos pos, NaturalSpawner.SpawnPredicate filter, NaturalSpawner.AfterSpawnCallback callback, CallbackInfo ci, StructureManager structuremanager, ChunkGenerator chunkgenerator, int i, BlockState blockstate, BlockPos.MutableBlockPos blockpos$mutableblockpos, int j, int k, int l, int i1, int j1, MobSpawnSettings.SpawnerData mobspawnsettings$spawnerdata, SpawnGroupData spawngroupdata, int k1, int l1, int i2, double d0, double d1, Player player, double d2, Mob mob) {
         MomentManager momentManager = MomentManager.of(serverLevel.getLevel());
-        for (MomentInstance instance : momentManager.getRunMoments().values()) {
+        for (MomentInstance<?> instance : momentManager.getRunMoments().values()) {
             if (instance.canSpawnEntity(serverLevel,mob,pos)) {
                 instance.moment()
                         .filter(moment -> moment.isInArea(serverLevel, mob.blockPosition()))

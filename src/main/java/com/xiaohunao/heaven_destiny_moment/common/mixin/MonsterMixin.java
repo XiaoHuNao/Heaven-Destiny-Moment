@@ -23,7 +23,7 @@ public class MonsterMixin {
     private static void isDarkEnoughToSpawn(ServerLevelAccessor serverLevelAccessor, BlockPos pos, RandomSource p_219012_, CallbackInfoReturnable<Boolean> cir) {
         ServerLevel level = serverLevelAccessor.getLevel();
         MomentManager momentManager = MomentManager.of(level);
-        for (MomentInstance instance : momentManager.getRunMoments().values()) {
+        for (MomentInstance<?> instance : momentManager.getRunMoments().values()) {
             instance.moment()
                     .filter(moment -> moment.isInArea(level,pos))
                     .flatMap(Moment::momentDataContext)

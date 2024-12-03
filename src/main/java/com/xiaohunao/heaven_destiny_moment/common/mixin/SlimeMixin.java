@@ -28,7 +28,7 @@ public class SlimeMixin {
     private static void checkSlimeSpawnRules(EntityType<Slime> entityType, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random, CallbackInfoReturnable<Boolean> cir) {
         if (level instanceof ServerLevel serverLevel) {
             MomentManager momentManager = MomentManager.of(serverLevel);
-            for (MomentInstance instance : momentManager.getRunMoments().values()) {
+            for (MomentInstance<?> instance : momentManager.getRunMoments().values()) {
                 instance.moment()
                         .filter(moment -> moment.isInArea(serverLevel, pos))
                         .flatMap(Moment::momentDataContext)

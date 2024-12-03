@@ -39,7 +39,7 @@ public class NaturalSpawnerSpawnStateMixin {
         int maxInstancesPerChunk = mobCategory.getMaxInstancesPerChunk();
         int currentCount = this.mobCategoryCounts.getInt(mobCategory);
         MomentManager momentManager = MomentManager.of(level);
-        for (MomentInstance instance : momentManager.getRunMoments().values()) {
+        for (MomentInstance<?> instance : momentManager.getRunMoments().values()) {
             instance.moment()
                     .flatMap(Moment::momentDataContext)
                     .flatMap(MomentDataContext::entitySpawnSettingsContext)

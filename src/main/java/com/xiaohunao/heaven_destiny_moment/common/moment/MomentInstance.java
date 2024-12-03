@@ -28,10 +28,11 @@ import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public abstract class MomentInstance extends AttachmentHolder {
+public abstract class MomentInstance<T extends Moment> extends AttachmentHolder {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected final Level level;
@@ -76,9 +77,9 @@ public abstract class MomentInstance extends AttachmentHolder {
         return create(momentKey,serverLevel,pos,serverPlayer,null);
     }
 
-    public Optional<Moment> moment() {
+    public Optional<T> moment() {
         Registry<Moment> registry = level.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
-        return Optional.ofNullable(registry.get(momentKey));
+        return Optional.ofNullable((T) registry.get(momentKey));
     }
     public void init(){
         initMomentBar();
@@ -91,7 +92,7 @@ public abstract class MomentInstance extends AttachmentHolder {
 
 
     @Nullable
-    public static MomentInstance loadStatic(Level level, CompoundTag compoundTag) {
+    public static MomentInstance<?> loadStatic(Level level, CompoundTag compoundTag) {
         String id = compoundTag.getString("id");
         ResourceLocation resourcelocation = ResourceLocation.tryParse(id);
         if (resourcelocation == null) {
@@ -365,7 +366,16 @@ public abstract class MomentInstance extends AttachmentHolder {
 
     }
 
-    public boolean canCreate(Map<UUID, MomentInstance> runMoments, ServerLevel serverLevel, BlockPos pos,@Nullable ServerPlayer player) {
+    public boolean canCreate(Map<UUID, MomentInstance<?>> runMoments, ServerLevel serverLevel, BlockPos pos,@Nullable ServerPlayer player) {
         return true;
+    }
+
+    public Player getRandomPlayer() {
+        if (players.isEmpty()){
+            return null;
+        }
+
+        List<Player> playerList = Lists.newArrayList(players);
+        return playerList.get(level.random.nextInt(playerList.size()));
     }
 }

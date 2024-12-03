@@ -25,7 +25,7 @@ public class LocalMobCapCalculatorMixin {
     @Redirect(method = "canSpawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/LocalMobCapCalculator$MobCounts;canSpawn(Lnet/minecraft/world/entity/MobCategory;)Z"))
     private boolean canSpawn(LocalMobCapCalculator.MobCounts mobCounts, MobCategory mobCategory) {
         MomentManager momentManager = MomentManager.of(chunkMap.level);
-        for (MomentInstance instance : momentManager.getRunMoments().values()) {
+        for (MomentInstance<?> instance : momentManager.getRunMoments().values()) {
             instance.moment()
                     .flatMap(Moment::momentDataContext)
                     .flatMap(MomentDataContext::entitySpawnSettingsContext)

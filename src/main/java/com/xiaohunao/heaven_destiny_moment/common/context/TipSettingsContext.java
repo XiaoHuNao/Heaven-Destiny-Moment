@@ -25,7 +25,7 @@ public record TipSettingsContext(Optional<Map<MomentState, Holder<SoundEvent>>> 
             Codec.unboundedMap(MomentState.CODEC, ComponentSerialization.CODEC).optionalFieldOf("texts").forGetter(TipSettingsContext::texts)
     ).apply(instance, TipSettingsContext::new));
 
-    public void playTooltip(MomentInstance instance) {
+    public void playTooltip(MomentInstance<?> instance) {
         if (!instance.getLevel().isClientSide) return;
 
         texts.ifPresent(texts ->{

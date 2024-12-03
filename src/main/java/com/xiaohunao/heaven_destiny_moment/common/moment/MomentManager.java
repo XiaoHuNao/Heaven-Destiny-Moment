@@ -31,9 +31,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class MomentManager extends SavedData {
     private static final String NAME = HeavenDestinyMoment.MODID + "_moment_manager";
 
-    private final Map<UUID, MomentInstance> runMoments = Maps.newHashMap();
-    private MomentInstance clientOnlyMoment = null;
-    private final Multimap<UUID, Pair<UUID,MomentInstance>> playerMoments = HashMultimap.create();
+    private final Map<UUID, MomentInstance<?>> runMoments = Maps.newHashMap();
+    private MomentInstance<?> clientOnlyMoment = null;
+    private final Multimap<UUID, Pair<UUID,MomentInstance<?>>> playerMoments = HashMultimap.create();
 
     private static MomentManager clientMonger;
     private Level level;
@@ -96,16 +96,16 @@ public class MomentManager extends SavedData {
         });
     }
 
-    public Map<UUID, MomentInstance> getRunMoment() {
+    public Map<UUID, MomentInstance<?>> getRunMoment() {
         return this.runMoments;
     }
 
-    public void removeMoment(MomentInstance instance) {
+    public void removeMoment(MomentInstance<?> instance) {
         runMoments.remove(instance.getID());
         PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new MomentManagerSyncPayload(instance.serializeNBT(),false));
     }
 
-    public boolean addMoment(MomentInstance instance, ServerLevel serverLevel, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
+    public boolean addMoment(MomentInstance<?> instance, ServerLevel serverLevel, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
         UUID uuid = instance.getID();
         Boolean conditionMatch = instance.moment()
                 .flatMap(Moment::momentDataContext)
@@ -121,7 +121,7 @@ public class MomentManager extends SavedData {
         }
         return false;
     }
-    public boolean addPlayerToMoment(Player player, MomentInstance instance) {
+    public boolean addPlayerToMoment(Player player, MomentInstance<?> instance) {
         UUID playerUUID = player.getUUID();
 
         if (!playerMoments.containsKey(playerUUID)) {
@@ -134,9 +134,9 @@ public class MomentManager extends SavedData {
         }
 
         boolean canAddPlayer = true;
-        for (Pair<UUID, MomentInstance> uuidMomentInstancePair : playerMoments.get(playerUUID)) {
-            MomentInstance second = uuidMomentInstancePair.getSecond();
-            Optional<Moment> moment = second.moment();
+        for (Pair<UUID, MomentInstance<?>> uuidMomentInstancePair : playerMoments.get(playerUUID)) {
+            MomentInstance<?> second = uuidMomentInstancePair.getSecond();
+            Optional<? extends Moment> moment = second.moment();
             if (moment.isPresent()) {
                 if (second.getID().equals(instance.getID())) break;
 
@@ -164,21 +164,21 @@ public class MomentManager extends SavedData {
         return false;
     }
 
-    public MomentManager setClientOnlyMoment(MomentInstance clientOnlyMoment) {
+    public MomentManager setClientOnlyMoment(MomentInstance<?> clientOnlyMoment) {
         this.clientOnlyMoment = clientOnlyMoment;
         setDirty();
         return this;
     }
 
-    public Optional<MomentInstance> getClientOnlyMoment() {
+    public Optional<MomentInstance<?>> getClientOnlyMoment() {
         return Optional.ofNullable(clientOnlyMoment);
     }
 
-    public Collection<Pair<UUID, MomentInstance>> getPlayerMoment(UUID playerUUID) {
+    public Collection<Pair<UUID, MomentInstance<?>>> getPlayerMoment(UUID playerUUID) {
         return playerMoments.get(playerUUID);
     }
 
-    public Map<UUID, MomentInstance> getRunMoments() {
+    public Map<UUID, MomentInstance<?>> getRunMoments() {
         return ImmutableMap.copyOf(runMoments);
     }
 }
