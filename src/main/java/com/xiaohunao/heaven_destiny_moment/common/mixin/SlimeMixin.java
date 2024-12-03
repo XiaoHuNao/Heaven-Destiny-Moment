@@ -29,9 +29,9 @@ public class SlimeMixin {
         if (level instanceof ServerLevel serverLevel) {
             MomentManager momentManager = MomentManager.of(serverLevel);
             for (MomentInstance instance : momentManager.getRunMoments().values()) {
-                instance.getMoment()
+                instance.moment()
                         .filter(moment -> moment.isInArea(serverLevel, pos))
-                        .map(Moment::getMomentDataContext)
+                        .flatMap(Moment::momentDataContext)
                         .flatMap(MomentDataContext::entitySpawnSettingsContext)
                         .flatMap(EntitySpawnSettingsContext::rule)
                         .flatMap(MobSpawnRule::slimesSpawnEverywhere)

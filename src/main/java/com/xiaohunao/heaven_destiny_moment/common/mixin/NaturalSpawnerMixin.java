@@ -41,9 +41,9 @@ public class NaturalSpawnerMixin {
     private static void mobsAt(ServerLevel serverLevel, StructureManager structureManager, ChunkGenerator chunkGenerator, MobCategory mobCategory, BlockPos pos, Holder<Biome> biomeHolder, CallbackInfoReturnable<WeightedRandomList<MobSpawnSettings.SpawnerData>> cir) {
         MomentManager momentManager = MomentManager.of(serverLevel);
         for (MomentInstance instance : momentManager.getRunMoments().values()) {
-            instance.getMoment()
+            instance.moment()
                     .filter(moment -> moment.isInArea(serverLevel, pos))
-                    .map(Moment::getMomentDataContext)
+                    .flatMap(Moment::momentDataContext)
                     .flatMap(MomentDataContext::entitySpawnSettingsContext)
                     .ifPresent(entitySpawnSettingsContext -> {
                         List<MobSpawnSettings.SpawnerData> unwrap = new ArrayList<>(cir.getReturnValue().unwrap());
@@ -74,9 +74,9 @@ public class NaturalSpawnerMixin {
                 );
 
         for (MomentInstance instance : momentManager.getRunMoments().values()) {
-            instance.getMoment()
+            instance.moment()
                     .filter(moment -> moment.isInArea((ServerLevel) level, pos))
-                    .map(Moment::getMomentDataContext)
+                    .flatMap(Moment::momentDataContext)
                     .flatMap(MomentDataContext::entitySpawnSettingsContext)
                     .ifPresent(entitySpawnSettingsContext -> {
                         MobSpawnSettings mobSettings = cir.getReturnValue().getMobSettings();
@@ -121,9 +121,9 @@ public class NaturalSpawnerMixin {
     private static void isRightDistanceToPlayerAndSpawnPoint(ServerLevel serverLevel, ChunkAccess chunk, BlockPos.MutableBlockPos pos, double distance, CallbackInfoReturnable<Boolean> cir){
         MomentManager momentManager = MomentManager.of(serverLevel);
         for (MomentInstance instance : momentManager.getRunMoments().values()) {
-            instance.getMoment()
+            instance.moment()
                     .filter(moment -> moment.isInArea(serverLevel, pos))
-                    .map(Moment::getMomentDataContext)
+                    .flatMap(Moment::momentDataContext)
                     .flatMap(MomentDataContext::entitySpawnSettingsContext)
                     .flatMap(EntitySpawnSettingsContext::rule)
                     .flatMap(MobSpawnRule::ignoreDistance)
@@ -179,7 +179,7 @@ public class NaturalSpawnerMixin {
         MomentManager momentManager = MomentManager.of(serverLevel.getLevel());
         for (MomentInstance instance : momentManager.getRunMoments().values()) {
             if (instance.canSpawnEntity(serverLevel,mob,pos)) {
-                instance.getMoment()
+                instance.moment()
                         .filter(moment -> moment.isInArea(serverLevel, mob.blockPosition()))
                         .ifPresent(moment -> {
                             MomentEntityAttachment data = mob.getData(HDMAttachments.MOMENT_ENTITY);

@@ -40,8 +40,8 @@ public class NaturalSpawnerSpawnStateMixin {
         int currentCount = this.mobCategoryCounts.getInt(mobCategory);
         MomentManager momentManager = MomentManager.of(level);
         for (MomentInstance instance : momentManager.getRunMoments().values()) {
-            instance.getMoment()
-                    .map(Moment::getMomentDataContext)
+            instance.moment()
+                    .flatMap(Moment::momentDataContext)
                     .flatMap(MomentDataContext::entitySpawnSettingsContext)
                     .flatMap(EntitySpawnSettingsContext::biomeEntitySpawnSettings)
                     .flatMap(BiomeEntitySpawnSettings::spawnCategoryMultiplier)

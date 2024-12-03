@@ -24,9 +24,9 @@ public class PathfinderMobMixin {
         MomentManager momentManager = MomentManager.of(serverLevel);
         PathfinderMob mob = (PathfinderMob) (Object) this;
         for (MomentInstance instance : momentManager.getRunMoments().values()) {
-            instance.getMoment()
+            instance.moment()
                     .filter(moment -> moment.isInArea(serverLevel, mob.blockPosition()))
-                    .map(Moment::getMomentDataContext)
+                    .flatMap(Moment::momentDataContext)
                     .flatMap(MomentDataContext::entitySpawnSettingsContext)
                     .flatMap(EntitySpawnSettingsContext::rule)
                     .flatMap(MobSpawnRule::ignoreLightLevel)

@@ -26,8 +26,8 @@ public class LocalMobCapCalculatorMixin {
     private boolean canSpawn(LocalMobCapCalculator.MobCounts mobCounts, MobCategory mobCategory) {
         MomentManager momentManager = MomentManager.of(chunkMap.level);
         for (MomentInstance instance : momentManager.getRunMoments().values()) {
-            instance.getMoment()
-                    .map(Moment::getMomentDataContext)
+            instance.moment()
+                    .flatMap(Moment::momentDataContext)
                     .flatMap(MomentDataContext::entitySpawnSettingsContext)
                     .flatMap(EntitySpawnSettingsContext::biomeEntitySpawnSettings)
                     .flatMap(BiomeEntitySpawnSettings::spawnCategoryMultiplier)

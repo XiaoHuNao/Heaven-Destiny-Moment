@@ -30,10 +30,11 @@ public abstract class LevelRendererMixin {
         MomentManager momentManager = MomentManager.of(level);
 
         Float moonSize = momentManager.getClientOnlyMoment()
-                .flatMap(MomentInstance::getMoment)
-                .map(Moment::getClientSettingsContext)
+                .flatMap(MomentInstance::moment)
+                .flatMap(Moment::clientSettingsContext)
                 .flatMap(ClientSettingsContext::clientMoonSettingsContext)
-                .flatMap(ClientMoonSettingsContext::MoonSize).orElse(null);
+                .flatMap(ClientMoonSettingsContext::MoonSize)
+                .orElse(null);
 
         if (moonSize != null) {
             return moonSize;
@@ -44,14 +45,13 @@ public abstract class LevelRendererMixin {
     private void renderSky(int moonTextureId, ResourceLocation originaResourceLocation) {
         MomentManager momentManager = MomentManager.of(level);
 
-        ResourceLocation moonTexture = momentManager.getClientOnlyMoment()
-                .flatMap(MomentInstance::getMoment)
-                .map(Moment::getClientSettingsContext)
+        momentManager.getClientOnlyMoment()
+                .flatMap(MomentInstance::moment)
+                .flatMap(Moment::clientSettingsContext)
                 .flatMap(ClientSettingsContext::clientMoonSettingsContext)
-                .flatMap(ClientMoonSettingsContext::MoonTexture).orElse(null);
-        if (moonTexture != null){
-            RenderSystem.setShaderTexture(moonTextureId, moonTexture);
-        }
+                .flatMap(ClientMoonSettingsContext::MoonTexture)
+                .ifPresent(moonTexture -> RenderSystem.setShaderTexture(moonTextureId, moonTexture));
+
         RenderSystem.setShaderTexture(moonTextureId, originaResourceLocation);
     }
 
@@ -59,10 +59,11 @@ public abstract class LevelRendererMixin {
     private void renderSky(Matrix4f frustumMatrix, Matrix4f projectionMatrix, float partialTick, Camera camera, boolean isFoggy, Runnable skyFogSetup, CallbackInfo ci) {
         MomentManager momentManager = MomentManager.of(level);
         Integer moonColor = momentManager.getClientOnlyMoment()
-                .flatMap(MomentInstance::getMoment)
-                .map(Moment::getClientSettingsContext)
+                .flatMap(MomentInstance::moment)
+                .flatMap(Moment::clientSettingsContext)
                 .flatMap(ClientSettingsContext::clientMoonSettingsContext)
-                .flatMap(ClientMoonSettingsContext::moonColor).orElse(null);
+                .flatMap(ClientMoonSettingsContext::moonColor)
+                .orElse(null);
 
         if (moonColor != null){
             Vector3f color = ColorUtils.colorToVector3f(moonColor);

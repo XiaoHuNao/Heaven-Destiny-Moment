@@ -21,8 +21,8 @@ public abstract class LightMapTextureMixin {
         MomentManager momentManager = MomentManager.of(clientlevel);
 
         momentManager.getClientOnlyMoment()
-                .flatMap(MomentInstance::getMoment)
-                .map(Moment::getClientSettingsContext)
+                .flatMap(MomentInstance::moment)
+                .flatMap(Moment::clientSettingsContext)
                 .flatMap(ClientSettingsContext::environmentColor)
                 .ifPresent(color -> vector3f.set(ColorUtils.colorToVector3f(color)));
     }

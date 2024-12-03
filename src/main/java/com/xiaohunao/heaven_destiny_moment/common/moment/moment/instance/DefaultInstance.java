@@ -17,9 +17,4 @@ public class DefaultInstance extends MomentInstance {
     public DefaultInstance(UUID uuid, Level level, ResourceKey<Moment> moment) {
         super( HDMMomentTypes.DEFAULT.get(), uuid, level, moment);
     }
-
-    @Override
-    public void finalizeSpawn(Entity entity) {
-
-    }
 }

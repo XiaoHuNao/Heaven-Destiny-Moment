@@ -24,9 +24,9 @@ public class MonsterMixin {
         ServerLevel level = serverLevelAccessor.getLevel();
         MomentManager momentManager = MomentManager.of(level);
         for (MomentInstance instance : momentManager.getRunMoments().values()) {
-            instance.getMoment()
+            instance.moment()
                     .filter(moment -> moment.isInArea(level,pos))
-                    .map(Moment::getMomentDataContext)
+                    .flatMap(Moment::momentDataContext)
                     .flatMap(MomentDataContext::entitySpawnSettingsContext)
                     .flatMap(EntitySpawnSettingsContext::rule)
                     .flatMap(MobSpawnRule::ignoreLightLevel)
