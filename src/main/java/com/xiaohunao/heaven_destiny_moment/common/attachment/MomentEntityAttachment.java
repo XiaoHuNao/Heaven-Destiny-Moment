@@ -35,7 +35,9 @@ public class MomentEntityAttachment implements INBTSerializable<CompoundTag> {
 
     @Override
     public void deserializeNBT(@NotNull HolderLookup.Provider provider,@NotNull CompoundTag compoundTag) {
-        this.momentUid = compoundTag.getUUID("momentUid");
+        if (compoundTag.contains("momentUid")) {
+            this.momentUid = compoundTag.getUUID("momentUid");
+        }
     }
 
     public MomentEntityAttachment setUid(UUID momentUid) {
