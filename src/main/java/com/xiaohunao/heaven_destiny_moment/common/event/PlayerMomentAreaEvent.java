@@ -1,30 +1,28 @@
 package com.xiaohunao.heaven_destiny_moment.common.event;
 
+import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.area.Area;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 public abstract class PlayerMomentAreaEvent extends PlayerEvent {
-    private final Area area;
+    private final MomentInstance momentInstance;
 
-    public PlayerMomentAreaEvent(Player player, Area area) {
+    public PlayerMomentAreaEvent(Player player, MomentInstance momentInstance) {
         super(player);
-        this.area = area;
+        this.momentInstance = momentInstance;
     }
 
-    public Area getArea() {
-        return area;
-    }
 
     public static class Enter extends PlayerMomentAreaEvent {
-        public Enter(Player player, Area area) {
-            super(player, area);
+        public Enter(Player player, MomentInstance momentInstance) {
+            super(player, momentInstance);
         }
     }
 
     public static class Exit extends PlayerMomentAreaEvent {
-        public Exit(Player player, Area area) {
-            super(player, area);
+        public Exit(Player player, MomentInstance momentInstance) {
+            super(player, momentInstance);
         }
     }
 }

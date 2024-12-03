@@ -1,6 +1,7 @@
 package com.xiaohunao.heaven_destiny_moment.common.moment;
 
 import com.mojang.logging.LogUtils;
+import com.xiaohunao.heaven_destiny_moment.client.gui.bar.render.IBarRenderType;
 import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettingsContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentDataContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.TipSettingsContext;
@@ -14,16 +15,19 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import org.slf4j.Logger;
 
+import java.util.Optional;
+
 public abstract class Moment implements IMoment {
-    private static final Logger LOGGER = LogUtils.getLogger();
+    private IBarRenderType barRenderType;
+    private Area area;
+    private MomentDataContext momentDataContext;
+    private TipSettingsContext tipSettingsContext;
+    private ClientSettingsContext clientSettingsContext;
 
-    private final ResourceLocation barRenderType;
-    private final Area area;
-    private final MomentDataContext momentDataContext;
-    private final TipSettingsContext tipSettingsContext;
-    private final ClientSettingsContext clientSettingsContext;
+    public Moment() {
+    }
 
-    public Moment(ResourceLocation barRenderType, Area area, MomentDataContext momentDataContext, TipSettingsContext tipSettingsContext, ClientSettingsContext clientSettingsContext) {
+    public Moment(IBarRenderType barRenderType, Area area, MomentDataContext momentDataContext, TipSettingsContext tipSettingsContext, ClientSettingsContext clientSettingsContext) {
         this.barRenderType = barRenderType;
         this.area = area;
         this.momentDataContext = momentDataContext;
@@ -34,26 +38,54 @@ public abstract class Moment implements IMoment {
     public abstract MomentInstance newMomentInstance(Level level, ResourceKey<Moment> momentResourceKey);
 
     public boolean isInArea(ServerLevel level, BlockPos blockPos) {
-        return area.matches(level, blockPos);
+        if (area != null){
+            return area.matches(level,blockPos);
+        }
+        return true;
     }
 
-    public ResourceLocation getBarRenderType() {
-        return barRenderType;
+    public Optional<IBarRenderType> barRenderType() {
+        return Optional.ofNullable(barRenderType);
     }
 
-    public MomentDataContext getMomentDataContext() {
-        return momentDataContext;
+    public Optional<MomentDataContext> momentDataContext() {
+        return Optional.ofNullable(momentDataContext);
     }
 
-    public ClientSettingsContext getClientSettingsContext() {
-        return clientSettingsContext;
+    public Optional<ClientSettingsContext> clientSettingsContext() {
+        return Optional.ofNullable(clientSettingsContext);
     }
 
-    public TipSettingsContext getTipSettingsContext() {
-        return tipSettingsContext;
+    public Optional<TipSettingsContext> tipSettingsContext() {
+        return Optional.ofNullable(tipSettingsContext);
     }
 
-    public Area getArea() {
-        return area;
+    public Optional<Area> area() {
+        return Optional.ofNullable(area);
+    }
+
+    public Moment setBarRenderType(IBarRenderType barRenderType) {
+        this.barRenderType = barRenderType;
+        return this;
+    }
+
+    public Moment setMomentDataContext(MomentDataContext momentDataContext) {
+        this.momentDataContext = momentDataContext;
+        return this;
+    }
+
+    public Moment setArea(Area area) {
+        this.area = area;
+        return this;
+    }
+
+    public Moment setClientSettingsContext(ClientSettingsContext clientSettingsContext) {
+        this.clientSettingsContext = clientSettingsContext;
+        return this;
+    }
+
+    public Moment setTipSettingsContext(TipSettingsContext tipSettingsContext) {
+        this.tipSettingsContext = tipSettingsContext;
+        return this;
     }
 }

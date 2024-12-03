@@ -7,6 +7,7 @@ import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Pair;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettingsContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.MomentDataContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.IConditionContext;
 import com.xiaohunao.heaven_destiny_moment.common.mixed.MomentManagerContainer;
 import com.xiaohunao.heaven_destiny_moment.common.network.ClientOnlyMomentSyncPayload;
@@ -104,18 +105,21 @@ public class MomentManager extends SavedData {
         PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new MomentManagerSyncPayload(instance.serializeNBT(),false));
     }
 
-    public void addMoment(MomentInstance instance, ServerLevel serverLevel, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
+    public boolean addMoment(MomentInstance instance, ServerLevel serverLevel, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
         UUID uuid = instance.getID();
-        if (instance.moment != null) {
-            instance.moment.getMomentDataContext().conditions().ifPresent(conditions -> {
-                boolean conditionMatch = conditions.stream().anyMatch(condition -> condition.matches(instance, pos));
-                if (instance.canCreate(runMoments,serverLevel,pos,serverPlayer) && conditionMatch) {
-                    runMoments.put(uuid, instance);
-                    PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(instance.serializeNBT(),false));
-                    setDirty();
-                }
-            });
+        Boolean conditionMatch = instance.moment()
+                .flatMap(Moment::momentDataContext)
+                .flatMap(MomentDataContext::conditions)
+                .map(set -> set.stream().anyMatch(condition -> condition.matches(instance, pos)))
+                .orElse(true);
+        if (instance.canCreate(runMoments,serverLevel,pos,serverPlayer) && conditionMatch) {
+            instance.init();
+            runMoments.put(uuid, instance);
+            PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(instance.serializeNBT(),false));
+            setDirty();
+            return true;
         }
+        return false;
     }
     public boolean addPlayerToMoment(Player player, MomentInstance instance) {
         UUID playerUUID = player.getUUID();
@@ -132,12 +136,13 @@ public class MomentManager extends SavedData {
         boolean canAddPlayer = true;
         for (Pair<UUID, MomentInstance> uuidMomentInstancePair : playerMoments.get(playerUUID)) {
             MomentInstance second = uuidMomentInstancePair.getSecond();
-            Optional<Moment> moment = second.getMoment();
+            Optional<Moment> moment = second.moment();
             if (moment.isPresent()) {
-                ClientSettingsContext clientSettingsContext = moment.get().getClientSettingsContext();
                 if (second.getID().equals(instance.getID())) break;
 
-                if (!clientSettingsContext.isEmpty()) {
+                Boolean isEmpty = moment.flatMap(Moment::clientSettingsContext).map(ClientSettingsContext::isEmpty).orElse(true);
+
+                if (!isEmpty) {
                     canAddPlayer = false;
                     break;
                 }
@@ -146,7 +151,8 @@ public class MomentManager extends SavedData {
 
         if (canAddPlayer) {
             playerMoments.put(playerUUID, new Pair<>(instance.getID(), instance));
-            if (instance.getMoment().get().getClientSettingsContext().isEmpty()) {
+            Boolean isEmpty = instance.moment().flatMap(Moment::clientSettingsContext).map(ClientSettingsContext::isEmpty).orElse(true);
+            if (isEmpty) {
                 if (!instance.getLevel().isClientSide) {
                     PacketDistributor.sendToPlayersInDimension((ServerLevel) instance.getLevel(), new ClientOnlyMomentSyncPayload(instance.serializeNBT()));
                 }

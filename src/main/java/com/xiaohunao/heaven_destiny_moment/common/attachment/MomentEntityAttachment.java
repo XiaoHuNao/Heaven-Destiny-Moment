@@ -14,10 +14,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class MomentEntityAttachment implements INBTSerializable<CompoundTag> {
+    private final IAttachmentHolder attachmentHolder;
     private UUID momentUid;
 
     public MomentEntityAttachment(IAttachmentHolder attachmentHolder) {
-
+        this.attachmentHolder = attachmentHolder;
     }
 
     @Override

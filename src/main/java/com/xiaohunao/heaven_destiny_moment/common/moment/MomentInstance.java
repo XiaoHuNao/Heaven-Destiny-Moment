@@ -5,11 +5,13 @@ import com.google.common.collect.Sets;
 import com.mojang.logging.LogUtils;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
+import com.xiaohunao.heaven_destiny_moment.common.context.MomentDataContext;
 import com.xiaohunao.heaven_destiny_moment.common.event.MomentEvent;
 import com.xiaohunao.heaven_destiny_moment.common.event.PlayerMomentAreaEvent;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMAttachments;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMRegistries;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.ResourceKey;
@@ -26,6 +28,7 @@ import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public abstract class MomentInstance extends AttachmentHolder {
@@ -34,10 +37,10 @@ public abstract class MomentInstance extends AttachmentHolder {
     protected final Level level;
     protected final MomentType<?> type;
     protected final ResourceKey<Moment> momentKey;
-    protected final Moment moment;
     protected final UUID uuid;
-    protected final MomentBar bar;
 
+
+    protected MomentBar bar;
     protected long tick = -1L;
     protected MomentState state;
     protected final Set<UUID> playerUUIDs = Sets.newHashSet();
@@ -49,8 +52,6 @@ public abstract class MomentInstance extends AttachmentHolder {
         this.type = type;
         this.level = level;
         this.momentKey = momentKey;
-        this.moment = registryChecked(momentKey, level).get(momentKey);
-        this.bar = new MomentBar(uuid, moment.getBarRenderType());
     }
 
     protected MomentInstance(MomentType<?> type, UUID uuid, Level level, ResourceKey<Moment> momentKey) {
@@ -58,28 +59,36 @@ public abstract class MomentInstance extends AttachmentHolder {
         this.type = type;
         this.level = level;
         this.momentKey = momentKey;
-        this.moment = Objects.requireNonNull(registryChecked(momentKey, level)).get(momentKey);
-        this.bar = new MomentBar(uuid, moment.getBarRenderType());
     }
 
+    public static boolean create(ResourceKey<Moment> momentKey, ServerLevel serverLevel, BlockPos pos, ServerPlayer serverPlayer, @Nullable Consumer<MomentInstance> modifier) {
+        Registry<Moment> registry = serverLevel.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
+        return Optional.ofNullable(registry.get(momentKey))
+                .map(moment -> moment.newMomentInstance(serverLevel,momentKey))
+                .map(instance -> {
+                    if (modifier != null) {
+                        modifier.accept(instance);
+                    }
+                    return MomentManager.of(serverLevel).addMoment(instance,serverLevel,pos,serverPlayer);
+                }).orElse(false);
+    }
     public static boolean create(ResourceKey<Moment> momentKey, ServerLevel serverLevel, BlockPos pos, ServerPlayer serverPlayer) {
-        Moment moment = registryChecked(momentKey, serverLevel).get(momentKey);
-        if (moment != null) {
-            MomentInstance momentInstance = moment.newMomentInstance(serverLevel, momentKey);
-            MomentManager.of(serverLevel).addMoment(momentInstance,serverLevel,pos,serverPlayer);
-            return true;
-        }
-        return false;
+        return create(momentKey,serverLevel,pos,serverPlayer,null);
     }
 
-    public static Registry<Moment> registryChecked(ResourceKey<Moment> momentKey, Level level) {
+    public Optional<Moment> moment() {
         Registry<Moment> registry = level.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
-        if (registry.getHolder(momentKey).isEmpty()) {
-            HeavenDestinyMoment.LOGGER.error("Moment {} not found in registry", momentKey.location());
-            return null;
-        }
-        return registry;
+        return Optional.ofNullable(registry.get(momentKey));
     }
+    public void init(){
+        initMomentBar();
+    }
+    public void initMomentBar(){
+        moment().flatMap(Moment::barRenderType).ifPresent(type -> {
+            this.bar = new MomentBar(uuid,type);
+        });
+    }
+
 
     @Nullable
     public static MomentInstance loadStatic(Level level, CompoundTag compoundTag) {
@@ -225,13 +234,15 @@ public abstract class MomentInstance extends AttachmentHolder {
     }
 
     private void victory() {
-        moment.getMomentDataContext().rewards().ifPresent(rewards -> {
-            players.forEach(player -> {
-                rewards.forEach(reward -> {
-                    reward.createReward(this, player);
+        moment().flatMap(Moment::momentDataContext)
+                .flatMap(MomentDataContext::rewards)
+                .ifPresent(rewards -> {
+                    players.forEach(player -> {
+                            rewards.forEach(reward -> {
+                                reward.createReward(this, player);
+                            });
+                        });
                 });
-            });
-        });
     }
 
     private void lose() {
@@ -246,7 +257,7 @@ public abstract class MomentInstance extends AttachmentHolder {
 
     public MomentEvent setState(MomentState state) {
         this.state = state;
-        moment.getTipSettingsContext().playTooltip(this);
+        moment().flatMap(Moment::tipSettingsContext).ifPresent(tip -> tip.playTooltip(this));
         return NeoForge.EVENT_BUS.post(MomentEvent.getEventToPost(this, state));
     }
 
@@ -271,53 +282,63 @@ public abstract class MomentInstance extends AttachmentHolder {
     }
 
     private void updatePlayers() {
+        if (bar != null){
 
-        final Set<Player> oldPlayers = Sets.newHashSet(bar.getPlayers());
+        }
+
+        final Set<Player> oldPlayers = Sets.newHashSet(players);
         final Set<Player> newPlayers = Sets.newHashSet((getPlayers(validPlayer())));
-        players.clear();
+//        players.clear();
+
 
         newPlayers.stream()
                 .filter(player -> !oldPlayers.contains(player))
                 .forEach(serverPlayer -> {
                     if (MomentManager.of(level).addPlayerToMoment(serverPlayer,this)) {
-                        bar.addPlayer(serverPlayer);
+//                        bar.addPlayer(serverPlayer);
+                        players.add(serverPlayer);
+                        playerUUIDs.add(serverPlayer.getUUID());
                     }
                 });
         oldPlayers.stream()
                 .filter(player -> !newPlayers.contains(player))
-                .forEach(bar::removePlayer);
-        bar.getPlayers().forEach(player -> {
-            playerUUIDs.add(player.getUUID());
-            players.add(player);
-        });
+                .forEach(player1 -> {
+//                    bar.removePlayer(player1);
+                    players.remove(player1);
+                    playerUUIDs.add(player1.getUUID());
+                });
+//        bar.getPlayers().forEach(player -> {
+//            playerUUIDs.add(player.getUUID());
+//            players.add(player);
+//        });
+
+
     }
 
     private void updatePlayerIsInArea() {
         if (level.isClientSide) return;
 
         players.stream().filter(Objects::nonNull).forEach(player -> {
-            boolean inArea = moment.isInArea((ServerLevel) level, player.blockPosition());
-            boolean uuidContains = inAreaPlayers.contains(player.getUUID());
-            if (inArea && !uuidContains) {
-                onPlayerEnterArea((ServerPlayer) player);
-            } else if (!inArea && uuidContains) {
-                onPlayerExitArea((ServerPlayer) player);
-            }
+            moment().ifPresent(moment -> {
+                boolean inArea = moment.isInArea((ServerLevel) level, player.blockPosition());
+                boolean uuidContains = inAreaPlayers.contains(player.getUUID());
+                if (inArea && !uuidContains) {
+                    onPlayerEnterArea((ServerPlayer) player);
+                } else if (!inArea && uuidContains) {
+                    onPlayerExitArea((ServerPlayer) player);
+                }
+            });
         });
     }
 
     private void onPlayerExitArea(ServerPlayer player) {
         inAreaPlayers.remove(player.getUUID());
-        NeoForge.EVENT_BUS.post(new PlayerMomentAreaEvent.Exit(player, moment.getArea()));
+        NeoForge.EVENT_BUS.post(new PlayerMomentAreaEvent.Exit(player, this));
     }
 
     private void onPlayerEnterArea(ServerPlayer player) {
         inAreaPlayers.add(player.getUUID());
-        NeoForge.EVENT_BUS.post(new PlayerMomentAreaEvent.Enter(player, moment.getArea()));
-    }
-
-    public Optional<Moment> getMoment() {
-        return Optional.ofNullable(moment);
+        NeoForge.EVENT_BUS.post(new PlayerMomentAreaEvent.Enter(player, this));
     }
 
     public MomentState getState() {
@@ -332,7 +353,9 @@ public abstract class MomentInstance extends AttachmentHolder {
         return bar;
     }
 
-    public abstract void finalizeSpawn(Entity entity);
+    public void finalizeSpawn(Entity entity) {
+
+    }
 
     public void addKillCount(LivingEntity livingEntity) {
         this.setData(HDMAttachments.MOMENT_KILL_ENTITY,getData(HDMAttachments.MOMENT_KILL_ENTITY).addKillCount(livingEntity));

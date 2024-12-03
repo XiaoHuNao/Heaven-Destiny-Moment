@@ -26,8 +26,7 @@ public class MomentBarOverlay implements LayeredDraw.Layer {
         if (clientLevel == null) return;
         int i = 0;
         for (MomentBar bar : barMap.values()) {
-            IBarRenderType value = HDMRegistries.BAR_RENDER_TYPE.get(bar.getType());
-            if (value != null) value.renderBar(guiGraphics, bar, i);
+            bar.getType().renderBar(guiGraphics, bar, i);
             i++;
         }
     }
