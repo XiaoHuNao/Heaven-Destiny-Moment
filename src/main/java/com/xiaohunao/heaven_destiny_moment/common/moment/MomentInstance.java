@@ -220,21 +220,21 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
     }
 
 
-    private void ready() {
+    protected void ready() {
 
     }
 
-    private void start() {
+    protected void start() {
 
     }
 
-    private void ongoing() {
+    protected void ongoing() {
         if (!players.isEmpty() && state == MomentState.ONGOING) {
             tick();
         }
     }
 
-    private void victory() {
+    protected void victory() {
         moment().flatMap(Moment::momentDataContext)
                 .flatMap(MomentDataContext::rewards)
                 .ifPresent(rewards -> {
@@ -246,7 +246,7 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
                 });
     }
 
-    private void lose() {
+    protected void lose() {
 
     }
 
