@@ -1,6 +1,5 @@
 package com.xiaohunao.heaven_destiny_moment.common.moment;
 
-import com.mojang.logging.LogUtils;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.render.IBarRenderType;
 import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettingsContext;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentDataContext;
@@ -8,84 +7,83 @@ import com.xiaohunao.heaven_destiny_moment.common.context.TipSettingsContext;
 import com.xiaohunao.heaven_destiny_moment.common.moment.area.Area;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import org.slf4j.Logger;
 
 import java.util.Optional;
 
 public abstract class Moment implements IMoment {
-    private IBarRenderType barRenderType;
-    private Area area;
-    private MomentDataContext momentDataContext;
-    private TipSettingsContext tipSettingsContext;
-    private ClientSettingsContext clientSettingsContext;
+    public Optional<IBarRenderType> barRenderType;
+    public Optional<Area> area;
+    public Optional<MomentDataContext> momentDataContext;
+    public Optional<TipSettingsContext> tipSettingsContext;
+    public Optional<ClientSettingsContext> clientSettingsContext;
 
     public Moment() {
+        this.barRenderType = Optional.empty();
+        this.area = Optional.empty();
+        this.momentDataContext = Optional.empty();
+        this.tipSettingsContext = Optional.empty();
+        this.clientSettingsContext = Optional.empty();
     }
 
-    public Moment(IBarRenderType barRenderType, Area area, MomentDataContext momentDataContext, TipSettingsContext tipSettingsContext, ClientSettingsContext clientSettingsContext) {
-        this.barRenderType = barRenderType;
+    public Moment(Optional<IBarRenderType> renderType, Optional<Area> area, Optional<MomentDataContext> momentDataContext, Optional<TipSettingsContext> tipSettingsContext, Optional<ClientSettingsContext> clientSettingsContext) {
+        this.barRenderType = renderType;
         this.area = area;
         this.momentDataContext = momentDataContext;
         this.tipSettingsContext = tipSettingsContext;
         this.clientSettingsContext = clientSettingsContext;
     }
+
 
     public abstract MomentInstance newMomentInstance(Level level, ResourceKey<Moment> momentResourceKey);
 
     public boolean isInArea(ServerLevel level, BlockPos blockPos) {
-        if (area != null){
-            return area.matches(level,blockPos);
-        }
-        return true;
+        return area.map(area1 -> area1.matches(level,blockPos)).orElse(true);
     }
 
     public Optional<IBarRenderType> barRenderType() {
-        return Optional.ofNullable(barRenderType);
+        return barRenderType;
     }
 
     public Optional<MomentDataContext> momentDataContext() {
-        return Optional.ofNullable(momentDataContext);
+        return momentDataContext;
     }
 
     public Optional<ClientSettingsContext> clientSettingsContext() {
-        return Optional.ofNullable(clientSettingsContext);
+        return clientSettingsContext;
     }
 
     public Optional<TipSettingsContext> tipSettingsContext() {
-        return Optional.ofNullable(tipSettingsContext);
+        return tipSettingsContext;
     }
 
     public Optional<Area> area() {
-        return Optional.ofNullable(area);
+        return area;
     }
 
     public Moment setBarRenderType(IBarRenderType barRenderType) {
-        this.barRenderType = barRenderType;
+        this.barRenderType = Optional.of(barRenderType);
         return this;
     }
 
     public Moment setMomentDataContext(MomentDataContext momentDataContext) {
-        this.momentDataContext = momentDataContext;
+        this.momentDataContext = Optional.of(momentDataContext);
         return this;
     }
 
     public Moment setArea(Area area) {
-        this.area = area;
+        this.area = Optional.of(area);
         return this;
     }
 
     public Moment setClientSettingsContext(ClientSettingsContext clientSettingsContext) {
-        this.clientSettingsContext = clientSettingsContext;
+        this.clientSettingsContext = Optional.of(clientSettingsContext);
         return this;
     }
 
     public Moment setTipSettingsContext(TipSettingsContext tipSettingsContext) {
-        this.tipSettingsContext = tipSettingsContext;
+        this.tipSettingsContext = Optional.of(tipSettingsContext);
         return this;
     }
 }

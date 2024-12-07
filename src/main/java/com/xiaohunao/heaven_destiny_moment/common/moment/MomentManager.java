@@ -110,7 +110,7 @@ public class MomentManager extends SavedData {
         Boolean conditionMatch = instance.moment()
                 .flatMap(Moment::momentDataContext)
                 .flatMap(MomentDataContext::conditions)
-                .map(set -> set.stream().anyMatch(condition -> condition.matches(instance, pos)))
+                .map(set -> set.stream().allMatch(condition -> condition.matches(instance, pos)))
                 .orElse(true);
         if (instance.canCreate(runMoments,serverLevel,pos,serverPlayer) && conditionMatch) {
             instance.init();

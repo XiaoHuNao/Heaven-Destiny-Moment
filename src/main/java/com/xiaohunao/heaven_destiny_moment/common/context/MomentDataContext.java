@@ -41,7 +41,7 @@ public record MomentDataContext(Optional<Integer> readyTime, Optional<Set<IRewar
         }
 
         public Builder addReward(IRewardContext... reward) {
-            if (rewards.isEmpty()){
+            if (rewards == null){
                 rewards = Sets.newHashSet();
             }
             rewards.addAll(Set.of(reward));
@@ -49,7 +49,7 @@ public record MomentDataContext(Optional<Integer> readyTime, Optional<Set<IRewar
         }
 
         public Builder addCondition(IConditionContext... condition) {
-            if (conditions.isEmpty()){
+            if (conditions == null){
                 conditions = Sets.newHashSet();
             }
             conditions.addAll(Set.of(condition));

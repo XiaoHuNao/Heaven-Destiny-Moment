@@ -77,9 +77,19 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
         return create(momentKey,serverLevel,pos,serverPlayer,null);
     }
 
+    public static Registry<Moment> registryChecked(ResourceKey<Moment> momentKey, Level level) {
+        Registry<Moment> registry = level.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
+        if (registry.getHolder(momentKey).isEmpty()) {
+            HeavenDestinyMoment.LOGGER.error("Moment {} not found in registry", momentKey.location());
+            return null;
+        }
+        return registry;
+    }
+
     public Optional<T> moment() {
         Registry<Moment> registry = level.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
-        return Optional.ofNullable((T) registry.get(momentKey));
+        Moment moment = registry.get(momentKey);
+        return Optional.ofNullable((T) moment);
     }
     public void init(){
         initMomentBar();

@@ -45,14 +45,14 @@ public abstract class LevelRendererMixin {
     private void renderSky(int moonTextureId, ResourceLocation originaResourceLocation) {
         MomentManager momentManager = MomentManager.of(level);
 
-        momentManager.getClientOnlyMoment()
+        ResourceLocation moonTexture = momentManager.getClientOnlyMoment()
                 .flatMap(MomentInstance::moment)
                 .flatMap(Moment::clientSettingsContext)
                 .flatMap(ClientSettingsContext::clientMoonSettingsContext)
                 .flatMap(ClientMoonSettingsContext::MoonTexture)
-                .ifPresent(moonTexture -> RenderSystem.setShaderTexture(moonTextureId, moonTexture));
+                .orElse(originaResourceLocation);
 
-        RenderSystem.setShaderTexture(moonTextureId, originaResourceLocation);
+        RenderSystem.setShaderTexture(moonTextureId, moonTexture);
     }
 
     @Inject(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;getMoonPhase()I"))

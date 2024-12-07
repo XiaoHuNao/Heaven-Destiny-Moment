@@ -5,6 +5,7 @@ import com.xiaohunao.heaven_destiny_moment.common.context.condition.LocationCond
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 
 import java.util.function.Function;
 
@@ -13,6 +14,8 @@ public record LocationArea(LocationConditionContext locationConditionContext) im
     public static final MapCodec<LocationArea> CODEC = LocationConditionContext.CODEC.xmap(LocationArea::new, LocationArea::locationConditionContext);
 
     public static final LocationArea EMPTY = new LocationArea(LocationConditionContext.Builder.location().build());
+    public static final LocationArea OVERWORLD = new Builder().build(builder -> builder.setDimension(Level.OVERWORLD).build());
+
 
 
     @Override
@@ -26,7 +29,7 @@ public record LocationArea(LocationConditionContext locationConditionContext) im
     }
 
     public static class Builder {
-        public Area build(Function<LocationConditionContext.Builder,LocationConditionContext> function) {
+        public LocationArea build(Function<LocationConditionContext.Builder,LocationConditionContext> function) {
             return new LocationArea(function.apply(new LocationConditionContext.Builder()));
         }
     }

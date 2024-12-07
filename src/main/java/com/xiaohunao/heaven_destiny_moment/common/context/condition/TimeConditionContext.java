@@ -21,34 +21,20 @@ public record TimeConditionContext(Optional<Long> min,Optional<Long> max) implem
         Codec.LONG.optionalFieldOf("max").forGetter(TimeConditionContext::max)
     ).apply(instance, TimeConditionContext::new));
 
-    private static final BiMap<Long, String> TIME_MAP = HashBiMap.create();
-
     public static TimeConditionContext exactly(long value) {
         return new TimeConditionContext(Optional.of(value), Optional.of(value));
-    }
-    public static TimeConditionContext exactly(String value) {
-        return TimeConditionContext.exactly(TIME_MAP.inverse().get(value));
     }
 
     public static TimeConditionContext between(long min, long max) {
         return new TimeConditionContext(Optional.of(min), Optional.of(max));
     }
-    public static TimeConditionContext between(String min, String max) {
-        return TimeConditionContext.between(TIME_MAP.inverse().get(min), TIME_MAP.inverse().get(max));
-    }
 
     public static TimeConditionContext atLeast(long min) {
         return new TimeConditionContext(Optional.of(min), Optional.empty());
     }
-    public static TimeConditionContext atLeast(String min) {
-        return TimeConditionContext.atLeast(TIME_MAP.inverse().get(min));
-    }
 
     public static TimeConditionContext atMost(long max) {
         return new TimeConditionContext(Optional.empty(), Optional.of(max));
-    }
-    public static TimeConditionContext atMost(String max) {
-        return TimeConditionContext.atMost(TIME_MAP.inverse().get(max));
     }
 
     public boolean matches(long value) {
@@ -70,20 +56,4 @@ public record TimeConditionContext(Optional<Long> min,Optional<Long> max) implem
         return HDMContextRegister.TIME_CONDITION.get();
     }
 
-
-    static {
-        TIME_MAP.put(0L, "Sunrise");
-        TIME_MAP.put(1000L, "Day");
-        TIME_MAP.put(12000L, "Sunset");
-        TIME_MAP.put(23000L, "Night");
-        TIME_MAP.put(6000L, "Midnight");
-        TIME_MAP.put(14000L, "FullMoon");
-        TIME_MAP.put(38000L, "WaningGibbous");
-        TIME_MAP.put(62000L, "ThirdQuarter");
-        TIME_MAP.put(86000L, "WaningCrescent");
-        TIME_MAP.put(110000L, "NewMoon");
-        TIME_MAP.put(134000L, "WaxingCrescent");
-        TIME_MAP.put(158000L, "FirstQuarter");
-        TIME_MAP.put(182000L, "WaxingGibbous");
-    }
 }

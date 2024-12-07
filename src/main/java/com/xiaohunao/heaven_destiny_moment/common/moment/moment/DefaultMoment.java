@@ -29,20 +29,19 @@ public class DefaultMoment extends Moment {
             MomentDataContext.CODEC.optionalFieldOf("moment_data_context").forGetter(Moment::momentDataContext),
             TipSettingsContext.CODEC.optionalFieldOf("tips").forGetter(Moment::tipSettingsContext),
             ClientSettingsContext.CODEC.optionalFieldOf("clientSettingsContext").forGetter(Moment::clientSettingsContext)
-    ).apply(instance, (resourceLocation, area, momentDataContext, tipSettingsContext, clientSettingsContext) -> new DefaultMoment()));
-
-
+    ).apply(instance, DefaultMoment::new));
 
 
     public DefaultMoment() {
+        super();
     }
 
-    public DefaultMoment(IBarRenderType barRenderType, Area area, MomentDataContext momentDataContext, TipSettingsContext tipSettingsContext, ClientSettingsContext clientSettingsContext) {
-        super(barRenderType, area, momentDataContext, tipSettingsContext, clientSettingsContext);
+    public DefaultMoment(Optional<IBarRenderType> renderType, Optional<Area> area, Optional<MomentDataContext> momentDataContext, Optional<TipSettingsContext> tipSettingsContext, Optional<ClientSettingsContext> clientSettingsContext) {
+        super(renderType, area, momentDataContext, tipSettingsContext, clientSettingsContext);
     }
 
     @Override
-    public MomentInstance newMomentInstance(Level level, ResourceKey<Moment> moment) {
+    public MomentInstance<DefaultMoment> newMomentInstance(Level level, ResourceKey<Moment> moment) {
         return new DefaultInstance(level, moment);
     }
 
