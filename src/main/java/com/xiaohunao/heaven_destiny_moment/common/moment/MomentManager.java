@@ -35,7 +35,7 @@ public class MomentManager extends SavedData {
     private MomentInstance<?> clientOnlyMoment = null;
     private final Multimap<UUID, Pair<UUID,MomentInstance<?>>> playerMoments = HashMultimap.create();
 
-    private static MomentManager clientMonger;
+    private MomentManager clientMonger;
     private Level level;
 
 
@@ -51,11 +51,12 @@ public class MomentManager extends SavedData {
             }
             return momentManager;
         } else {
-            if (clientMonger == null) {
-                clientMonger = new MomentManager();
+            if (momentManager == null) {
+                momentManager = new MomentManager();
+                container.heaven_destiny_moment$setMomentManager(momentManager);
             }
-            clientMonger.level = level;
-            return clientMonger;
+            momentManager.level = level;
+            return momentManager;
         }
     }
 
@@ -101,6 +102,7 @@ public class MomentManager extends SavedData {
     }
 
     public void removeMoment(MomentInstance<?> instance) {
+
         runMoments.remove(instance.getID());
         PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new MomentManagerSyncPayload(instance.serializeNBT(),false));
     }
