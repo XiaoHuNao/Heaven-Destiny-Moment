@@ -14,6 +14,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -50,11 +51,11 @@ public record TipSettingsContext(Optional<Map<MomentState, Holder<SoundEvent>>> 
         private Map<MomentState, Holder<SoundEvent>> soundEvents;
 
         public Builder tooltip(MomentState momentState, String descriptionId) {
-            return tooltip(momentState,Component.translatable("moment.tooltip.text." + descriptionId));
+            return tooltip(momentState,Component.translatable("moment.tooltip.text." + momentState.name().toLowerCase(Locale.ROOT) + "." + descriptionId));
         }
 
         public Builder tooltip(MomentState momentState, String descriptionId, int color) {
-            return tooltip(momentState,Component.translatable("moment.tooltip.text." + descriptionId),color);
+            return tooltip(momentState,Component.translatable("moment.tooltip.text." + momentState.name().toLowerCase(Locale.ROOT) + "." + descriptionId),color);
         }
 
         public Builder tooltip(MomentState momentState, Component component) {
