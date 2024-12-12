@@ -11,6 +11,6 @@ import java.util.function.Function;
 public interface ICondition {
     Codec<ICondition> CODEC = Codec.lazyInitialized(() -> HDMRegistries.Suppliers.CONDITION_CODEC.get().byNameCodec()).dispatch(ICondition::codec, Function.identity());
 
-    boolean matches(MomentInstance instance, BlockPos pos);
+    boolean matches(MomentInstance<?> instance, BlockPos pos);
     MapCodec<? extends ICondition> codec();
 }

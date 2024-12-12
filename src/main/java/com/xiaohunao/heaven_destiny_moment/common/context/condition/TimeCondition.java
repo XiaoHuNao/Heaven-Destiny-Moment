@@ -44,7 +44,7 @@ public record TimeCondition(Optional<Long> min, Optional<Long> max) implements I
     }
 
     @Override
-    public boolean matches(MomentInstance instance, BlockPos pos) {
+    public boolean matches(MomentInstance<?> instance, BlockPos pos) {
         Level level = instance.getLevel();
         return this.matches(level.getDayTime());
     }

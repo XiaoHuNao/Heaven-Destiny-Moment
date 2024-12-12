@@ -43,7 +43,7 @@ public record LocationCondition(Optional<LocationPredicate.PositionPredicate> po
     ).apply(instance, LocationCondition::new));
 
     @Override
-    public boolean matches(MomentInstance instance, BlockPos pos) {
+    public boolean matches(MomentInstance<?> instance, BlockPos pos) {
         Level level = instance.getLevel();
         if (level instanceof ServerLevel serverLevel){
            return matches(serverLevel,pos);
