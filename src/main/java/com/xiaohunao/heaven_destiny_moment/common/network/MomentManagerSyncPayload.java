@@ -11,6 +11,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
@@ -24,7 +25,7 @@ public record MomentManagerSyncPayload(CompoundTag runMoment,boolean isRemove) i
     );
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public @NotNull Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 
@@ -33,12 +34,12 @@ public record MomentManagerSyncPayload(CompoundTag runMoment,boolean isRemove) i
             if (context.player().isLocalPlayer()) {
                 Level level = context.player().level();
                 MomentManager momentManager = MomentManager.of(level);
-                Optional<MomentInstance> momentInstance = Optional.ofNullable(MomentInstance.loadStatic(level, runMoment));
+                Optional<MomentInstance<?>> momentInstance = Optional.ofNullable(MomentInstance.loadStatic(level, runMoment));
                 momentInstance.ifPresent(instance -> {
                     if (!isRemove) {
-                        momentManager.getRunMoment().put(instance.getID(), instance);
+                        momentManager.getRunMoments().put(instance.getID(), instance);
                     } else {
-                        momentManager.getRunMoment().remove(instance.getID());
+                        momentManager.getRunMoments().remove(instance.getID());
                     }
                 });
             }

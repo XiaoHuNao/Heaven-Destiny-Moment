@@ -6,9 +6,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Pair;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
-import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettingsContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.MomentDataContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.condition.IConditionContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettings;
+import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.mixed.MomentManagerContainer;
 import com.xiaohunao.heaven_destiny_moment.common.network.ClientOnlyMomentSyncPayload;
 import com.xiaohunao.heaven_destiny_moment.common.network.MomentManagerSyncPayload;
@@ -97,10 +96,6 @@ public class MomentManager extends SavedData {
         });
     }
 
-    public Map<UUID, MomentInstance<?>> getRunMoment() {
-        return this.runMoments;
-    }
-
     public void removeMoment(MomentInstance<?> instance) {
 
         runMoments.remove(instance.getID());
@@ -111,7 +106,7 @@ public class MomentManager extends SavedData {
         UUID uuid = instance.getID();
         Boolean conditionMatch = instance.moment()
                 .flatMap(Moment::momentDataContext)
-                .flatMap(MomentDataContext::conditions)
+                .flatMap(MomentData::conditions)
                 .map(set -> set.stream().allMatch(condition -> condition.matches(instance, pos)))
                 .orElse(true);
         if (instance.canCreate(runMoments,serverLevel,pos,serverPlayer) && conditionMatch) {
@@ -142,7 +137,7 @@ public class MomentManager extends SavedData {
             if (moment.isPresent()) {
                 if (second.getID().equals(instance.getID())) break;
 
-                Boolean isEmpty = moment.flatMap(Moment::clientSettingsContext).map(ClientSettingsContext::isEmpty).orElse(true);
+                Boolean isEmpty = moment.flatMap(Moment::clientSettingsContext).map(ClientSettings::isEmpty).orElse(true);
 
                 if (!isEmpty) {
                     canAddPlayer = false;
@@ -153,7 +148,7 @@ public class MomentManager extends SavedData {
 
         if (canAddPlayer) {
             playerMoments.put(playerUUID, new Pair<>(instance.getID(), instance));
-            Boolean isEmpty = instance.moment().flatMap(Moment::clientSettingsContext).map(ClientSettingsContext::isEmpty).orElse(true);
+            Boolean isEmpty = instance.moment().flatMap(Moment::clientSettingsContext).map(ClientSettings::isEmpty).orElse(true);
             if (isEmpty) {
                 if (!instance.getLevel().isClientSide) {
                     PacketDistributor.sendToPlayersInDimension((ServerLevel) instance.getLevel(), new ClientOnlyMomentSyncPayload(instance.serializeNBT()));
@@ -180,7 +175,11 @@ public class MomentManager extends SavedData {
         return playerMoments.get(playerUUID);
     }
 
-    public Map<UUID, MomentInstance<?>> getRunMoments() {
+    public Map<UUID, MomentInstance<?>> getImmutableRunMoments() {
         return ImmutableMap.copyOf(runMoments);
     }
+    public Map<UUID, MomentInstance<?>> getRunMoments() {
+        return runMoments;
+    }
+
 }
