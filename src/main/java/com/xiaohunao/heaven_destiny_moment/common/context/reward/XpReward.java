@@ -7,10 +7,10 @@ import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import net.minecraft.world.entity.player.Player;
 
-public record XpRewardContext(int xp) implements IRewardContext {
-    public static final MapCodec<XpRewardContext> CODEC = MapCodec.assumeMapUnsafe(RecordCodecBuilder.create(instance -> instance.group(
-            Codec.INT.fieldOf("xp").forGetter(XpRewardContext::getXp)
-    ).apply(instance, XpRewardContext::new)));
+public record XpReward(int xp) implements IReward {
+    public static final MapCodec<XpReward> CODEC = MapCodec.assumeMapUnsafe(RecordCodecBuilder.create(instance -> instance.group(
+            Codec.INT.fieldOf("xp").forGetter(XpReward::getXp)
+    ).apply(instance, XpReward::new)));
 
     @Override
     public void createReward(MomentInstance moment, Player player) {
@@ -22,7 +22,7 @@ public record XpRewardContext(int xp) implements IRewardContext {
     }
 
     @Override
-    public MapCodec<? extends IRewardContext> codec() {
+    public MapCodec<? extends IReward> codec() {
         return HDMContextRegister.XP_REWARD.get();
     }
 }

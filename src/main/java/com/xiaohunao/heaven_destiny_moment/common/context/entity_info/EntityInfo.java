@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.xiaohunao.heaven_destiny_moment.common.context.amount.IAmountContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.amount.IAmount;
 import com.xiaohunao.heaven_destiny_moment.common.context.attachable.IAttachable;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -13,13 +13,13 @@ import net.minecraft.world.entity.EntityType;
 import java.util.List;
 import java.util.Optional;
 
-public record EntityInfoContext(EntityType<?> entityType, Optional<IAmountContext> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches) implements IEntityInfoContext {
-    public static final MapCodec<EntityInfoContext> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("entity_type").forGetter(EntityInfoContext::entityType),
-            IAmountContext.CODEC.optionalFieldOf("amount").forGetter(EntityInfoContext::amount),
-            Codec.INT.optionalFieldOf("weight").forGetter(EntityInfoContext::weight),
-            IAttachable.CODEC.listOf().optionalFieldOf("attaches").forGetter(EntityInfoContext::attaches)
-    ).apply(instance, EntityInfoContext::new));
+public record EntityInfo(EntityType<?> entityType, Optional<IAmount> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches) implements IEntityInfo {
+    public static final MapCodec<EntityInfo> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("entity_type").forGetter(EntityInfo::entityType),
+            IAmount.CODEC.optionalFieldOf("amount").forGetter(EntityInfo::amount),
+            Codec.INT.optionalFieldOf("weight").forGetter(EntityInfo::weight),
+            IAttachable.CODEC.listOf().optionalFieldOf("attaches").forGetter(EntityInfo::attaches)
+    ).apply(instance, EntityInfo::new));
 
 
 
@@ -39,14 +39,14 @@ public record EntityInfoContext(EntityType<?> entityType, Optional<IAmountContex
 
 
     @Override
-    public MapCodec<? extends IEntityInfoContext> codec() {
+    public MapCodec<? extends IEntityInfo> codec() {
         return HDMContextRegister.ENTITY_INFO.get();
     }
 
 
     public static class Builder {
         protected EntityType<?> entityType;
-        protected Optional<IAmountContext> amount;
+        protected Optional<IAmount> amount;
         protected Optional<List<IAttachable>> attaches;
         protected Optional<Integer> weight;
 
@@ -54,7 +54,7 @@ public record EntityInfoContext(EntityType<?> entityType, Optional<IAmountContex
             this.entityType = (entityType);
         }
 
-        public Builder amount(IAmountContext amount){
+        public Builder amount(IAmount amount){
             this.amount = Optional.of(amount);
             return this;
         }
@@ -72,8 +72,8 @@ public record EntityInfoContext(EntityType<?> entityType, Optional<IAmountContex
             return this;
         }
 
-        public IEntityInfoContext build() {
-            return new EntityInfoContext(entityType, amount, weight, attaches);
+        public IEntityInfo build() {
+            return new EntityInfo(entityType, amount, weight, attaches);
         }
     }
 }

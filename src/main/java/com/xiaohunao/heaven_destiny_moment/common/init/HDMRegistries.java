@@ -3,12 +3,12 @@ package com.xiaohunao.heaven_destiny_moment.common.init;
 import com.mojang.serialization.MapCodec;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.render.IBarRenderType;
-import com.xiaohunao.heaven_destiny_moment.common.context.amount.IAmountContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.amount.IAmount;
 import com.xiaohunao.heaven_destiny_moment.common.context.attachable.IAttachable;
-import com.xiaohunao.heaven_destiny_moment.common.context.condition.IConditionContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.IEntityInfoContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.ICondition;
+import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.IEntityInfo;
 import com.xiaohunao.heaven_destiny_moment.common.context.equippable_slot.IEquippableSlot;
-import com.xiaohunao.heaven_destiny_moment.common.context.reward.IRewardContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.reward.IReward;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentType;
 import com.xiaohunao.heaven_destiny_moment.common.moment.area.Area;
@@ -28,10 +28,10 @@ public class HDMRegistries {
 
     public static final Registry<MapCodec<? extends Area>> AREA_CODEC = new RegistryBuilder<>(Keys.AREA_CODEC).create();
     public static final Registry<MapCodec<? extends Moment>> MOMENT_CODEC = new RegistryBuilder<>(Keys.MOMENT_CODEC).create();
-    public static final Registry<MapCodec<? extends IAmountContext>> AMOUNT_CODEC = new RegistryBuilder<>(Keys.AMOUNT_CODEC).create();
-    public static final Registry<MapCodec<? extends IConditionContext>> CONDITION_CODEC = new RegistryBuilder<>(Keys.CONDITION_CODEC).create();
-    public static final Registry<MapCodec<? extends IEntityInfoContext>> ENTITY_INFO_CODEC = new RegistryBuilder<>(Keys.ENTITY_INFO_CODEC).create();
-    public static final Registry<MapCodec<? extends IRewardContext>> REWARD_CODEC = new RegistryBuilder<>(Keys.REWARD_CODEC).create();
+    public static final Registry<MapCodec<? extends IAmount>> AMOUNT_CODEC = new RegistryBuilder<>(Keys.AMOUNT_CODEC).create();
+    public static final Registry<MapCodec<? extends ICondition>> CONDITION_CODEC = new RegistryBuilder<>(Keys.CONDITION_CODEC).create();
+    public static final Registry<MapCodec<? extends IEntityInfo>> ENTITY_INFO_CODEC = new RegistryBuilder<>(Keys.ENTITY_INFO_CODEC).create();
+    public static final Registry<MapCodec<? extends IReward>> REWARD_CODEC = new RegistryBuilder<>(Keys.REWARD_CODEC).create();
     public static final Registry<MapCodec<? extends IAttachable>> ATTACHABLE_CODEC = new RegistryBuilder<>(Keys.ATTACHABLE_CODEC).create();
     public static final Registry<MapCodec<? extends IEquippableSlot>> EQUIPPABLE_SLOT_CODEC = new RegistryBuilder<>(Keys.EQUIPPABLE_SLOT_CODEC).create();
 
@@ -41,10 +41,10 @@ public class HDMRegistries {
 
         public static final ResourceKey<Registry<MapCodec<? extends Area>>> AREA_CODEC = HeavenDestinyMoment.asResourceKey("area_codec");
         public static final ResourceKey<Registry<MapCodec<? extends Moment>>> MOMENT_CODEC = HeavenDestinyMoment.asResourceKey("moment_codec");
-        public static final ResourceKey<Registry<MapCodec<? extends IAmountContext>>> AMOUNT_CODEC = HeavenDestinyMoment.asResourceKey("amount_codec");
-        public static final ResourceKey<Registry<MapCodec<? extends IConditionContext>>> CONDITION_CODEC = HeavenDestinyMoment.asResourceKey("condition_codec");
-        public static final ResourceKey<Registry<MapCodec<? extends IEntityInfoContext>>> ENTITY_INFO_CODEC = HeavenDestinyMoment.asResourceKey("entity_info_codec");
-        public static final ResourceKey<Registry<MapCodec<? extends IRewardContext>>> REWARD_CODEC = HeavenDestinyMoment.asResourceKey("reward_codec");
+        public static final ResourceKey<Registry<MapCodec<? extends IAmount>>> AMOUNT_CODEC = HeavenDestinyMoment.asResourceKey("amount_codec");
+        public static final ResourceKey<Registry<MapCodec<? extends ICondition>>> CONDITION_CODEC = HeavenDestinyMoment.asResourceKey("condition_codec");
+        public static final ResourceKey<Registry<MapCodec<? extends IEntityInfo>>> ENTITY_INFO_CODEC = HeavenDestinyMoment.asResourceKey("entity_info_codec");
+        public static final ResourceKey<Registry<MapCodec<? extends IReward>>> REWARD_CODEC = HeavenDestinyMoment.asResourceKey("reward_codec");
         public static final ResourceKey<Registry<MapCodec<? extends IAttachable>>> ATTACHABLE_CODEC = HeavenDestinyMoment.asResourceKey("attachable_codec");
         public static final ResourceKey<Registry<MapCodec<? extends IEquippableSlot>>> EQUIPPABLE_SLOT_CODEC = HeavenDestinyMoment.asResourceKey("equippable_slot_codec");
 
@@ -56,10 +56,10 @@ public class HDMRegistries {
     public static final class Suppliers {
         public static final Supplier<Registry<MapCodec<? extends Area>>> AREA_CODEC = supplyRegistry(Keys.AREA_CODEC);
         public static final Supplier<Registry<MapCodec<? extends Moment>>> MOMENT_CODEC = supplyRegistry(Keys.MOMENT_CODEC);
-        public static final Supplier<Registry<MapCodec<? extends IAmountContext>>> AMOUNT_CODEC = supplyRegistry(Keys.AMOUNT_CODEC);
-        public static final Supplier<Registry<MapCodec<? extends IConditionContext>>> CONDITION_CODEC = supplyRegistry(Keys.CONDITION_CODEC);
-        public static final Supplier<Registry<MapCodec<? extends IEntityInfoContext>>> ENTITY_INFO_CODEC = supplyRegistry(Keys.ENTITY_INFO_CODEC);
-        public static final Supplier<Registry<MapCodec<? extends IRewardContext>>> REWARD_CODEC = supplyRegistry(Keys.REWARD_CODEC);
+        public static final Supplier<Registry<MapCodec<? extends IAmount>>> AMOUNT_CODEC = supplyRegistry(Keys.AMOUNT_CODEC);
+        public static final Supplier<Registry<MapCodec<? extends ICondition>>> CONDITION_CODEC = supplyRegistry(Keys.CONDITION_CODEC);
+        public static final Supplier<Registry<MapCodec<? extends IEntityInfo>>> ENTITY_INFO_CODEC = supplyRegistry(Keys.ENTITY_INFO_CODEC);
+        public static final Supplier<Registry<MapCodec<? extends IReward>>> REWARD_CODEC = supplyRegistry(Keys.REWARD_CODEC);
         public static final Supplier<Registry<MapCodec<? extends IAttachable>>> ATTACHABLE_CODEC = supplyRegistry(Keys.ATTACHABLE_CODEC);
         public static final Supplier<Registry<MapCodec<? extends IEquippableSlot>>> EQUIPPABLE_SLOT_CODEC = supplyRegistry(Keys.EQUIPPABLE_SLOT_CODEC);
     }

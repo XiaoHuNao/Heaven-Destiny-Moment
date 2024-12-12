@@ -2,12 +2,11 @@ package com.xiaohunao.heaven_destiny_moment.common.mixin;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.xiaohunao.heaven_destiny_moment.common.attachment.MomentEntityAttachment;
 import com.xiaohunao.heaven_destiny_moment.common.context.BiomeEntitySpawnSettings;
-import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettingsContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.MobSpawnRule;
-import com.xiaohunao.heaven_destiny_moment.common.context.MomentDataContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMAttachments;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
@@ -24,7 +23,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.levelgen.Heightmap;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -40,11 +38,11 @@ public class NaturalSpawnerMixin {
     @Inject(method = "mobsAt", at = @At("RETURN"), cancellable = true)
     private static void mobsAt(ServerLevel serverLevel, StructureManager structureManager, ChunkGenerator chunkGenerator, MobCategory mobCategory, BlockPos pos, Holder<Biome> biomeHolder, CallbackInfoReturnable<WeightedRandomList<MobSpawnSettings.SpawnerData>> cir) {
         MomentManager momentManager = MomentManager.of(serverLevel);
-        for (MomentInstance<?> instance : momentManager.getRunMoments().values()) {
+        for (MomentInstance<?> instance : momentManager.getImmutableRunMoments().values()) {
             instance.moment()
                     .filter(moment -> moment.isInArea(serverLevel, pos))
                     .flatMap(Moment::momentDataContext)
-                    .flatMap(MomentDataContext::entitySpawnSettingsContext)
+                    .flatMap(MomentData::entitySpawnSettingsContext)
                     .ifPresent(entitySpawnSettingsContext -> {
                         List<MobSpawnSettings.SpawnerData> unwrap = new ArrayList<>(cir.getReturnValue().unwrap());
                         cir.setReturnValue(entitySpawnSettingsContext.adjustmentBiomeEntitySpawnSettings(mobCategory, unwrap));
@@ -73,11 +71,11 @@ public class NaturalSpawnerMixin {
                         .build()
                 );
 
-        for (MomentInstance<?> instance : momentManager.getRunMoments().values()) {
+        for (MomentInstance<?> instance : momentManager.getImmutableRunMoments().values()) {
             instance.moment()
                     .filter(moment -> moment.isInArea((ServerLevel) level, pos))
                     .flatMap(Moment::momentDataContext)
-                    .flatMap(MomentDataContext::entitySpawnSettingsContext)
+                    .flatMap(MomentData::entitySpawnSettingsContext)
                     .ifPresent(entitySpawnSettingsContext -> {
                         MobSpawnSettings mobSettings = cir.getReturnValue().getMobSettings();
                         entitySpawnSettingsContext.biomeEntitySpawnSettings().flatMap(BiomeEntitySpawnSettings::biomeMobSpawnSettings).ifPresent(mobSpawnSettings -> {
@@ -120,12 +118,12 @@ public class NaturalSpawnerMixin {
     @Inject(method = "isRightDistanceToPlayerAndSpawnPoint", at =@At("RETURN"), cancellable = true)
     private static void isRightDistanceToPlayerAndSpawnPoint(ServerLevel serverLevel, ChunkAccess chunk, BlockPos.MutableBlockPos pos, double distance, CallbackInfoReturnable<Boolean> cir){
         MomentManager momentManager = MomentManager.of(serverLevel);
-        for (MomentInstance<?> instance : momentManager.getRunMoments().values()) {
+        for (MomentInstance<?> instance : momentManager.getImmutableRunMoments().values()) {
             instance.moment()
                     .filter(moment -> moment.isInArea(serverLevel, pos))
                     .flatMap(Moment::momentDataContext)
-                    .flatMap(MomentDataContext::entitySpawnSettingsContext)
-                    .flatMap(EntitySpawnSettingsContext::rule)
+                    .flatMap(MomentData::entitySpawnSettingsContext)
+                    .flatMap(EntitySpawnSettings::rule)
                     .flatMap(MobSpawnRule::ignoreDistance)
                     .ifPresent(cir::setReturnValue);
         }
@@ -177,7 +175,7 @@ public class NaturalSpawnerMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"),locals = LocalCapture.CAPTURE_FAILSOFT, cancellable = true)
     private static void spawnCategoryForPosition(MobCategory category, ServerLevel serverLevel, ChunkAccess chunk, BlockPos pos, NaturalSpawner.SpawnPredicate filter, NaturalSpawner.AfterSpawnCallback callback, CallbackInfo ci, StructureManager structuremanager, ChunkGenerator chunkgenerator, int i, BlockState blockstate, BlockPos.MutableBlockPos blockpos$mutableblockpos, int j, int k, int l, int i1, int j1, MobSpawnSettings.SpawnerData mobspawnsettings$spawnerdata, SpawnGroupData spawngroupdata, int k1, int l1, int i2, double d0, double d1, Player player, double d2, Mob mob) {
         MomentManager momentManager = MomentManager.of(serverLevel.getLevel());
-        for (MomentInstance<?> instance : momentManager.getRunMoments().values()) {
+        for (MomentInstance<?> instance : momentManager.getImmutableRunMoments().values()) {
             if (instance.canSpawnEntity(serverLevel,mob,pos)) {
                 instance.moment()
                         .filter(moment -> moment.isInArea(serverLevel, mob.blockPosition()))

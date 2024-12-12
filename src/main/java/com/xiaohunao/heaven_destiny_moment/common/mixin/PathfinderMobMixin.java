@@ -1,8 +1,8 @@
 package com.xiaohunao.heaven_destiny_moment.common.mixin;
 
-import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettingsContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.MobSpawnRule;
-import com.xiaohunao.heaven_destiny_moment.common.context.MomentDataContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
@@ -23,12 +23,12 @@ public class PathfinderMobMixin {
 
         MomentManager momentManager = MomentManager.of(serverLevel);
         PathfinderMob mob = (PathfinderMob) (Object) this;
-        for (MomentInstance<?> instance : momentManager.getRunMoments().values()) {
+        for (MomentInstance<?> instance : momentManager.getImmutableRunMoments().values()) {
             instance.moment()
                     .filter(moment -> moment.isInArea(serverLevel, mob.blockPosition()))
                     .flatMap(Moment::momentDataContext)
-                    .flatMap(MomentDataContext::entitySpawnSettingsContext)
-                    .flatMap(EntitySpawnSettingsContext::rule)
+                    .flatMap(MomentData::entitySpawnSettingsContext)
+                    .flatMap(EntitySpawnSettings::rule)
                     .flatMap(MobSpawnRule::ignoreLightLevel)
                     .ifPresent(cir::setReturnValue);
         }

@@ -23,24 +23,24 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
-public record LocationConditionContext(Optional<LocationPredicate.PositionPredicate> position, Optional<List<ResourceKey<Biome>>> biomes,
-                                       Optional<List<ResourceKey<Structure>>> structures, Optional<List<ResourceKey<Level>>> dimension,
-                                       Optional<Boolean> smokey, Optional<LightPredicate> light, Optional<BlockPredicate> block,
-                                       Optional<FluidPredicate> fluid, Optional<Boolean> canSeeSky, Optional<List<Integer>> validMoonPhases) implements IConditionContext {
-    private static final Logger log = LoggerFactory.getLogger(LocationConditionContext.class);
+public record LocationCondition(Optional<LocationPredicate.PositionPredicate> position, Optional<List<ResourceKey<Biome>>> biomes,
+                                Optional<List<ResourceKey<Structure>>> structures, Optional<List<ResourceKey<Level>>> dimension,
+                                Optional<Boolean> smokey, Optional<LightPredicate> light, Optional<BlockPredicate> block,
+                                Optional<FluidPredicate> fluid, Optional<Boolean> canSeeSky, Optional<List<Integer>> validMoonPhases) implements ICondition {
+    private static final Logger log = LoggerFactory.getLogger(LocationCondition.class);
     public static final ResourceLocation ID = HeavenDestinyMoment.asResource("location");
-    public static final MapCodec<LocationConditionContext> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            LocationPredicate.PositionPredicate.CODEC.optionalFieldOf("position").forGetter(LocationConditionContext::position),
-            ResourceKey.codec(Registries.BIOME).listOf().optionalFieldOf("biomes").forGetter(LocationConditionContext::biomes),
-            ResourceKey.codec(Registries.STRUCTURE).listOf().optionalFieldOf("structures").forGetter(LocationConditionContext::structures),
-            ResourceKey.codec(Registries.DIMENSION).listOf().optionalFieldOf("dimension").forGetter(LocationConditionContext::dimension),
-            Codec.BOOL.optionalFieldOf("smokey").forGetter(LocationConditionContext::smokey),
-            LightPredicate.CODEC.optionalFieldOf("light").forGetter(LocationConditionContext::light),
-            BlockPredicate.CODEC.optionalFieldOf("block").forGetter(LocationConditionContext::block),
-            FluidPredicate.CODEC.optionalFieldOf("fluid").forGetter(LocationConditionContext::fluid),
-            Codec.BOOL.optionalFieldOf("canSeeSky").forGetter(LocationConditionContext::canSeeSky),
-            Codec.INT.listOf().optionalFieldOf("validMoonPhases").forGetter(LocationConditionContext::validMoonPhases)
-    ).apply(instance, LocationConditionContext::new));
+    public static final MapCodec<LocationCondition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            LocationPredicate.PositionPredicate.CODEC.optionalFieldOf("position").forGetter(LocationCondition::position),
+            ResourceKey.codec(Registries.BIOME).listOf().optionalFieldOf("biomes").forGetter(LocationCondition::biomes),
+            ResourceKey.codec(Registries.STRUCTURE).listOf().optionalFieldOf("structures").forGetter(LocationCondition::structures),
+            ResourceKey.codec(Registries.DIMENSION).listOf().optionalFieldOf("dimension").forGetter(LocationCondition::dimension),
+            Codec.BOOL.optionalFieldOf("smokey").forGetter(LocationCondition::smokey),
+            LightPredicate.CODEC.optionalFieldOf("light").forGetter(LocationCondition::light),
+            BlockPredicate.CODEC.optionalFieldOf("block").forGetter(LocationCondition::block),
+            FluidPredicate.CODEC.optionalFieldOf("fluid").forGetter(LocationCondition::fluid),
+            Codec.BOOL.optionalFieldOf("canSeeSky").forGetter(LocationCondition::canSeeSky),
+            Codec.INT.listOf().optionalFieldOf("validMoonPhases").forGetter(LocationCondition::validMoonPhases)
+    ).apply(instance, LocationCondition::new));
 
     @Override
     public boolean matches(MomentInstance instance, BlockPos pos) {
@@ -119,7 +119,7 @@ public record LocationConditionContext(Optional<LocationPredicate.PositionPredic
     }
 
     @Override
-    public MapCodec<? extends IConditionContext> codec() {
+    public MapCodec<? extends ICondition> codec() {
         return HDMContextRegister.LOCATION_CONDITION.get();
     }
 
@@ -156,9 +156,9 @@ public record LocationConditionContext(Optional<LocationPredicate.PositionPredic
             return new Builder();
         }
 
-        public LocationConditionContext build() {
+        public LocationCondition build() {
             Optional<LocationPredicate.PositionPredicate> optional = LocationPredicate.PositionPredicate.of(this.x, this.y, this.z);
-            return new LocationConditionContext(optional, this.biomes, this.structures, this.dimension, this.smokey, this.light, this.block, this.fluid, this.canSeeSky,this.validMoonPhases);
+            return new LocationCondition(optional, this.biomes, this.structures, this.dimension, this.smokey, this.light, this.block, this.fluid, this.canSeeSky,this.validMoonPhases);
         }
 
         @SafeVarargs

@@ -8,10 +8,10 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.function.Function;
 
-public interface IRewardContext {
-    Codec<IRewardContext> CODEC = Codec.lazyInitialized(() -> HDMRegistries.Suppliers.REWARD_CODEC.get().byNameCodec()).dispatch(IRewardContext::codec, Function.identity());
+public interface IReward {
+    Codec<IReward> CODEC = Codec.lazyInitialized(() -> HDMRegistries.Suppliers.REWARD_CODEC.get().byNameCodec()).dispatch(IReward::codec, Function.identity());
 
-    MapCodec<? extends IRewardContext> codec();
+    MapCodec<? extends IReward> codec();
 
     void createReward(MomentInstance momentInstance, Player player);
 }

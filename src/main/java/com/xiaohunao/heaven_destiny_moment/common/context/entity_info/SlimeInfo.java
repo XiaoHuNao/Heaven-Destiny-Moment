@@ -7,11 +7,11 @@ import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import net.minecraft.world.entity.EntityType;
 
 
-public record SlimeInfoContext(EntityInfoContext entityInfo , Integer size) implements IEntityInfoContext{
-    public static final MapCodec<SlimeInfoContext> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            EntityInfoContext.CODEC.fieldOf("entity_info").forGetter(SlimeInfoContext::entityInfo),
-            Codec.INT.fieldOf("size").forGetter(SlimeInfoContext::size)
-    ).apply(instance, SlimeInfoContext::new));
+public record SlimeInfo(EntityInfo entityInfo , Integer size) implements IEntityInfo {
+    public static final MapCodec<SlimeInfo> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            EntityInfo.CODEC.fieldOf("entity_info").forGetter(SlimeInfo::entityInfo),
+            Codec.INT.fieldOf("size").forGetter(SlimeInfo::size)
+    ).apply(instance, SlimeInfo::new));
 
 //    @Override
 //    public Entity crateEntity(Level level) {
@@ -25,11 +25,11 @@ public record SlimeInfoContext(EntityInfoContext entityInfo , Integer size) impl
 
 
     @Override
-    public MapCodec<? extends IEntityInfoContext> codec() {
+    public MapCodec<? extends IEntityInfo> codec() {
         return HDMContextRegister.SLIME_INFO.get();
     }
 
-    public static class Builder extends EntityInfoContext.Builder {
+    public static class Builder extends EntityInfo.Builder {
         private Integer size;
 
         public Builder(EntityType<?> entityType) {
@@ -42,8 +42,8 @@ public record SlimeInfoContext(EntityInfoContext entityInfo , Integer size) impl
         }
 
         @Override
-        public IEntityInfoContext build() {
-            return new SlimeInfoContext(new EntityInfoContext(entityType, amount, weight, attaches), size);
+        public IEntityInfo build() {
+            return new SlimeInfo(new EntityInfo(entityType, amount, weight, attaches), size);
         }
     }
 }

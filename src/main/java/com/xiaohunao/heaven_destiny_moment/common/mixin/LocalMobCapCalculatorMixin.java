@@ -1,8 +1,8 @@
 package com.xiaohunao.heaven_destiny_moment.common.mixin;
 
 import com.xiaohunao.heaven_destiny_moment.common.context.BiomeEntitySpawnSettings;
-import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettingsContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.MomentDataContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettings;
+import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
@@ -19,7 +19,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
@@ -41,12 +40,12 @@ public abstract class LocalMobCapCalculatorMixin {
 
         for(ServerPlayer serverplayer : serverPlayers) {
             LocalMobCapCalculator.MobCounts localmobcapcalculator$mobcounts = this.playerMobCounts.get(serverplayer);
-            for (MomentInstance<?> instance : momentManager.getRunMoments().values()) {
+            for (MomentInstance<?> instance : momentManager.getImmutableRunMoments().values()) {
                 Boolean aBoolean = instance.moment()
                         .filter(moment -> moment.isInArea((ServerLevel) serverplayer.level(), serverplayer.blockPosition()))
                         .flatMap(Moment::momentDataContext)
-                        .flatMap(MomentDataContext::entitySpawnSettingsContext)
-                        .flatMap(EntitySpawnSettingsContext::biomeEntitySpawnSettings)
+                        .flatMap(MomentData::entitySpawnSettingsContext)
+                        .flatMap(EntitySpawnSettings::biomeEntitySpawnSettings)
                         .flatMap(BiomeEntitySpawnSettings::spawnCategoryMultiplier)
                         .map(multiplierMap -> {
                             Object2IntMap<MobCategory> counts = localmobcapcalculator$mobcounts.counts;

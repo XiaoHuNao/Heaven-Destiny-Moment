@@ -10,7 +10,7 @@ import net.minecraft.world.level.Level;
 
 import java.util.UUID;
 
-public class DefaultInstance extends MomentInstance<DefaultMoment> {
+public class DefaultInstance extends MomentInstance {
     public DefaultInstance(Level level, ResourceKey<Moment> moment) {
         super(HDMMomentTypes.DEFAULT.get(), level, moment);
     }

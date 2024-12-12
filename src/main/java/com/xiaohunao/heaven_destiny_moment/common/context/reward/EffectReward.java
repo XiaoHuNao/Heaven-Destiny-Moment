@@ -2,18 +2,18 @@ package com.xiaohunao.heaven_destiny_moment.common.context.reward;
 
 import com.mojang.serialization.MapCodec;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
-import com.xiaohunao.heaven_destiny_moment.common.context.WeightedContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.Weighted;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 
-public record EffectRewardContext(WeightedContext<MobEffectInstance> effectInstances) implements IRewardContext {
+public record EffectReward(Weighted<MobEffectInstance> effectInstances) implements IReward {
     public static final ResourceLocation ID = HeavenDestinyMoment.asResource("effect");
-    public static final MapCodec<EffectRewardContext> CODEC = MapCodec.assumeMapUnsafe(WeightedContext.codec(MobEffectInstance.CODEC)
+    public static final MapCodec<EffectReward> CODEC = MapCodec.assumeMapUnsafe(Weighted.codec(MobEffectInstance.CODEC)
             .fieldOf("effects")
-            .xmap(EffectRewardContext::new, EffectRewardContext::effectInstances)
+            .xmap(EffectReward::new, EffectReward::effectInstances)
             .codec());
 
     @Override
@@ -22,7 +22,7 @@ public record EffectRewardContext(WeightedContext<MobEffectInstance> effectInsta
     }
 
     @Override
-    public MapCodec<? extends IRewardContext> codec() {
+    public MapCodec<? extends IReward> codec() {
         return HDMContextRegister.EFFECT_REWARD.get();
     }
 }

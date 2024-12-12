@@ -7,10 +7,10 @@ import com.xiaohunao.heaven_destiny_moment.common.init.HDMRegistries;
 
 import java.util.function.Function;
 
-public  interface IAmountContext {
-    Codec<IAmountContext> CODEC = Codec.lazyInitialized(() -> HDMRegistries.Suppliers.AMOUNT_CODEC.get().byNameCodec()).dispatch(IAmountContext::codec, Function.identity());
+public  interface IAmount {
+    Codec<IAmount> CODEC = Codec.lazyInitialized(() -> HDMRegistries.Suppliers.AMOUNT_CODEC.get().byNameCodec()).dispatch(IAmount::codec, Function.identity());
 
     int getAmount();
 
-    MapCodec<? extends IAmountContext> codec();
+    MapCodec<? extends IAmount> codec();
 }

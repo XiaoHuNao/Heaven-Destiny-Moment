@@ -2,19 +2,13 @@ package com.xiaohunao.heaven_destiny_moment.common.context;
 
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.xiaohunao.heaven_destiny_moment.common.context.reward.XpRewardContext;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.random.Weight;
 import net.minecraft.util.random.WeightedEntry;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
-public record WeightedContext<T>(int totalWeight,List<WeightedEntry.Wrapper<T>> list) {
+public record Weighted<T>(int totalWeight, List<WeightedEntry.Wrapper<T>> list) {
     private static int calculateTotalWeight(List<? extends WeightedEntry> entries) {
         long total = 0;
         for (WeightedEntry entry : entries) {
@@ -51,9 +45,9 @@ public record WeightedContext<T>(int totalWeight,List<WeightedEntry.Wrapper<T>> 
         return this.list;
     }
 
-    public static <T> Codec<WeightedContext<T>> codec(Codec<T> codec) {
+    public static <T> Codec<Weighted<T>> codec(Codec<T> codec) {
         return WeightedEntry.Wrapper.codec(codec).listOf()
-                .xmap(wrappers -> new WeightedContext<>(calculateTotalWeight(wrappers), wrappers), WeightedContext::unwrap);
+                .xmap(wrappers -> new Weighted<>(calculateTotalWeight(wrappers), wrappers), Weighted::unwrap);
     }
 
     public static class Builder<T> {
@@ -64,8 +58,8 @@ public record WeightedContext<T>(int totalWeight,List<WeightedEntry.Wrapper<T>> 
             return this;
         }
 
-        public WeightedContext<T> build(){
-            return new WeightedContext<>(calculateTotalWeight(list), list);
+        public Weighted<T> build(){
+            return new Weighted<>(calculateTotalWeight(list), list);
         }
     }
 

@@ -1,8 +1,8 @@
 package com.xiaohunao.heaven_destiny_moment.common.mixin;
 
 import com.xiaohunao.heaven_destiny_moment.common.context.BiomeEntitySpawnSettings;
-import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettingsContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.MomentDataContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettings;
+import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
@@ -39,11 +39,11 @@ public class NaturalSpawnerSpawnStateMixin {
         int maxInstancesPerChunk = mobCategory.getMaxInstancesPerChunk();
         int currentCount = this.mobCategoryCounts.getInt(mobCategory);
         MomentManager momentManager = MomentManager.of(level);
-        for (MomentInstance<?> instance : momentManager.getRunMoments().values()) {
+        for (MomentInstance<?> instance : momentManager.getImmutableRunMoments().values()) {
             instance.moment()
                     .flatMap(Moment::momentDataContext)
-                    .flatMap(MomentDataContext::entitySpawnSettingsContext)
-                    .flatMap(EntitySpawnSettingsContext::biomeEntitySpawnSettings)
+                    .flatMap(MomentData::entitySpawnSettingsContext)
+                    .flatMap(EntitySpawnSettings::biomeEntitySpawnSettings)
                     .flatMap(BiomeEntitySpawnSettings::spawnCategoryMultiplier)
                     .ifPresent(multiplierMap -> {
                         Double spawnMultiplier = multiplierMap.getOrDefault(mobCategory, 1.0);

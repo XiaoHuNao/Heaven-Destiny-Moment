@@ -1,7 +1,5 @@
 package com.xiaohunao.heaven_destiny_moment.common.context.condition;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -14,27 +12,27 @@ import net.minecraft.world.level.Level;
 
 import java.util.Optional;
 
-public record TimeConditionContext(Optional<Long> min,Optional<Long> max) implements IConditionContext {
+public record TimeCondition(Optional<Long> min, Optional<Long> max) implements ICondition {
     public static final ResourceLocation ID = HeavenDestinyMoment.asResource("time");
-    public static final MapCodec<TimeConditionContext> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        Codec.LONG.optionalFieldOf("min").forGetter(TimeConditionContext::min),
-        Codec.LONG.optionalFieldOf("max").forGetter(TimeConditionContext::max)
-    ).apply(instance, TimeConditionContext::new));
+    public static final MapCodec<TimeCondition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        Codec.LONG.optionalFieldOf("min").forGetter(TimeCondition::min),
+        Codec.LONG.optionalFieldOf("max").forGetter(TimeCondition::max)
+    ).apply(instance, TimeCondition::new));
 
-    public static TimeConditionContext exactly(long value) {
-        return new TimeConditionContext(Optional.of(value), Optional.of(value));
+    public static TimeCondition exactly(long value) {
+        return new TimeCondition(Optional.of(value), Optional.of(value));
     }
 
-    public static TimeConditionContext between(long min, long max) {
-        return new TimeConditionContext(Optional.of(min), Optional.of(max));
+    public static TimeCondition between(long min, long max) {
+        return new TimeCondition(Optional.of(min), Optional.of(max));
     }
 
-    public static TimeConditionContext atLeast(long min) {
-        return new TimeConditionContext(Optional.of(min), Optional.empty());
+    public static TimeCondition atLeast(long min) {
+        return new TimeCondition(Optional.of(min), Optional.empty());
     }
 
-    public static TimeConditionContext atMost(long max) {
-        return new TimeConditionContext(Optional.empty(), Optional.of(max));
+    public static TimeCondition atMost(long max) {
+        return new TimeCondition(Optional.empty(), Optional.of(max));
     }
 
     public boolean matches(long value) {
@@ -52,7 +50,7 @@ public record TimeConditionContext(Optional<Long> min,Optional<Long> max) implem
     }
 
     @Override
-    public MapCodec<? extends IConditionContext> codec() {
+    public MapCodec<? extends ICondition> codec() {
         return HDMContextRegister.TIME_CONDITION.get();
     }
 

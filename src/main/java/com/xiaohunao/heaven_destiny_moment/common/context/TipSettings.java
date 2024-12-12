@@ -8,23 +8,20 @@ import com.xiaohunao.heaven_destiny_moment.common.moment.MomentState;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-public record TipSettingsContext(Optional<Map<MomentState, Holder<SoundEvent>>> soundEvents, Optional<Map<MomentState, Component>> texts) {
-    public static final TipSettingsContext EMPTY = new TipSettingsContext(Optional.empty(),Optional.empty());
+public record TipSettings(Optional<Map<MomentState, Holder<SoundEvent>>> soundEvents, Optional<Map<MomentState, Component>> texts) {
+    public static final TipSettings EMPTY = new TipSettings(Optional.empty(),Optional.empty());
 
-    public static final Codec<TipSettingsContext> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.unboundedMap(MomentState.CODEC, SoundEvent.CODEC).optionalFieldOf("soundEvents").forGetter(TipSettingsContext::soundEvents),
-            Codec.unboundedMap(MomentState.CODEC, ComponentSerialization.CODEC).optionalFieldOf("texts").forGetter(TipSettingsContext::texts)
-    ).apply(instance, TipSettingsContext::new));
+    public static final Codec<TipSettings> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.unboundedMap(MomentState.CODEC, SoundEvent.CODEC).optionalFieldOf("soundEvents").forGetter(TipSettings::soundEvents),
+            Codec.unboundedMap(MomentState.CODEC, ComponentSerialization.CODEC).optionalFieldOf("texts").forGetter(TipSettings::texts)
+    ).apply(instance, TipSettings::new));
 
     public void playTooltip(MomentInstance<?> instance) {
         if (!instance.getLevel().isClientSide) return;
@@ -82,8 +79,8 @@ public record TipSettingsContext(Optional<Map<MomentState, Holder<SoundEvent>>> 
             return this;
         }
 
-        public TipSettingsContext build() {
-            return new TipSettingsContext(Optional.ofNullable(soundEvents), Optional.ofNullable(texts));
+        public TipSettings build() {
+            return new TipSettings(Optional.ofNullable(soundEvents), Optional.ofNullable(texts));
         }
 
     }

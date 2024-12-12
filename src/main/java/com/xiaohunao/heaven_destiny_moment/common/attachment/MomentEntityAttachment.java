@@ -45,8 +45,8 @@ public class MomentEntityAttachment implements INBTSerializable<CompoundTag> {
         return this;
     }
 
-    public Optional<MomentInstance> getMomentInstance(Entity entity) {
+    public Optional<MomentInstance<?>> getMomentInstance(Entity entity) {
         MomentManager momentManager = MomentManager.of(entity.level());
-        return Optional.ofNullable(momentManager.getRunMoment().get(momentUid));
+        return Optional.ofNullable(momentManager.getImmutableRunMoments().get(momentUid));
     }
 }

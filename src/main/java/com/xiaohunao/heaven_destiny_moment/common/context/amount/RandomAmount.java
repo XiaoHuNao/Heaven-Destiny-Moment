@@ -7,11 +7,11 @@ import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 
 import java.util.Random;
 
-public record RandomAmountContext(int min, int max) implements IAmountContext {
-    public static final MapCodec<RandomAmountContext> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.INT.fieldOf("min").forGetter(RandomAmountContext::min),
-            Codec.INT.fieldOf("max").forGetter(RandomAmountContext::max)
-    ).apply(instance, RandomAmountContext::new));
+public record RandomAmount(int min, int max) implements IAmount {
+    public static final MapCodec<RandomAmount> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            Codec.INT.fieldOf("min").forGetter(RandomAmount::min),
+            Codec.INT.fieldOf("max").forGetter(RandomAmount::max)
+    ).apply(instance, RandomAmount::new));
 
     private static final Random rand = new Random();
 
@@ -21,7 +21,7 @@ public record RandomAmountContext(int min, int max) implements IAmountContext {
         return Math.max(0, rand.nextInt(newMax - this.min + 1) + this.min);
     }
     @Override
-    public MapCodec<? extends IAmountContext> codec() {
+    public MapCodec<? extends IAmount> codec() {
         return HDMContextRegister.RANDOM_AMOUNT.get();
     }
 }

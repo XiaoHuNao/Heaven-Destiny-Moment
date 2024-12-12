@@ -12,13 +12,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public record EntitySpawnListContext(Optional<List<EntityType<?>>> entityTypes, Optional<List<TagKey<EntityType<?>>>> tagKeys, Optional<Boolean> isBlackList) {
-    public static final Codec<EntitySpawnListContext> CODEC = RecordCodecBuilder.create(builder ->
+public record EntitySpawnList(Optional<List<EntityType<?>>> entityTypes, Optional<List<TagKey<EntityType<?>>>> tagKeys, Optional<Boolean> isBlackList) {
+    public static final Codec<EntitySpawnList> CODEC = RecordCodecBuilder.create(builder ->
             builder.group(
-                    BuiltInRegistries.ENTITY_TYPE.byNameCodec().listOf().optionalFieldOf("entity_types").forGetter(EntitySpawnListContext::entityTypes),
-                    TagKey.codec(Registries.ENTITY_TYPE).listOf().optionalFieldOf("tag_keys").forGetter(EntitySpawnListContext::tagKeys),
-                    Codec.BOOL.optionalFieldOf("is_black_list").forGetter(EntitySpawnListContext::isBlackList)
-            ).apply(builder, EntitySpawnListContext::new)
+                    BuiltInRegistries.ENTITY_TYPE.byNameCodec().listOf().optionalFieldOf("entity_types").forGetter(EntitySpawnList::entityTypes),
+                    TagKey.codec(Registries.ENTITY_TYPE).listOf().optionalFieldOf("tag_keys").forGetter(EntitySpawnList::tagKeys),
+                    Codec.BOOL.optionalFieldOf("is_black_list").forGetter(EntitySpawnList::isBlackList)
+            ).apply(builder, EntitySpawnList::new)
     );
 
     public boolean contains(EntityType<?> entityType) {
@@ -38,8 +38,8 @@ public record EntitySpawnListContext(Optional<List<EntityType<?>>> entityTypes, 
         private List<TagKey<EntityType<?>>> tagKeys;
         private Boolean isBlackList;
 
-        public EntitySpawnListContext build() {
-            return new EntitySpawnListContext(Optional.ofNullable(entityTypes),Optional.ofNullable(tagKeys),Optional.ofNullable(isBlackList));
+        public EntitySpawnList build() {
+            return new EntitySpawnList(Optional.ofNullable(entityTypes),Optional.ofNullable(tagKeys),Optional.ofNullable(isBlackList));
         }
 
         public Builder entityType(EntityType<?>... entityType){

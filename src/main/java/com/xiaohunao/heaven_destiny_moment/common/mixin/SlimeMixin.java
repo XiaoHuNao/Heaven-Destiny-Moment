@@ -1,8 +1,8 @@
 package com.xiaohunao.heaven_destiny_moment.common.mixin;
 
-import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettingsContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.MobSpawnRule;
-import com.xiaohunao.heaven_destiny_moment.common.context.MomentDataContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
@@ -28,12 +28,12 @@ public class SlimeMixin {
     private static void checkSlimeSpawnRules(EntityType<Slime> entityType, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random, CallbackInfoReturnable<Boolean> cir) {
         if (level instanceof ServerLevel serverLevel) {
             MomentManager momentManager = MomentManager.of(serverLevel);
-            for (MomentInstance<?> instance : momentManager.getRunMoments().values()) {
+            for (MomentInstance<?> instance : momentManager.getImmutableRunMoments().values()) {
                 instance.moment()
                         .filter(moment -> moment.isInArea(serverLevel, pos))
                         .flatMap(Moment::momentDataContext)
-                        .flatMap(MomentDataContext::entitySpawnSettingsContext)
-                        .flatMap(EntitySpawnSettingsContext::rule)
+                        .flatMap(MomentData::entitySpawnSettingsContext)
+                        .flatMap(EntitySpawnSettings::rule)
                         .flatMap(MobSpawnRule::slimesSpawnEverywhere)
                         .ifPresent(slimesSpawnEverywhere -> {
                             boolean origin = pos.getY() > 50 &&

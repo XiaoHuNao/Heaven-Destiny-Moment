@@ -1,16 +1,16 @@
 package com.xiaohunao.heaven_destiny_moment.common.context.reward;
 
 import com.mojang.serialization.MapCodec;
-import com.xiaohunao.heaven_destiny_moment.common.context.WeightedContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.Weighted;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-public record ItemRewardContext(WeightedContext<ItemStack> reward) implements IRewardContext {
-    public static final MapCodec<ItemRewardContext> CODEC = MapCodec.assumeMapUnsafe(WeightedContext.codec(ItemStack.CODEC)
+public record ItemReward(Weighted<ItemStack> reward) implements IReward {
+    public static final MapCodec<ItemReward> CODEC = MapCodec.assumeMapUnsafe(Weighted.codec(ItemStack.CODEC)
             .fieldOf("items")
-            .xmap(ItemRewardContext::new, ItemRewardContext::reward)
+            .xmap(ItemReward::new, ItemReward::reward)
             .codec());
 
     @Override
@@ -21,12 +21,12 @@ public record ItemRewardContext(WeightedContext<ItemStack> reward) implements IR
     }
 
     @Override
-    public MapCodec<? extends IRewardContext> codec() {
+    public MapCodec<? extends IReward> codec() {
         return HDMContextRegister.ITEM_REWARD.get();
     }
 
     public static class Builder {
-        private final WeightedContext.Builder<ItemStack> builder = new WeightedContext.Builder<>();
+        private final Weighted.Builder<ItemStack> builder = new Weighted.Builder<>();
 
 
     }

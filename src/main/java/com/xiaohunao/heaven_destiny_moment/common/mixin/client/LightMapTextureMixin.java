@@ -1,7 +1,7 @@
 package com.xiaohunao.heaven_destiny_moment.common.mixin.client;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettingsContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettings;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
@@ -23,7 +23,7 @@ public abstract class LightMapTextureMixin {
         momentManager.getClientOnlyMoment()
                 .flatMap(MomentInstance::moment)
                 .flatMap(Moment::clientSettingsContext)
-                .flatMap(ClientSettingsContext::environmentColor)
+                .flatMap(ClientSettings::environmentColor)
                 .ifPresent(color -> {
                     vector3f.set(ColorUtils.colorToVector3f(color));
                 });

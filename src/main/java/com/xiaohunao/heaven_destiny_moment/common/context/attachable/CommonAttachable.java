@@ -5,7 +5,7 @@ import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.xiaohunao.heaven_destiny_moment.common.context.AttributeContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.AttributeElement;
 import com.xiaohunao.heaven_destiny_moment.common.context.equippable_slot.IEquippableSlot;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import net.minecraft.core.Holder;
@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public record CommonAttachable(Optional<List<MobEffectInstance>> effects, Optional<Map<IEquippableSlot, ItemStack>> equipments, Optional<List<AttributeContext>> attributes) implements IAttachable{
+public record CommonAttachable(Optional<List<MobEffectInstance>> effects, Optional<Map<IEquippableSlot, ItemStack>> equipments, Optional<List<AttributeElement>> attributes) implements IAttachable{
     public final static MapCodec<CommonAttachable> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             MobEffectInstance.CODEC.listOf().optionalFieldOf("effects").forGetter(CommonAttachable::effects),
             Codec.unboundedMap(IEquippableSlot.CODEC,ItemStack.CODEC).optionalFieldOf("equipments").forGetter(CommonAttachable::equipments),
-            AttributeContext.CODEC.listOf().optionalFieldOf("attributes").forGetter(CommonAttachable::attributes)
+            AttributeElement.CODEC.listOf().optionalFieldOf("attributes").forGetter(CommonAttachable::attributes)
     ).apply(instance, CommonAttachable::new));
 
     @Override
@@ -36,8 +36,8 @@ public record CommonAttachable(Optional<List<MobEffectInstance>> effects, Option
             equipment.forEach(((slot, stack) -> slot.wear(livingEntity,stack)));
         });
         attributes.ifPresent(attributeContexts -> {
-            attributeContexts.forEach(attributeContext -> {
-                attributeContext.addAttribute(livingEntity);
+            attributeContexts.forEach(attributeElement -> {
+                attributeElement.addAttribute(livingEntity);
             });
         });
     }
@@ -50,7 +50,7 @@ public record CommonAttachable(Optional<List<MobEffectInstance>> effects, Option
     public static class Builder {
         private List<MobEffectInstance> effects;
         private Map<IEquippableSlot, ItemStack> equipments;
-        private List<AttributeContext> attributes;
+        private List<AttributeElement> attributes;
 
         public CommonAttachable build(){
            return new CommonAttachable(Optional.ofNullable(effects),Optional.ofNullable(equipments),Optional.ofNullable(attributes));
@@ -82,7 +82,7 @@ public record CommonAttachable(Optional<List<MobEffectInstance>> effects, Option
             if (attributes == null) {
                 attributes = Lists.newArrayList();
             }
-            attributes.add(new AttributeContext(attribute,attributeModifiers));
+            attributes.add(new AttributeElement(attribute,attributeModifiers));
             return this;
         }
     }

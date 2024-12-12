@@ -2,17 +2,17 @@ package com.xiaohunao.heaven_destiny_moment.common.init;
 
 import com.mojang.serialization.MapCodec;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
-import com.xiaohunao.heaven_destiny_moment.common.context.amount.IAmountContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.amount.IntegerAmountContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.amount.RandomAmountContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.amount.IAmount;
+import com.xiaohunao.heaven_destiny_moment.common.context.amount.IntegerAmount;
+import com.xiaohunao.heaven_destiny_moment.common.context.amount.RandomAmount;
 import com.xiaohunao.heaven_destiny_moment.common.context.attachable.CommonAttachable;
 import com.xiaohunao.heaven_destiny_moment.common.context.attachable.IAttachable;
-import com.xiaohunao.heaven_destiny_moment.common.context.condition.IConditionContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.condition.LocationConditionContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.condition.TimeConditionContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.EntityInfoContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.IEntityInfoContext;
-import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.SlimeInfoContext;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.ICondition;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.LocationCondition;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.TimeCondition;
+import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.EntityInfo;
+import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.IEntityInfo;
+import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.SlimeInfo;
 import com.xiaohunao.heaven_destiny_moment.common.context.equippable_slot.IEquippableSlot;
 import com.xiaohunao.heaven_destiny_moment.common.context.equippable_slot.VanillaEquippableSlot;
 import com.xiaohunao.heaven_destiny_moment.common.context.reward.*;
@@ -27,10 +27,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class HDMContextRegister {
     public static final DeferredRegister<MapCodec<? extends Area>> AREA_CODEC = DeferredRegister.create(HDMRegistries.Keys.AREA_CODEC, HeavenDestinyMoment.MODID);
     public static final DeferredRegister<MapCodec<? extends Moment>> MOMENT_CODEC = DeferredRegister.create(HDMRegistries.Keys.MOMENT_CODEC, HeavenDestinyMoment.MODID);
-    public static final DeferredRegister<MapCodec<? extends IAmountContext>> AMOUNT_CODEC = DeferredRegister.create(HDMRegistries.Keys.AMOUNT_CODEC, HeavenDestinyMoment.MODID);
-    public static final DeferredRegister<MapCodec<? extends IConditionContext>> CONDITION_CODEC = DeferredRegister.create(HDMRegistries.Keys.CONDITION_CODEC, HeavenDestinyMoment.MODID);
-    public static final DeferredRegister<MapCodec<? extends IEntityInfoContext>> ENTITY_INFO_CODEC = DeferredRegister.create(HDMRegistries.Keys.ENTITY_INFO_CODEC, HeavenDestinyMoment.MODID);
-    public static final DeferredRegister<MapCodec<? extends IRewardContext>> REWARD_CODEC = DeferredRegister.create(HDMRegistries.Keys.REWARD_CODEC, HeavenDestinyMoment.MODID);
+    public static final DeferredRegister<MapCodec<? extends IAmount>> AMOUNT_CODEC = DeferredRegister.create(HDMRegistries.Keys.AMOUNT_CODEC, HeavenDestinyMoment.MODID);
+    public static final DeferredRegister<MapCodec<? extends ICondition>> CONDITION_CODEC = DeferredRegister.create(HDMRegistries.Keys.CONDITION_CODEC, HeavenDestinyMoment.MODID);
+    public static final DeferredRegister<MapCodec<? extends IEntityInfo>> ENTITY_INFO_CODEC = DeferredRegister.create(HDMRegistries.Keys.ENTITY_INFO_CODEC, HeavenDestinyMoment.MODID);
+    public static final DeferredRegister<MapCodec<? extends IReward>> REWARD_CODEC = DeferredRegister.create(HDMRegistries.Keys.REWARD_CODEC, HeavenDestinyMoment.MODID);
     public static final DeferredRegister<MapCodec<? extends IEquippableSlot>> EQUIPPABLE_SLOT_CODEC = DeferredRegister.create(HDMRegistries.Keys.EQUIPPABLE_SLOT_CODEC, HeavenDestinyMoment.MODID);
     public static final DeferredRegister<MapCodec<? extends IAttachable>> ATTACHABLE_CODEC = DeferredRegister.create(HDMRegistries.Keys.ATTACHABLE_CODEC, HeavenDestinyMoment.MODID);
 
@@ -40,20 +40,20 @@ public class HDMContextRegister {
     public static final DeferredHolder<MapCodec<? extends Moment>, MapCodec<? extends Moment>> DEFAULT_MOMENT = MOMENT_CODEC.register("default", () -> DefaultMoment.CODEC);
 
 
-    public static final DeferredHolder<MapCodec<? extends IAmountContext>, MapCodec<? extends IAmountContext>> INTEGER_AMOUNT = AMOUNT_CODEC.register("integer", () -> IntegerAmountContext.CODEC);
-    public static final DeferredHolder<MapCodec<? extends IAmountContext>, MapCodec<? extends IAmountContext>> RANDOM_AMOUNT = AMOUNT_CODEC.register("random", () -> RandomAmountContext.CODEC);
+    public static final DeferredHolder<MapCodec<? extends IAmount>, MapCodec<? extends IAmount>> INTEGER_AMOUNT = AMOUNT_CODEC.register("integer", () -> IntegerAmount.CODEC);
+    public static final DeferredHolder<MapCodec<? extends IAmount>, MapCodec<? extends IAmount>> RANDOM_AMOUNT = AMOUNT_CODEC.register("random", () -> RandomAmount.CODEC);
 
-    public static final DeferredHolder<MapCodec<? extends IConditionContext>, MapCodec<? extends IConditionContext>> TIME_CONDITION = CONDITION_CODEC.register("time", () -> TimeConditionContext.CODEC);
-    public static final DeferredHolder<MapCodec<? extends IConditionContext>, MapCodec<? extends IConditionContext>> LOCATION_CONDITION = CONDITION_CODEC.register("location", () -> LocationConditionContext.CODEC);
+    public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<? extends ICondition>> TIME_CONDITION = CONDITION_CODEC.register("time", () -> TimeCondition.CODEC);
+    public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<? extends ICondition>> LOCATION_CONDITION = CONDITION_CODEC.register("location", () -> LocationCondition.CODEC);
 
-    public static final DeferredHolder<MapCodec<? extends IEntityInfoContext>, MapCodec<? extends IEntityInfoContext>> ENTITY_INFO = ENTITY_INFO_CODEC.register("entity_info", () -> EntityInfoContext.CODEC);
-    public static final DeferredHolder<MapCodec<? extends IEntityInfoContext>, MapCodec<? extends IEntityInfoContext>> SLIME_INFO = ENTITY_INFO_CODEC.register("slime_info", () -> SlimeInfoContext.CODEC);
+    public static final DeferredHolder<MapCodec<? extends IEntityInfo>, MapCodec<? extends IEntityInfo>> ENTITY_INFO = ENTITY_INFO_CODEC.register("entity_info", () -> EntityInfo.CODEC);
+    public static final DeferredHolder<MapCodec<? extends IEntityInfo>, MapCodec<? extends IEntityInfo>> SLIME_INFO = ENTITY_INFO_CODEC.register("slime_info", () -> SlimeInfo.CODEC);
 
 
-    public static final DeferredHolder<MapCodec<? extends IRewardContext>, MapCodec<? extends IRewardContext>> XP_REWARD = REWARD_CODEC.register("xp", () -> XpRewardContext.CODEC);
-    public static final DeferredHolder<MapCodec<? extends IRewardContext>, MapCodec<? extends IRewardContext>> EFFECT_REWARD = REWARD_CODEC.register("effect", () -> EffectRewardContext.CODEC);
-    public static final DeferredHolder<MapCodec<? extends IRewardContext>, MapCodec<? extends IRewardContext>> ATTRIBUTE_REWARD = REWARD_CODEC.register("attribute", () -> AttributeRewardContext.CODEC);
-    public static final DeferredHolder<MapCodec<? extends IRewardContext>, MapCodec<? extends IRewardContext>> ITEM_REWARD = REWARD_CODEC.register("item", () -> ItemRewardContext.CODEC);
+    public static final DeferredHolder<MapCodec<? extends IReward>, MapCodec<? extends IReward>> XP_REWARD = REWARD_CODEC.register("xp", () -> XpReward.CODEC);
+    public static final DeferredHolder<MapCodec<? extends IReward>, MapCodec<? extends IReward>> EFFECT_REWARD = REWARD_CODEC.register("effect", () -> EffectReward.CODEC);
+    public static final DeferredHolder<MapCodec<? extends IReward>, MapCodec<? extends IReward>> ATTRIBUTE_REWARD = REWARD_CODEC.register("attribute", () -> AttributeReward.CODEC);
+    public static final DeferredHolder<MapCodec<? extends IReward>, MapCodec<? extends IReward>> ITEM_REWARD = REWARD_CODEC.register("item", () -> ItemReward.CODEC);
 
 
     public static final DeferredHolder<MapCodec<? extends IAttachable>, MapCodec<? extends IAttachable>> COMMON_ATTACHABLE = ATTACHABLE_CODEC.register("common", () -> CommonAttachable.CODEC);
