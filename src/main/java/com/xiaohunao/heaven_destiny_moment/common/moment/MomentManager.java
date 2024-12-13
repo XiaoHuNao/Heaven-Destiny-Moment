@@ -7,6 +7,7 @@ import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Pair;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettings;
+import com.xiaohunao.heaven_destiny_moment.common.context.ConditionGroup;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.mixed.MomentManagerContainer;
 import com.xiaohunao.heaven_destiny_moment.common.network.ClientOnlyMomentSyncPayload;
@@ -22,6 +23,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -32,7 +34,7 @@ public class MomentManager extends SavedData {
 
     private final Map<UUID, MomentInstance<?>> runMoments = Maps.newHashMap();
     private MomentInstance<?> clientOnlyMoment = null;
-    private final Multimap<UUID, Pair<UUID,MomentInstance<?>>> playerMoments = HashMultimap.create();
+    private final Multimap<UUID, MomentInstance<?>> playerMoments = HashMultimap.create();
 
     private MomentManager clientMonger;
     private Level level;
@@ -61,7 +63,7 @@ public class MomentManager extends SavedData {
 
 
     @Override
-    public CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider provider) {
+    public @NotNull CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider provider) {
         ListTag listTag = new ListTag();
         runMoments.values().forEach(momentInstance -> listTag.add(momentInstance.serializeNBT()));
         compoundTag.put("moment", listTag);
@@ -72,7 +74,7 @@ public class MomentManager extends SavedData {
         MomentManager manager = new MomentManager();
         ListTag listTag = tag.getList("moment", Tag.TAG_COMPOUND);
         listTag.forEach(compoundTag -> {
-            MomentInstance instance = MomentInstance.loadStatic(serverLevel, (CompoundTag) compoundTag);
+            MomentInstance<?> instance = MomentInstance.loadStatic(serverLevel, (CompoundTag) compoundTag);
             if (instance != null) {
                 UUID uuid = instance.getID();
                 manager.runMoments.put(uuid, instance);
@@ -84,11 +86,12 @@ public class MomentManager extends SavedData {
     }
 
     public void tick() {
-        CopyOnWriteArrayList<MomentInstance> momentInstances = new CopyOnWriteArrayList<>(runMoments.values());
+        CopyOnWriteArrayList<MomentInstance<?>> momentInstances = new CopyOnWriteArrayList<>(runMoments.values());
         momentInstances.forEach(instance -> {
             if (instance.state == MomentState.END) {
                 if (!level.isClientSide){
                     removeMoment(instance);
+                    PacketDistributor.sendToPlayersInDimension((ServerLevel) instance.getLevel(), new ClientOnlyMomentSyncPayload(instance.serializeNBT(),true));
                 }
                 runMoments.remove(instance.getID());
             }
@@ -105,8 +108,9 @@ public class MomentManager extends SavedData {
     public boolean addMoment(MomentInstance<?> instance, ServerLevel serverLevel, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
         UUID uuid = instance.getID();
         Boolean conditionMatch = instance.moment()
-                .flatMap(Moment::momentDataContext)
-                .flatMap(MomentData::conditions)
+                .flatMap(Moment::momentData)
+                .flatMap(MomentData::conditionGroup)
+                .flatMap(ConditionGroup::create)
                 .map(set -> set.stream().allMatch(condition -> condition.matches(instance, pos)))
                 .orElse(true);
         if (instance.canCreate(runMoments,serverLevel,pos,serverPlayer) && conditionMatch) {
@@ -122,22 +126,21 @@ public class MomentManager extends SavedData {
         UUID playerUUID = player.getUUID();
 
         if (!playerMoments.containsKey(playerUUID)) {
-            playerMoments.put(playerUUID, new Pair<>(instance.getID(), instance));
-            if (!instance.getLevel().isClientSide) {
-                PacketDistributor.sendToPlayersInDimension((ServerLevel) instance.getLevel(), new ClientOnlyMomentSyncPayload(instance.serializeNBT()));
+            playerMoments.put(playerUUID, instance);
+            if (!instance.getLevel().isClientSide && instance.isClientOnlyMoment()) {
+                PacketDistributor.sendToPlayersInDimension((ServerLevel) instance.getLevel(), new ClientOnlyMomentSyncPayload(instance.serializeNBT(),false));
             }
             setDirty();
             return true;
         }
 
         boolean canAddPlayer = true;
-        for (Pair<UUID, MomentInstance<?>> uuidMomentInstancePair : playerMoments.get(playerUUID)) {
-            MomentInstance<?> second = uuidMomentInstancePair.getSecond();
-            Optional<? extends Moment> moment = second.moment();
+        for (MomentInstance<?> momentInstance : playerMoments.get(playerUUID)) {
+            Optional<? extends Moment> moment = momentInstance.moment();
             if (moment.isPresent()) {
-                if (second.getID().equals(instance.getID())) break;
+                if (momentInstance.getID().equals(instance.getID())) break;
 
-                Boolean isEmpty = moment.flatMap(Moment::clientSettingsContext).map(ClientSettings::isEmpty).orElse(true);
+                Boolean isEmpty = moment.flatMap(Moment::clientSettings).map(ClientSettings::isPresent).orElse(true);
 
                 if (!isEmpty) {
                     canAddPlayer = false;
@@ -147,17 +150,26 @@ public class MomentManager extends SavedData {
         }
 
         if (canAddPlayer) {
-            playerMoments.put(playerUUID, new Pair<>(instance.getID(), instance));
-            Boolean isEmpty = instance.moment().flatMap(Moment::clientSettingsContext).map(ClientSettings::isEmpty).orElse(true);
+            playerMoments.put(playerUUID, instance);
+            Boolean isEmpty = instance.moment().flatMap(Moment::clientSettings).map(ClientSettings::isPresent).orElse(true);
             if (isEmpty) {
-                if (!instance.getLevel().isClientSide) {
-                    PacketDistributor.sendToPlayersInDimension((ServerLevel) instance.getLevel(), new ClientOnlyMomentSyncPayload(instance.serializeNBT()));
+                if (!instance.getLevel().isClientSide && instance.isClientOnlyMoment()) {
+                    PacketDistributor.sendToPlayersInDimension((ServerLevel) instance.getLevel(), new ClientOnlyMomentSyncPayload(instance.serializeNBT(),false));
                 }
             }
             setDirty();
             return true;
         }
 
+        return false;
+    }
+    public boolean removePlayerToMoment(Player player,MomentInstance<?> instance){
+        UUID playerUUID = player.getUUID();
+        if (playerMoments.containsKey(playerUUID)) {
+            playerMoments.remove(playerUUID,instance);
+            setDirty();
+            return true;
+        }
         return false;
     }
 
@@ -171,7 +183,7 @@ public class MomentManager extends SavedData {
         return Optional.ofNullable(clientOnlyMoment);
     }
 
-    public Collection<Pair<UUID, MomentInstance<?>>> getPlayerMoment(UUID playerUUID) {
+    public Collection<MomentInstance<?>> getPlayerMoment(UUID playerUUID) {
         return playerMoments.get(playerUUID);
     }
 

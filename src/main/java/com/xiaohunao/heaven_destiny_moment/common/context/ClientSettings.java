@@ -16,8 +16,8 @@ public record ClientSettings(Optional<Integer> environmentColor,
     ).apply(instance, ClientSettings::new));
 
 
-    public boolean isEmpty() {
-        return environmentColor.isEmpty() && clientMoonSettingsContext.isEmpty();
+    public boolean isPresent() {
+        return environmentColor.isPresent() || clientMoonSettingsContext.isPresent();
     }
 
 

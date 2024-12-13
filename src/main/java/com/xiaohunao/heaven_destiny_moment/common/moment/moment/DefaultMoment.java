@@ -21,9 +21,9 @@ public class DefaultMoment extends Moment {
     public static final MapCodec<Moment> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             HDMRegistries.BAR_RENDER_TYPE.byNameCodec().optionalFieldOf("bar_render_type").forGetter(Moment::barRenderType),
             Area.CODEC.optionalFieldOf("area").forGetter(Moment::area),
-            MomentData.CODEC.optionalFieldOf("moment_data_context").forGetter(Moment::momentDataContext),
-            TipSettings.CODEC.optionalFieldOf("tips").forGetter(Moment::tipSettingsContext),
-            ClientSettings.CODEC.optionalFieldOf("clientSettingsContext").forGetter(Moment::clientSettingsContext)
+            MomentData.CODEC.optionalFieldOf("moment_data_context").forGetter(Moment::momentData),
+            TipSettings.CODEC.optionalFieldOf("tips").forGetter(Moment::tipSettings),
+            ClientSettings.CODEC.optionalFieldOf("clientSettingsContext").forGetter(Moment::clientSettings)
     ).apply(instance, DefaultMoment::new));
 
 

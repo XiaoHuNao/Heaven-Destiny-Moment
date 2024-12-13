@@ -12,10 +12,11 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record ClientOnlyMomentSyncPayload(CompoundTag clientOnlyMoment) implements CustomPacketPayload {
+public record ClientOnlyMomentSyncPayload(CompoundTag clientOnlyMoment,boolean isRemove) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<ClientOnlyMomentSyncPayload> TYPE = new CustomPacketPayload.Type<>(HeavenDestinyMoment.asResource("client_only_moment_sync"));
     public static final StreamCodec<ByteBuf, ClientOnlyMomentSyncPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.fromCodec(CompoundTag.CODEC), ClientOnlyMomentSyncPayload::clientOnlyMoment,
+            ByteBufCodecs.BOOL,ClientOnlyMomentSyncPayload::isRemove,
             ClientOnlyMomentSyncPayload::new
     );
 
@@ -29,8 +30,15 @@ public record ClientOnlyMomentSyncPayload(CompoundTag clientOnlyMoment) implemen
             if (context.player().isLocalPlayer()) {
                 Level level = context.player().level();
                 MomentManager momentManager = MomentManager.of(level);
-                MomentInstance momentInstance = MomentInstance.loadStatic(level, clientOnlyMoment);
-                momentManager.setClientOnlyMoment(momentInstance);
+                MomentInstance<?> momentInstance = MomentInstance.loadStatic(level, clientOnlyMoment);
+
+                if (!isRemove){
+                    momentManager.setClientOnlyMoment(momentInstance);
+                }else {
+                    if (momentInstance.isClientOnlyMoment()) {
+                        momentManager.setClientOnlyMoment(null);
+                    }
+                }
             }
         }).exceptionally(e -> {
             context.disconnect(Component.translatable("neoforge.network.invalid_flow", e.getMessage()));

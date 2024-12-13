@@ -43,7 +43,7 @@ public abstract class LocalMobCapCalculatorMixin {
             for (MomentInstance<?> instance : momentManager.getImmutableRunMoments().values()) {
                 Boolean aBoolean = instance.moment()
                         .filter(moment -> moment.isInArea((ServerLevel) serverplayer.level(), serverplayer.blockPosition()))
-                        .flatMap(Moment::momentDataContext)
+                        .flatMap(Moment::momentData)
                         .flatMap(MomentData::entitySpawnSettingsContext)
                         .flatMap(EntitySpawnSettings::biomeEntitySpawnSettings)
                         .flatMap(BiomeEntitySpawnSettings::spawnCategoryMultiplier)

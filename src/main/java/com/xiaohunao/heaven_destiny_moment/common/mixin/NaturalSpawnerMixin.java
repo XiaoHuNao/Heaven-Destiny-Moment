@@ -41,7 +41,7 @@ public class NaturalSpawnerMixin {
         for (MomentInstance<?> instance : momentManager.getImmutableRunMoments().values()) {
             instance.moment()
                     .filter(moment -> moment.isInArea(serverLevel, pos))
-                    .flatMap(Moment::momentDataContext)
+                    .flatMap(Moment::momentData)
                     .flatMap(MomentData::entitySpawnSettingsContext)
                     .ifPresent(entitySpawnSettingsContext -> {
                         List<MobSpawnSettings.SpawnerData> unwrap = new ArrayList<>(cir.getReturnValue().unwrap());
@@ -74,7 +74,7 @@ public class NaturalSpawnerMixin {
         for (MomentInstance<?> instance : momentManager.getImmutableRunMoments().values()) {
             instance.moment()
                     .filter(moment -> moment.isInArea((ServerLevel) level, pos))
-                    .flatMap(Moment::momentDataContext)
+                    .flatMap(Moment::momentData)
                     .flatMap(MomentData::entitySpawnSettingsContext)
                     .ifPresent(entitySpawnSettingsContext -> {
                         MobSpawnSettings mobSettings = cir.getReturnValue().getMobSettings();
@@ -121,7 +121,7 @@ public class NaturalSpawnerMixin {
         for (MomentInstance<?> instance : momentManager.getImmutableRunMoments().values()) {
             instance.moment()
                     .filter(moment -> moment.isInArea(serverLevel, pos))
-                    .flatMap(Moment::momentDataContext)
+                    .flatMap(Moment::momentData)
                     .flatMap(MomentData::entitySpawnSettingsContext)
                     .flatMap(EntitySpawnSettings::rule)
                     .flatMap(MobSpawnRule::ignoreDistance)

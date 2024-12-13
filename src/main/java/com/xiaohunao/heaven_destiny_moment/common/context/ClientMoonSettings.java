@@ -15,7 +15,7 @@ public record ClientMoonSettings(Optional<Integer> moonColor, Optional<Float> Mo
     ).apply(instance, ClientMoonSettings::new));
 
     public boolean isEmpty() {
-        return moonColor.isEmpty() && MoonSize.isEmpty() && MoonTexture.isEmpty();
+        return moonColor.isPresent() || MoonSize.isPresent() ||MoonTexture.isPresent();
     }
 
 

@@ -22,7 +22,7 @@ public abstract class LightMapTextureMixin {
 
         momentManager.getClientOnlyMoment()
                 .flatMap(MomentInstance::moment)
-                .flatMap(Moment::clientSettingsContext)
+                .flatMap(Moment::clientSettings)
                 .flatMap(ClientSettings::environmentColor)
                 .ifPresent(color -> {
                     vector3f.set(ColorUtils.colorToVector3f(color));

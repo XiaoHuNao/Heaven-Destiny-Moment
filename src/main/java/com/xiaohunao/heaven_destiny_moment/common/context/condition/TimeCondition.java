@@ -36,17 +36,32 @@ public record TimeCondition(Optional<Long> min, Optional<Long> max) implements I
     }
 
     public boolean matches(long value) {
+        Long minVal = min.orElse(null);
+        Long maxVal = max.orElse(null);
 
-        if (this.min.isPresent() && this.min.get() > value) {
-            return false;
+        if (minVal != null && maxVal != null) {
+            if (minVal <= maxVal) {
+                return value >= minVal && value <= maxVal;
+            } else {
+                return value >= minVal || value <= maxVal;
+            }
         }
-        return this.max.isEmpty() || this.max.get() > value;
+
+        if (minVal != null) {
+            return value >= minVal;
+        }
+
+        if (maxVal != null) {
+            return value <= maxVal;
+        }
+
+        return false;
     }
 
     @Override
     public boolean matches(MomentInstance<?> instance, BlockPos pos) {
         Level level = instance.getLevel();
-        return this.matches(level.getDayTime());
+        return this.matches(level.getDayTime() % 24000);
     }
 
     @Override

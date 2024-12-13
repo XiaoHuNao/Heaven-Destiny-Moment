@@ -41,7 +41,7 @@ public class NaturalSpawnerSpawnStateMixin {
         MomentManager momentManager = MomentManager.of(level);
         for (MomentInstance<?> instance : momentManager.getImmutableRunMoments().values()) {
             instance.moment()
-                    .flatMap(Moment::momentDataContext)
+                    .flatMap(Moment::momentData)
                     .flatMap(MomentData::entitySpawnSettingsContext)
                     .flatMap(EntitySpawnSettings::biomeEntitySpawnSettings)
                     .flatMap(BiomeEntitySpawnSettings::spawnCategoryMultiplier)
