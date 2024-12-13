@@ -1,0 +1,27 @@
+package com.xiaohunao.heaven_destiny_moment.common.context.condition;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
+import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
+import net.minecraft.core.BlockPos;
+
+import java.util.Random;
+
+public record AutoProbabilityCondition(int probability) implements ICondition {
+    public static final MapCodec<AutoProbabilityCondition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            Codec.INT.fieldOf("probability").forGetter(AutoProbabilityCondition::probability)
+    ).apply(instance, AutoProbabilityCondition::new));
+
+    static Random random = new Random();
+    @Override
+    public boolean matches(MomentInstance<?> instance, BlockPos pos) {
+        return random.nextInt(probability) == 0;
+    }
+
+    @Override
+    public MapCodec<? extends ICondition> codec() {
+        return HDMContextRegister.AUTO_PROBABILITY.get();
+    }
+}

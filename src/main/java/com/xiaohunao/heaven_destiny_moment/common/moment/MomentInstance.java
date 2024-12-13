@@ -61,7 +61,7 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
         this.momentKey = momentKey;
     }
 
-    public static boolean create(ResourceKey<Moment> momentKey, ServerLevel serverLevel, BlockPos pos, ServerPlayer serverPlayer, @Nullable Consumer<MomentInstance> modifier) {
+    public static boolean create(ResourceKey<Moment> momentKey, ServerLevel serverLevel, BlockPos pos, @Nullable ServerPlayer serverPlayer, @Nullable Consumer<MomentInstance> modifier) {
         Registry<Moment> registry = serverLevel.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
         return Optional.ofNullable(registry.get(momentKey))
                 .map(moment -> moment.newMomentInstance(serverLevel,momentKey))
@@ -72,7 +72,7 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
                     return MomentManager.of(serverLevel).addMoment(instance,serverLevel,pos,serverPlayer);
                 }).orElse(false);
     }
-    public static boolean create(ResourceKey<Moment> momentKey, ServerLevel serverLevel, BlockPos pos, ServerPlayer serverPlayer) {
+    public static boolean create(ResourceKey<Moment> momentKey, ServerLevel serverLevel, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
         return create(momentKey,serverLevel,pos,serverPlayer,null);
     }
 

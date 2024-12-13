@@ -2,16 +2,17 @@ package com.xiaohunao.heaven_destiny_moment.common.context;
 
 import com.google.common.collect.Lists;
 
+import com.google.common.collect.Maps;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.ICondition;
 
 import java.util.List;
 import java.util.Optional;
-
-public record ConditionGroup(Optional<List<ICondition>> create ,Optional<List<ICondition>> victory ,Optional<List<ICondition>> lose ,Optional<List<ICondition>> end) {
+public record ConditionGroup(Optional<Pair<Boolean,List<ICondition>>> create , Optional<List<ICondition>> victory , Optional<List<ICondition>> lose , Optional<List<ICondition>> end) {
     public static final Codec<ConditionGroup> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.list(ICondition.CODEC).optionalFieldOf("create").forGetter(ConditionGroup::create),
+            Codec.pair(Codec.BOOL,Codec.list(ICondition.CODEC)).optionalFieldOf("create").forGetter(ConditionGroup::create),
             Codec.list(ICondition.CODEC).optionalFieldOf("victory").forGetter(ConditionGroup::victory),
             Codec.list(ICondition.CODEC).optionalFieldOf("lose").forGetter(ConditionGroup::lose),
             Codec.list(ICondition.CODEC).optionalFieldOf("end").forGetter(ConditionGroup::end)
@@ -19,7 +20,7 @@ public record ConditionGroup(Optional<List<ICondition>> create ,Optional<List<IC
 
 
     public static class Builder {
-        private List<ICondition> create;
+        private Pair<Boolean,List<ICondition>> create;
         private List<ICondition> victory;
         private List<ICondition> lose;
         private List<ICondition> end;
@@ -28,8 +29,10 @@ public record ConditionGroup(Optional<List<ICondition>> create ,Optional<List<IC
             return new ConditionGroup(Optional.ofNullable(create), Optional.ofNullable(victory), Optional.ofNullable(lose), Optional.ofNullable(end));
         }
 
-        public Builder create(ICondition... conditions){
-            this.create = add(this.create,conditions);
+        public Builder create(boolean auto,ICondition... conditions){
+            if (this.create == null){
+                this.create = Pair.of(auto, List.of(conditions));
+            }
             return this;
         }
 

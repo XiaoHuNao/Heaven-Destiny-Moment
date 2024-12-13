@@ -115,7 +115,7 @@ public class MomentManager extends SavedData {
                 .flatMap(Moment::momentData)
                 .flatMap(MomentData::conditionGroup)
                 .flatMap(ConditionGroup::create)
-                .map(set -> set.stream().allMatch(condition -> condition.matches(instance, pos)))
+                .map(createGroup -> createGroup.getSecond().stream().allMatch(condition -> condition.matches(instance, pos)))
                 .orElse(true);
         boolean canCreate = instance.canCreate(runMoments, serverLevel, pos, serverPlayer);
         if (canCreate && conditionMatch) {
