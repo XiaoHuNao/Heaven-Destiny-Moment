@@ -113,7 +113,8 @@ public class MomentManager extends SavedData {
                 .flatMap(ConditionGroup::create)
                 .map(set -> set.stream().allMatch(condition -> condition.matches(instance, pos)))
                 .orElse(true);
-        if (instance.canCreate(runMoments,serverLevel,pos,serverPlayer) && conditionMatch) {
+        boolean canCreate = instance.canCreate(runMoments, serverLevel, pos, serverPlayer);
+        if (canCreate && conditionMatch) {
             instance.init();
             runMoments.put(uuid, instance);
             PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(instance.serializeNBT(),false));
