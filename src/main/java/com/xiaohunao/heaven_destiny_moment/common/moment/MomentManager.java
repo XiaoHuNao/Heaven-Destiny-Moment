@@ -100,8 +100,12 @@ public class MomentManager extends SavedData {
     }
 
     public void removeMoment(MomentInstance<?> instance) {
-
         runMoments.remove(instance.getID());
+        instance.players.forEach(player -> {
+            if (playerMoments.containsKey(player.getUUID())) {
+                playerMoments.remove(player.getUUID(),instance);
+            }
+        });
         PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new MomentManagerSyncPayload(instance.serializeNBT(),false));
     }
 
