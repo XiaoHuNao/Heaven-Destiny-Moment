@@ -6,18 +6,17 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.xiaohunao.heaven_destiny_moment.common.context.condition.ICondition;
 import com.xiaohunao.heaven_destiny_moment.common.context.reward.IReward;
 
 import java.util.*;
 
-public record MomentData(Optional<Integer> readyTime, Optional<HashSet<IReward>> rewards, Optional<HashSet<ICondition>> conditions,
+public record MomentData(Optional<Integer> readyTime, Optional<List<IReward>> rewards, Optional<ConditionGroup> conditionGroup,
                          Optional<EntitySpawnSettings> entitySpawnSettingsContext) {
 
     public static final Codec<MomentData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.INT.optionalFieldOf("ready_time").forGetter(MomentData::readyTime),
-            Codec.list(IReward.CODEC).xmap(Sets::newHashSet, Lists::newArrayList).optionalFieldOf("rewards").forGetter(MomentData::rewards),
-            Codec.list(ICondition.CODEC).xmap(Sets::newHashSet, Lists::newArrayList).optionalFieldOf("conditions").forGetter(MomentData::conditions),
+            Codec.list(IReward.CODEC).optionalFieldOf("rewards").forGetter(MomentData::rewards),
+            ConditionGroup.CODEC.optionalFieldOf("conditionGroup").forGetter(MomentData::conditionGroup),
             EntitySpawnSettings.CODEC.optionalFieldOf("entity_spawn_settings").forGetter(MomentData::entitySpawnSettingsContext)
     ).apply(instance, MomentData::new));
     public static final MomentData EMPTY = new MomentData(Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty());
@@ -25,13 +24,13 @@ public record MomentData(Optional<Integer> readyTime, Optional<HashSet<IReward>>
 
     public static class Builder {
         private Integer readyTime;
-        private HashSet<IReward> rewards;
-        private HashSet<ICondition> conditions;
-        private EntitySpawnSettings mobSpawnSettingsContext;
+        private List<IReward> rewards;
+        private ConditionGroup conditionGroup;
+        private EntitySpawnSettings entitySpawnSettings;
 
 
         public MomentData build() {
-            return new MomentData(Optional.ofNullable(readyTime),Optional.ofNullable(rewards),Optional.ofNullable(conditions),Optional.ofNullable(mobSpawnSettingsContext));
+            return new MomentData(Optional.ofNullable(readyTime),Optional.ofNullable(rewards),Optional.ofNullable(conditionGroup),Optional.ofNullable(entitySpawnSettings));
         }
 
         public Builder readyTime(int readyTime) {
@@ -41,22 +40,19 @@ public record MomentData(Optional<Integer> readyTime, Optional<HashSet<IReward>>
 
         public Builder addReward(IReward... reward) {
             if (rewards == null){
-                rewards = Sets.newHashSet();
+                rewards = Lists.newArrayList();
             }
             rewards.addAll(Set.of(reward));
             return this;
         }
 
-        public Builder addCondition(ICondition... condition) {
-            if (conditions == null){
-                conditions = Sets.newHashSet();
-            }
-            conditions.addAll(Set.of(condition));
+        public Builder conditionGroup(Function<ConditionGroup.Builder,ConditionGroup.Builder> conditionGroup) {
+            this.conditionGroup = conditionGroup.apply(new ConditionGroup.Builder()).build();
             return this;
         }
 
-        public Builder mobSpawnSettings(Function<EntitySpawnSettings.Builder, EntitySpawnSettings.Builder> entitySpawnSettings){
-            mobSpawnSettingsContext = entitySpawnSettings.apply(new EntitySpawnSettings.Builder()).build();
+        public Builder entitySpawnSettings(Function<EntitySpawnSettings.Builder, EntitySpawnSettings.Builder> entitySpawnSettings){
+            this.entitySpawnSettings = entitySpawnSettings.apply(new EntitySpawnSettings.Builder()).build();
             return this;
         }
 

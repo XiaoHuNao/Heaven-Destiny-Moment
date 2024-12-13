@@ -6,6 +6,7 @@ import com.mojang.logging.LogUtils;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.ICondition;
 import com.xiaohunao.heaven_destiny_moment.common.event.MomentEvent;
 import com.xiaohunao.heaven_destiny_moment.common.event.PlayerMomentAreaEvent;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMAttachments;
@@ -182,10 +183,34 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
 
         updatePlayers();
         updatePlayerIsInArea();
+        updateConditionGroup();
         updateMomentState();
 
 
 
+    }
+
+    private void updateConditionGroup() {
+        moment().flatMap(Moment::momentData)
+                .flatMap(MomentData::conditionGroup)
+                .ifPresent(conditionGroup -> {
+                    checkConditionsForEachPlayer(conditionGroup.victory(), MomentState.VICTORY);
+                    checkConditionsForEachPlayer(conditionGroup.end(), MomentState.END);
+                    checkConditionsForEachPlayer(conditionGroup.lose(), MomentState.LOSE);
+                });
+    }
+
+    private void checkConditionsForEachPlayer(Optional<List<ICondition>> conditionsOptional, MomentState state) {
+        if (conditionsOptional.isEmpty()) return;
+
+        List<ICondition> conditions = conditionsOptional.get();
+        players.forEach(player -> {
+            BlockPos blockPos = player.blockPosition();
+            boolean allConditionsMatch = conditions.stream().allMatch(condition -> condition.matches(this, blockPos));
+            if (allConditionsMatch) {
+                setState(state);
+            }
+        });
     }
 
     private void updateMomentState() {
@@ -243,7 +268,7 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
     }
 
     protected void victory() {
-        moment().flatMap(Moment::momentDataContext)
+        moment().flatMap(Moment::momentData)
                 .flatMap(MomentData::rewards)
                 .ifPresent(rewards -> {
                     players.forEach(player -> {
@@ -266,7 +291,8 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
 
     public MomentEvent setState(MomentState state) {
         this.state = state;
-        moment().flatMap(Moment::tipSettingsContext).ifPresent(tip -> tip.playTooltip(this));
+        moment().flatMap(Moment::tipSettings).ifPresent(tip -> tip.playTooltip(this));
+
         return NeoForge.EVENT_BUS.post(MomentEvent.getEventToPost(this, state));
     }
 
@@ -312,9 +338,12 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
         oldPlayers.stream()
                 .filter(player -> !newPlayers.contains(player))
                 .forEach(player1 -> {
-//                    bar.removePlayer(player1);
-                    players.remove(player1);
-                    playerUUIDs.add(player1.getUUID());
+
+                    if (MomentManager.of(level).removePlayerToMoment(player1,this)) {
+//                      bar.removePlayer(player1);
+                        players.remove(player1);
+                        playerUUIDs.add(player1.getUUID());
+                    }
                 });
 //        bar.getPlayers().forEach(player -> {
 //            playerUUIDs.add(player.getUUID());
@@ -385,5 +414,9 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
 
         List<Player> playerList = Lists.newArrayList(players);
         return playerList.get(level.random.nextInt(playerList.size()));
+    }
+
+    public boolean isClientOnlyMoment() {
+        return moment().map(Moment::isClientOnlyMoment).orElse(false);
     }
 }

@@ -15,19 +15,19 @@ import java.util.Optional;
 public abstract class Moment implements IMoment {
     public Optional<IBarRenderType> barRenderType = Optional.empty();
     public Optional<Area> area = Optional.empty();
-    public Optional<MomentData> momentDataContext = Optional.empty();
-    public Optional<TipSettings> tipSettingsContext = Optional.empty();
-    public Optional<ClientSettings> clientSettingsContext = Optional.empty();
+    public Optional<MomentData> momentData = Optional.empty();
+    public Optional<TipSettings> tipSettings = Optional.empty();
+    public Optional<ClientSettings> clientSettings = Optional.empty();
 
     public Moment() {}
 
-    public Moment(Optional<IBarRenderType> renderType, Optional<Area> area, Optional<MomentData> momentDataContext,
-                  Optional<TipSettings> tipSettingsContext, Optional<ClientSettings> clientSettingsContext) {
+    public Moment(Optional<IBarRenderType> renderType, Optional<Area> area, Optional<MomentData> momentData,
+                  Optional<TipSettings> tipSettings, Optional<ClientSettings> clientSettings) {
         this.barRenderType = renderType;
         this.area = area;
-        this.momentDataContext = momentDataContext;
-        this.tipSettingsContext = tipSettingsContext;
-        this.clientSettingsContext = clientSettingsContext;
+        this.momentData = momentData;
+        this.tipSettings = tipSettings;
+        this.clientSettings = clientSettings;
     }
 
 
@@ -41,16 +41,16 @@ public abstract class Moment implements IMoment {
         return barRenderType;
     }
 
-    public Optional<MomentData> momentDataContext() {
-        return momentDataContext;
+    public Optional<MomentData> momentData() {
+        return momentData;
     }
 
-    public Optional<ClientSettings> clientSettingsContext() {
-        return clientSettingsContext;
+    public Optional<ClientSettings> clientSettings() {
+        return clientSettings;
     }
 
-    public Optional<TipSettings> tipSettingsContext() {
-        return tipSettingsContext;
+    public Optional<TipSettings> tipSettings() {
+        return tipSettings;
     }
 
     public Optional<Area> area() {
@@ -62,8 +62,8 @@ public abstract class Moment implements IMoment {
         return this;
     }
 
-    public Moment setMomentDataContext(MomentData momentData) {
-        this.momentDataContext = Optional.of(momentData);
+    public Moment setMomentData(MomentData momentData) {
+        this.momentData = Optional.of(momentData);
         return this;
     }
 
@@ -72,13 +72,17 @@ public abstract class Moment implements IMoment {
         return this;
     }
 
-    public Moment setClientSettingsContext(ClientSettings clientSettings) {
-        this.clientSettingsContext = Optional.of(clientSettings);
+    public Moment setClientSettings(ClientSettings clientSettings) {
+        this.clientSettings = Optional.of(clientSettings);
         return this;
     }
 
-    public Moment setTipSettingsContext(TipSettings tipSettings) {
-        this.tipSettingsContext = Optional.of(tipSettings);
+    public Moment setTipSettings(TipSettings tipSettings) {
+        this.tipSettings = Optional.of(tipSettings);
         return this;
+    }
+
+    public boolean isClientOnlyMoment(){
+        return clientSettings.map(ClientSettings::isPresent).orElse(false);
     }
 }
