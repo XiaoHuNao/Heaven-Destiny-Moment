@@ -75,7 +75,8 @@ public record LocationCondition(Optional<LocationPredicate.PositionPredicate> po
 
 
     private boolean isBlockLoaded(ServerLevel level,BlockPos pos) {
-        return level.isLoaded(pos);
+//        return level.isLoaded(pos);
+        return true;
     }
 
     private boolean matchesPosition(double x, double y, double z) {

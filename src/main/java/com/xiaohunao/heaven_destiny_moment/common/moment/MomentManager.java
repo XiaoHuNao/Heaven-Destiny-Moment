@@ -9,6 +9,8 @@ import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.ConditionGroup;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.AutoProbabilityCondition;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.ICondition;
 import com.xiaohunao.heaven_destiny_moment.common.mixed.MomentManagerContainer;
 import com.xiaohunao.heaven_destiny_moment.common.network.ClientOnlyMomentSyncPayload;
 import com.xiaohunao.heaven_destiny_moment.common.network.MomentManagerSyncPayload;
@@ -115,7 +117,11 @@ public class MomentManager extends SavedData {
                 .flatMap(Moment::momentData)
                 .flatMap(MomentData::conditionGroup)
                 .flatMap(ConditionGroup::create)
-                .map(createGroup -> createGroup.getSecond().stream().allMatch(condition -> condition.matches(instance, pos)))
+                .map(createGroup -> {
+                   return createGroup.getSecond().stream()
+                           .filter(condition -> !(condition instanceof AutoProbabilityCondition))
+                           .allMatch(condition -> condition.matches(instance, pos));
+                })
                 .orElse(true);
         boolean canCreate = instance.canCreate(runMoments, serverLevel, pos, serverPlayer);
         if (canCreate && conditionMatch) {
