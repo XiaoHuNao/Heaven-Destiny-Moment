@@ -1,7 +1,12 @@
 package com.xiaohunao.heaven_destiny_moment.compat.kubejs;
 
-import dev.latvian.mods.kubejs.plugin.KubeJSPlugins;
+import com.xiaohunao.heaven_destiny_moment.compat.kubejs.event.HDMMomentKubeJSEvents;
+import dev.latvian.mods.kubejs.event.EventGroupRegistry;
+import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
 
-public class HDMKubeJSPlugin extends KubeJSPlugins {
-
+public class HDMKubeJSPlugin implements KubeJSPlugin {
+    @Override
+    public void registerEvents(EventGroupRegistry registry) {
+        registry.register(HDMMomentKubeJSEvents.MOMENTS);
+    }
 }

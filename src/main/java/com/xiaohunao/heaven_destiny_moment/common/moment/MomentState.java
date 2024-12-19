@@ -19,4 +19,16 @@ public enum MomentState {
         this.name = name;
         this.index = index;
     }
+
+    public static MomentState toMomentState(Object object) {
+        if (object == null) {
+            return null;
+        }
+
+        try {
+            return valueOf(object.toString().toLowerCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 }

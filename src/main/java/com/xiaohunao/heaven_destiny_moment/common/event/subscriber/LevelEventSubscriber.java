@@ -23,6 +23,7 @@ import java.util.Map;
 
 @EventBusSubscriber
 public class LevelEventSubscriber {
+    
     @SubscribeEvent
     public static void onLevelTick(LevelTickEvent.Post event) {
         Level level = event.getLevel();

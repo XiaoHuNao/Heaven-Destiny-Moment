@@ -2,7 +2,7 @@ package com.xiaohunao.heaven_destiny_moment.common.event.subscriber;
 
 import com.xiaohunao.heaven_destiny_moment.common.event.MomentEvent;
 import com.xiaohunao.heaven_destiny_moment.common.event.PlayerMomentAreaEvent;
-import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
+
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 
@@ -20,16 +20,17 @@ public class MomentEventSubscriber {
 
     @SubscribeEvent
     public static void onMomentOnGoing(MomentEvent.OnGoing event) {
-
     }
 
     @SubscribeEvent
     public static void onMomentVictory(MomentEvent.Victory event) {
+
     }
 
 
     @SubscribeEvent
     public static void onMomentLose(MomentEvent.Lose event) {
+
     }
 
     @SubscribeEvent
@@ -45,5 +46,4 @@ public class MomentEventSubscriber {
     public static void onPlayerMomentAreaExit(PlayerMomentAreaEvent.Exit event) {
 
     }
-
 }

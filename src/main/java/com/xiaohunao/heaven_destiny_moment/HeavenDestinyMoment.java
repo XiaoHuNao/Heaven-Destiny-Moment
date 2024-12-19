@@ -21,6 +21,8 @@ public class HeavenDestinyMoment {
     public static final String MODID = "heaven_destiny_moment";
     public static final Logger LOGGER = LogUtils.getLogger();
 
+
+
     public HeavenDestinyMoment(IEventBus modEventBus, ModContainer modContainer) {
         HDMMomentTypes.MOMENT_TYPE.register(modEventBus);
         HDMBarRenderTypes.BAR_RENDER_TYPE.register(modEventBus);
