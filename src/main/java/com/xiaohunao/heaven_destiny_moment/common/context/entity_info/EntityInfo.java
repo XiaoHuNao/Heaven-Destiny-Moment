@@ -5,6 +5,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.common.context.amount.IAmount;
+import com.xiaohunao.heaven_destiny_moment.common.context.amount.IntegerAmount;
+import com.xiaohunao.heaven_destiny_moment.common.context.amount.RandomAmount;
 import com.xiaohunao.heaven_destiny_moment.common.context.attachable.IAttachable;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -59,6 +61,16 @@ public record EntityInfo(EntityType<?> entityType, Optional<IAmount> amount, Opt
             return this;
         }
 
+        public Builder amount(int amount){
+            this.amount = Optional.of(new IntegerAmount(amount));
+            return this;
+        }
+
+        public Builder amount(int min,int max){
+            this.amount = Optional.of(new RandomAmount(min,max));
+            return this;
+        }
+
         public Builder weight(int weight){
             this.weight = Optional.of(weight);
             return this;
@@ -72,7 +84,7 @@ public record EntityInfo(EntityType<?> entityType, Optional<IAmount> amount, Opt
             return this;
         }
 
-        public IEntityInfo build() {
+        public EntityInfo build() {
             return new EntityInfo(entityType, amount, weight, attaches);
         }
     }
