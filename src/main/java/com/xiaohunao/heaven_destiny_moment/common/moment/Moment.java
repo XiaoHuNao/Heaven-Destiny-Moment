@@ -11,6 +11,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public abstract class Moment implements IMoment {
     public Optional<IBarRenderType> barRenderType = Optional.empty();
@@ -62,23 +65,24 @@ public abstract class Moment implements IMoment {
         return this;
     }
 
-    public Moment setMomentData(MomentData momentData) {
-        this.momentData = Optional.of(momentData);
-        return this;
-    }
-
     public Moment setArea(Area area) {
         this.area = Optional.of(area);
         return this;
     }
 
-    public Moment setClientSettings(ClientSettings clientSettings) {
-        this.clientSettings = Optional.of(clientSettings);
+    public Moment setMomentData(Function<MomentData.Builder,MomentData.Builder> momentData) {
+        this.momentData = Optional.of(momentData.apply(new MomentData.Builder()).build());
         return this;
     }
 
-    public Moment setTipSettings(TipSettings tipSettings) {
-        this.tipSettings = Optional.of(tipSettings);
+
+    public Moment setClientSettings(Function<ClientSettings.Builder,ClientSettings.Builder> clientSettings) {
+        this.clientSettings = Optional.of(clientSettings.apply(new ClientSettings.Builder()).build());
+        return this;
+    }
+
+    public Moment setTipSettings(Function<TipSettings.Builder,TipSettings.Builder> tipSettings) {
+        this.tipSettings = Optional.of(tipSettings.apply(new TipSettings.Builder()).build());
         return this;
     }
 

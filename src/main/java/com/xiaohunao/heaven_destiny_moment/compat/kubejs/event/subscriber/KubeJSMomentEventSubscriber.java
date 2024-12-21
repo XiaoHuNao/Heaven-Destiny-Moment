@@ -7,9 +7,8 @@ import com.xiaohunao.heaven_destiny_moment.compat.kubejs.event.HDMMomentKubeJSEv
 import com.xiaohunao.heaven_destiny_moment.compat.kubejs.event.MomentStateEventJS;
 import com.xiaohunao.heaven_destiny_moment.compat.kubejs.event.MomentTickEventJS;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 
-@EventBusSubscriber
+
 public class KubeJSMomentEventSubscriber {
     @SubscribeEvent
     public static void onMomentReady(MomentEvent.Ready event) {
@@ -54,7 +53,9 @@ public class KubeJSMomentEventSubscriber {
 
     @SubscribeEvent
     public static void onMomentTick(MomentEvent.Tick event) {
-        HDMMomentKubeJSEvents.Tick.post(new MomentTickEventJS(event.getMomentInstance()));
+        if (HDMMomentKubeJSEvents.Tick.hasListeners()) {
+            HDMMomentKubeJSEvents.Tick.post(new MomentTickEventJS(event.getMomentInstance()));
+        }
     }
 
 

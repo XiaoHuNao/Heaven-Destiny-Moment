@@ -20,9 +20,13 @@ public enum MomentState {
         this.index = index;
     }
 
-    public static MomentState toMomentState(Object object) {
+    public static MomentState wrap(Object object) {
         if (object == null) {
             return null;
+        }
+
+        if (object instanceof MomentState state){
+            return state;
         }
 
         try {
