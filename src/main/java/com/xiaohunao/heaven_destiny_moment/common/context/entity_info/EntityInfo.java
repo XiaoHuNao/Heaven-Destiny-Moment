@@ -84,7 +84,7 @@ public record EntityInfo(EntityType<?> entityType, Optional<IAmount> amount, Opt
             return this;
         }
 
-        public EntityInfo build() {
+        public IEntityInfo build() {
             return new EntityInfo(entityType, amount, weight, attaches);
         }
     }

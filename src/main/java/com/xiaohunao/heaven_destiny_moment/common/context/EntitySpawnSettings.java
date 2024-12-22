@@ -5,7 +5,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.EntityInfo;
+import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.IEntityInfo;
 import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -17,12 +17,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public record EntitySpawnSettings(Optional<List<List<EntityInfo>>> entitySpawnList, Optional<BiomeEntitySpawnSettings> biomeEntitySpawnSettings, Optional<MobSpawnRule> rule) {
+public record EntitySpawnSettings(Optional<List<List<IEntityInfo>>> entitySpawnList, Optional<BiomeEntitySpawnSettings> biomeEntitySpawnSettings, Optional<MobSpawnRule> rule) {
     public static final EntitySpawnSettings EMPTY = new EntitySpawnSettings(Optional.empty(),Optional.empty(),Optional.empty());
 
     public static final Codec<EntitySpawnSettings> CODEC = RecordCodecBuilder.create(builder ->
             builder.group(
-                    EntityInfo.CODEC.codec().listOf().listOf().optionalFieldOf("entity_spawn_list").forGetter(EntitySpawnSettings::entitySpawnList),
+                    IEntityInfo.CODEC.listOf().listOf().optionalFieldOf("entity_spawn_list").forGetter(EntitySpawnSettings::entitySpawnList),
                     BiomeEntitySpawnSettings.CODEC.optionalFieldOf("biome_entity_Spawn_settings").forGetter(EntitySpawnSettings::biomeEntitySpawnSettings),
                     MobSpawnRule.CODEC.optionalFieldOf("spawn_rule").forGetter(EntitySpawnSettings::rule)
             ).apply(builder, EntitySpawnSettings::new)
@@ -73,7 +73,7 @@ public record EntitySpawnSettings(Optional<List<List<EntityInfo>>> entitySpawnLi
 
 
     public static class Builder {
-        private List<List<EntityInfo>> entitySpawnList;
+        private List<List<IEntityInfo>> entitySpawnList;
         private BiomeEntitySpawnSettings biomeEntitySpawnSettings;
         private MobSpawnRule rule;
 
@@ -82,7 +82,7 @@ public record EntitySpawnSettings(Optional<List<List<EntityInfo>>> entitySpawnLi
             return this;
         }
 
-        public Builder entitySpawnList(EntityInfo... entityInfoContexts) {
+        public Builder entitySpawnList(IEntityInfo... entityInfoContexts) {
             if (entitySpawnList.isEmpty()){
                 entitySpawnList = Lists.newArrayList();
             }
