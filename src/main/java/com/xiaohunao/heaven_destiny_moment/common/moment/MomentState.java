@@ -1,10 +1,12 @@
 package com.xiaohunao.heaven_destiny_moment.common.moment;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.util.StringRepresentable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
-public enum MomentState {
+public enum MomentState implements StringRepresentable {
     READY("ready", 0),
     START("start", 1),
     ONGOING("ongoing", 2),
@@ -34,5 +36,11 @@ public enum MomentState {
         } catch (IllegalArgumentException e) {
             return null;
         }
+    }
+
+    @Override
+    @NotNull
+    public String getSerializedName() {
+        return name().toLowerCase(Locale.ROOT);
     }
 }

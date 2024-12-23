@@ -45,6 +45,7 @@ public class HDMContextRegister {
     public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<? extends ICondition>> LOCATION_CONDITION = CONDITION_CODEC.register("location", () -> LocationCondition.CODEC);
     public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<? extends ICondition>> WORLD_UNIQUE_MOMENT = CONDITION_CODEC.register("world_unique_moment", () -> WorldUniqueMomentCondition.CODEC);
     public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<? extends ICondition>> AUTO_PROBABILITY = CONDITION_CODEC.register("auto_probability", () -> AutoProbabilityCondition.CODEC);
+    public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<? extends ICondition>> PLAYER = CONDITION_CODEC.register("player", () -> PlayerCondition.CODEC);
 
     public static final DeferredHolder<MapCodec<? extends IEntityInfo>, MapCodec<? extends IEntityInfo>> ENTITY_INFO = ENTITY_INFO_CODEC.register("entity_info", () -> EntityInfo.CODEC);
     public static final DeferredHolder<MapCodec<? extends IEntityInfo>, MapCodec<? extends IEntityInfo>> SLIME_INFO = ENTITY_INFO_CODEC.register("slime_info", () -> SlimeInfo.CODEC);

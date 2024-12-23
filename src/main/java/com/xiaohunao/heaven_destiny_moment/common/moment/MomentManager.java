@@ -120,7 +120,7 @@ public class MomentManager extends SavedData {
                 .map(createGroup -> {
                    return createGroup.getSecond().stream()
                            .filter(condition -> !(condition instanceof AutoProbabilityCondition))
-                           .allMatch(condition -> condition.matches(instance, pos));
+                           .allMatch(condition -> condition.matches(instance, pos,serverPlayer));
                 })
                 .orElse(true);
         boolean canCreate = instance.canCreate(runMoments, serverLevel, pos, serverPlayer);

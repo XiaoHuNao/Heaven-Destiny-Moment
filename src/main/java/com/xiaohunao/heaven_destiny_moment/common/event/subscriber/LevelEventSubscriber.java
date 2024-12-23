@@ -39,20 +39,22 @@ public class LevelEventSubscriber {
             moments.entrySet().forEach(resourceKeyMomentEntry -> {
                 Moment moment = resourceKeyMomentEntry.getValue();
 
-                moment.momentData
-                        .flatMap(MomentData::conditionGroup)
-                        .flatMap(ConditionGroup::create)
-                        .ifPresent(createCondition -> {
-                            MomentInstance<? extends Moment> momentInstance = moment.newMomentInstance(serverLevel, resourceKeyMomentEntry.getKey());
+                serverLevel.getPlayers(serverPlayer -> true).forEach(serverPlayer -> {
+                    moment.momentData
+                            .flatMap(MomentData::conditionGroup)
+                            .flatMap(ConditionGroup::create)
+                            .ifPresent(createCondition -> {
+                                MomentInstance<? extends Moment> momentInstance = moment.newMomentInstance(serverLevel, resourceKeyMomentEntry.getKey());
 
-                            boolean allMatch = createCondition.getFirst() &&
-                                    createCondition.getSecond().stream()
-                                            .allMatch(condition -> condition.matches(momentInstance, BlockPos.ZERO));
+                                boolean allMatch = createCondition.getFirst() &&
+                                        createCondition.getSecond().stream()
+                                                .allMatch(condition -> condition.matches(momentInstance, serverPlayer.blockPosition(),serverPlayer));
 
-                            if (allMatch) {
-                                MomentManager.of(serverLevel).addMoment(momentInstance, serverLevel, BlockPos.ZERO, null);
-                            }
-                        });
+                                if (allMatch) {
+                                    MomentManager.of(serverLevel).addMoment(momentInstance, serverLevel, serverPlayer.blockPosition(), serverPlayer);
+                                }
+                            });
+                });
             });
         }
     }
@@ -65,17 +67,4 @@ public class LevelEventSubscriber {
             instance.livingDeath(entity);
         });
     }
-
-
-//    @SubscribeEvent
-//    public static void onPlayerInteractRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-//        Level level = event.getLevel();
-//        InteractionHand hand = event.getHand();
-//        Player player = event.getEntity();
-//        if (level.isClientSide() || hand != InteractionHand.MAIN_HAND) {
-//            return;
-//        }
-//
-//
-//    }
 }

@@ -205,10 +205,12 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
 
         List<ICondition> conditions = conditionsOptional.get();
         players.forEach(player -> {
-            BlockPos blockPos = player.blockPosition();
-            boolean allConditionsMatch = conditions.stream().allMatch(condition -> condition.matches(this, blockPos));
-            if (allConditionsMatch) {
-                setState(state);
+            if (player instanceof ServerPlayer serverPlayer){
+                BlockPos blockPos = player.blockPosition();
+                boolean allConditionsMatch = conditions.stream().allMatch(condition -> condition.matches(this, blockPos,serverPlayer));
+                if (allConditionsMatch) {
+                    setState(state);
+                }
             }
         });
     }
