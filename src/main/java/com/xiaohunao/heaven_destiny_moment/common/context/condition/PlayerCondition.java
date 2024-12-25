@@ -148,7 +148,7 @@ public record PlayerCondition(Type type, Optional<MinMaxBounds.Ints> level, Opti
 //    }
 
     public static class Builder {
-        private Type type = Type.SINGLE;
+        private Type type;
         private MinMaxBounds.Ints level = MinMaxBounds.Ints.ANY;
         private List<GameType> gameType = Lists.newArrayList();
         private ImmutableList.Builder<PlayerPredicate.StatMatcher<?>> stats;
@@ -157,6 +157,10 @@ public record PlayerCondition(Type type, Optional<MinMaxBounds.Ints> level, Opti
 
         public static PlayerPredicate.Builder player() {
             return new PlayerPredicate.Builder();
+        }
+
+        public Builder(Type type) {
+            this.type = type;
         }
 
         public Builder level(MinMaxBounds.Ints level) {
@@ -195,10 +199,6 @@ public record PlayerCondition(Type type, Optional<MinMaxBounds.Ints> level, Opti
             if (this.advancements == null) this.advancements = Maps.newHashMap();
 
             this.advancements.put(advancement, new PlayerPredicate.AdvancementCriterionsPredicate(new Object2BooleanOpenHashMap<>(criterions)));
-            return this;
-        }
-        public Builder type(Type type){
-            this.type = type;
             return this;
         }
 
