@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 public class HDMRegistries {
-    public static final Registry<MomentType> MOMENT_TYPE = new RegistryBuilder<>(Keys.MOMENT_TYPE).create();
+    public static final Registry<MomentType<?>> MOMENT_TYPE = new RegistryBuilder<>(Keys.MOMENT_TYPE).create();
 
     public static final Registry<MapCodec<? extends IBarRenderType>> BAR_RENDER_TYPE_CODEC = new RegistryBuilder<>(Keys.BAR_RENDER_TYPE_CODEC).create();
     public static final Registry<MapCodec<? extends Area>> AREA_CODEC = new RegistryBuilder<>(Keys.AREA_CODEC).create();
@@ -36,7 +36,7 @@ public class HDMRegistries {
     public static final Registry<MapCodec<? extends IEquippableSlot>> EQUIPPABLE_SLOT_CODEC = new RegistryBuilder<>(Keys.EQUIPPABLE_SLOT_CODEC).create();
 
     public static final class Keys {
-        public static final ResourceKey<Registry<MomentType>> MOMENT_TYPE = HeavenDestinyMoment.asResourceKey("moment_type");
+        public static final ResourceKey<Registry<MomentType<?>>> MOMENT_TYPE = HeavenDestinyMoment.asResourceKey("moment_type");
 
         public static final ResourceKey<Registry<MapCodec<? extends IBarRenderType>>> BAR_RENDER_TYPE_CODEC = HeavenDestinyMoment.asResourceKey("bar_render_type_codec");
         public static final ResourceKey<Registry<MapCodec<? extends Area>>> AREA_CODEC = HeavenDestinyMoment.asResourceKey("area_codec");

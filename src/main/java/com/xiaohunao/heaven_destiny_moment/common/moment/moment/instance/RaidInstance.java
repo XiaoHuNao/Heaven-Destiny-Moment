@@ -23,12 +23,17 @@ public class RaidInstance extends MomentInstance<RaidMoment> {
     }
 
     @Override
+    public void init() {
+        super.init();
+        this.readyTime = moment().map(RaidMoment::readyTime).orElse(100);
+    }
+
+    @Override
     protected void ready() {
         if (this.bar != null){
             int readyTime = moment().map(RaidMoment::readyTime).orElse(100);
-            this.readyTime = readyTime;
 
-            if (readyTime <= 0) {
+            if (this.readyTime <= 0) {
                 setState(MomentState.START);
             }
             this.bar.updateProgress(1 - (float) this.readyTime / readyTime);

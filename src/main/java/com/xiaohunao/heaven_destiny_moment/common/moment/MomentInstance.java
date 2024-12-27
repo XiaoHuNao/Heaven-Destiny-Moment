@@ -11,6 +11,8 @@ import com.xiaohunao.heaven_destiny_moment.common.event.MomentEvent;
 import com.xiaohunao.heaven_destiny_moment.common.event.PlayerMomentAreaEvent;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMAttachments;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMRegistries;
+import com.xiaohunao.heaven_destiny_moment.common.moment.moment.instance.DefaultInstance;
+import com.xiaohunao.heaven_destiny_moment.common.network.MomentManagerSyncPayload;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.*;
@@ -24,6 +26,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.attachment.AttachmentHolder;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
@@ -219,11 +222,13 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
     private void updateMomentState() {
         if (tick == 0L) {
             MomentEvent.Ready ready = (MomentEvent.Ready)setState(MomentState.READY);
-            if (!ready.isCanceled()){
-                ready();
-            }else {
+            if (ready.isCanceled()){
                 setState(MomentState.END);
             }
+        }
+
+        if (state == MomentState.READY){
+            ready();
         }
 
         if (state == MomentState.START){
@@ -294,8 +299,10 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
 
     public MomentEvent setState(MomentState state) {
         this.state = state;
+        if (level instanceof ServerLevel serverLevel){
+            PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(this.serializeNBT(),false));
+        }
         moment().flatMap(Moment::tipSettings).ifPresent(tip -> tip.playTooltip(this));
-
         return NeoForge.EVENT_BUS.post(MomentEvent.getEventToPost(this, state));
     }
 

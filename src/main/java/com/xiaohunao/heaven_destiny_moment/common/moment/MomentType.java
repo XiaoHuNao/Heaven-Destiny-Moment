@@ -8,32 +8,32 @@ import javax.annotation.Nullable;
 import java.util.Set;
 import java.util.UUID;
 
-public class MomentType {
-    private final MomentSupplier factory;
+public class MomentType<T extends MomentInstance<?>> {
+    private final MomentSupplier<T> factory;
 
-    public MomentType(MomentSupplier factory) {
+    public MomentType(MomentSupplier<T> factory) {
         this.factory = factory;
     }
 
     @Nullable
-    public MomentInstance create(UUID uuid, Level level, ResourceKey<Moment<?>> moment) {
+    public T create(UUID uuid, Level level, ResourceKey<Moment<?>> moment) {
         return factory.create(uuid, level, moment);
     }
 
 
-    public static final class Builder {
-        private final MomentSupplier factory;
-        public Builder(MomentSupplier factory) {
+    public static final class Builder<T extends MomentInstance<?>> {
+        private final MomentSupplier<T> factory;
+        public Builder(MomentSupplier<T> factory) {
             this.factory = factory;
         }
 
-        public MomentType build() {
-            return new MomentType(factory);
+        public MomentType<T> build() {
+            return new MomentType<>(factory);
         }
     }
 
     @FunctionalInterface
-    public interface MomentSupplier {
-        MomentInstance create(UUID uuid, Level level, ResourceKey<Moment<?>> moment);
+    public interface MomentSupplier<T> {
+        T create(UUID uuid, Level level, ResourceKey<Moment<?>> moment);
     }
 }

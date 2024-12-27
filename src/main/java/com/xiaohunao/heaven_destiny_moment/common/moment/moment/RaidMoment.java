@@ -53,6 +53,6 @@ public class RaidMoment extends Moment<RaidMoment> {
 
     @Override
     public MapCodec<? extends Moment<?>> codec() {
-        return HDMContextRegister.DEFAULT_MOMENT.get();
+        return HDMContextRegister.RAID_MOMENT.get();
     }
 }
