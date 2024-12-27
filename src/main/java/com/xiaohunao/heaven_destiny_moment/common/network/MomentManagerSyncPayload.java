@@ -1,6 +1,7 @@
 package com.xiaohunao.heaven_destiny_moment.common.network;
 
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
+import com.xiaohunao.heaven_destiny_moment.client.gui.hud.MomentBarOverlay;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
 import io.netty.buffer.ByteBuf;
@@ -37,8 +38,12 @@ public record MomentManagerSyncPayload(CompoundTag runMoment,boolean isRemove) i
                 Optional<MomentInstance<?>> momentInstance = Optional.ofNullable(MomentInstance.loadStatic(level, runMoment));
                 momentInstance.ifPresent(instance -> {
                     if (!isRemove) {
+                        if (instance.getBar() != null){
+                            MomentBarOverlay.barMap.put(instance.getID(), instance.getBar());
+                        }
                         momentManager.getRunMoments().put(instance.getID(), instance);
                     } else {
+                        MomentBarOverlay.barMap.remove(instance.getID());
                         momentManager.getRunMoments().remove(instance.getID());
                     }
                 });

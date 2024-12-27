@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
+import com.xiaohunao.heaven_destiny_moment.client.gui.hud.MomentBarOverlay;
 import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.ConditionGroup;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
@@ -67,6 +68,7 @@ public class MomentManager extends SavedData {
         ListTag listTag = new ListTag();
         runMoments.values().forEach(momentInstance -> listTag.add(momentInstance.serializeNBT()));
         compoundTag.put("moment", listTag);
+        MomentBarOverlay.barMap.clear();
         return compoundTag;
     }
 
