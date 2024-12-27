@@ -13,7 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class MomentKubeJSBuilder extends BuilderBase<Moment> {
+public class MomentKubeJSBuilder extends BuilderBase<Moment<?>> {
     public Optional<IBarRenderType> barRenderType = Optional.empty();
     public Optional<Area> area = Optional.empty();
     public Optional<MomentData> momentData = Optional.empty();
@@ -25,7 +25,7 @@ public class MomentKubeJSBuilder extends BuilderBase<Moment> {
     }
 
     @Override
-    public Moment createObject() {
+    public Moment<?> createObject() {
         return new DefaultMoment(barRenderType, area, momentData, tipSettings, clientSettings);
     }
 

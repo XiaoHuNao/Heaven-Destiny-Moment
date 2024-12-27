@@ -2,6 +2,9 @@ package com.xiaohunao.heaven_destiny_moment.common.init;
 
 import com.mojang.serialization.MapCodec;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
+import com.xiaohunao.heaven_destiny_moment.client.gui.bar.render.DefaultBarRenderType;
+import com.xiaohunao.heaven_destiny_moment.client.gui.bar.render.IBarRenderType;
+import com.xiaohunao.heaven_destiny_moment.client.gui.bar.render.TerrariaBarRenderType;
 import com.xiaohunao.heaven_destiny_moment.common.context.amount.IAmount;
 import com.xiaohunao.heaven_destiny_moment.common.context.amount.IntegerAmount;
 import com.xiaohunao.heaven_destiny_moment.common.context.amount.RandomAmount;
@@ -23,13 +26,15 @@ import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.area.Area;
 import com.xiaohunao.heaven_destiny_moment.common.moment.area.LocationArea;
 import com.xiaohunao.heaven_destiny_moment.common.moment.moment.DefaultMoment;
+import com.xiaohunao.heaven_destiny_moment.common.moment.moment.RaidMoment;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class HDMContextRegister {
+    public static final DeferredRegister<MapCodec<? extends IBarRenderType>> BAR_RENDER_TYPE_CODEC = DeferredRegister.create(HDMRegistries.Keys.BAR_RENDER_TYPE_CODEC, HeavenDestinyMoment.MODID);
     public static final DeferredRegister<MapCodec<? extends Area>> AREA_CODEC = DeferredRegister.create(HDMRegistries.Keys.AREA_CODEC, HeavenDestinyMoment.MODID);
-    public static final DeferredRegister<MapCodec<? extends Moment>> MOMENT_CODEC = DeferredRegister.create(HDMRegistries.Keys.MOMENT_CODEC, HeavenDestinyMoment.MODID);
+    public static final DeferredRegister<MapCodec<? extends Moment<?>>> MOMENT_CODEC = DeferredRegister.create(HDMRegistries.Keys.MOMENT_CODEC, HeavenDestinyMoment.MODID);
     public static final DeferredRegister<MapCodec<? extends IAmount>> AMOUNT_CODEC = DeferredRegister.create(HDMRegistries.Keys.AMOUNT_CODEC, HeavenDestinyMoment.MODID);
     public static final DeferredRegister<MapCodec<? extends ICondition>> CONDITION_CODEC = DeferredRegister.create(HDMRegistries.Keys.CONDITION_CODEC, HeavenDestinyMoment.MODID);
     public static final DeferredRegister<MapCodec<? extends IEntityInfo>> ENTITY_INFO_CODEC = DeferredRegister.create(HDMRegistries.Keys.ENTITY_INFO_CODEC, HeavenDestinyMoment.MODID);
@@ -38,9 +43,14 @@ public class HDMContextRegister {
     public static final DeferredRegister<MapCodec<? extends IAttachable>> ATTACHABLE_CODEC = DeferredRegister.create(HDMRegistries.Keys.ATTACHABLE_CODEC, HeavenDestinyMoment.MODID);
 
 
+    public static final DeferredHolder<MapCodec<? extends IBarRenderType>, MapCodec<? extends IBarRenderType>> DEFAULT_BAR_RENDER_TYPE = BAR_RENDER_TYPE_CODEC.register("default", () -> DefaultBarRenderType.CODEC);
+    public static final DeferredHolder<MapCodec<? extends IBarRenderType>, MapCodec<? extends IBarRenderType>> TERRA_BAR_RENDER_TYPE = BAR_RENDER_TYPE_CODEC.register("terrar", () -> TerrariaBarRenderType.CODEC);
+
+
     public static final DeferredHolder<MapCodec<? extends Area>, MapCodec<? extends Area>> LOCATION_AREA = AREA_CODEC.register("location", () -> LocationArea.CODEC);
 
-    public static final DeferredHolder<MapCodec<? extends Moment>, MapCodec<? extends Moment>> DEFAULT_MOMENT = MOMENT_CODEC.register("default", () -> DefaultMoment.CODEC);
+    public static final DeferredHolder<MapCodec<? extends Moment<?>>, MapCodec<Moment<Moment<?>>>> DEFAULT_MOMENT = MOMENT_CODEC.register("default", () -> DefaultMoment.CODEC);
+    public static final DeferredHolder<MapCodec<? extends Moment<?>>, MapCodec<RaidMoment>> RAID_MOMENT = MOMENT_CODEC.register("raid", () -> RaidMoment.CODEC);
 
 
     public static final DeferredHolder<MapCodec<? extends IAmount>, MapCodec<? extends IAmount>> INTEGER_AMOUNT = AMOUNT_CODEC.register("integer", () -> IntegerAmount.CODEC);
@@ -70,6 +80,7 @@ public class HDMContextRegister {
     public static final DeferredHolder<MapCodec<? extends IEquippableSlot>, MapCodec<? extends IEquippableSlot>> VANILLA_EQUIPPABLE_SLOT = EQUIPPABLE_SLOT_CODEC.register("vanilla", () -> VanillaEquippableSlot.CODEC);
 
     public static void register(IEventBus modEventBus) {
+        BAR_RENDER_TYPE_CODEC.register(modEventBus);
         AMOUNT_CODEC.register(modEventBus);
         CONDITION_CODEC.register(modEventBus);
         ENTITY_INFO_CODEC.register(modEventBus);

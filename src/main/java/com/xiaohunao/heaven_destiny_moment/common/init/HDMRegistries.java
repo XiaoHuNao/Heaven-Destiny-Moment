@@ -23,11 +23,11 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 public class HDMRegistries {
-    public static final Registry<MomentType<?>> MOMENT_TYPE = new RegistryBuilder<>(Keys.MOMENT_TYPE).create();
-    public static final Registry<IBarRenderType> BAR_RENDER_TYPE = new RegistryBuilder<>(Keys.BAR_RENDER_TYPE).create();
+    public static final Registry<MomentType> MOMENT_TYPE = new RegistryBuilder<>(Keys.MOMENT_TYPE).create();
 
+    public static final Registry<MapCodec<? extends IBarRenderType>> BAR_RENDER_TYPE_CODEC = new RegistryBuilder<>(Keys.BAR_RENDER_TYPE_CODEC).create();
     public static final Registry<MapCodec<? extends Area>> AREA_CODEC = new RegistryBuilder<>(Keys.AREA_CODEC).create();
-    public static final Registry<MapCodec<? extends Moment>> MOMENT_CODEC = new RegistryBuilder<>(Keys.MOMENT_CODEC).create();
+    public static final Registry<MapCodec<? extends Moment<?>>> MOMENT_CODEC = new RegistryBuilder<>(Keys.MOMENT_CODEC).create();
     public static final Registry<MapCodec<? extends IAmount>> AMOUNT_CODEC = new RegistryBuilder<>(Keys.AMOUNT_CODEC).create();
     public static final Registry<MapCodec<? extends ICondition>> CONDITION_CODEC = new RegistryBuilder<>(Keys.CONDITION_CODEC).create();
     public static final Registry<MapCodec<? extends IEntityInfo>> ENTITY_INFO_CODEC = new RegistryBuilder<>(Keys.ENTITY_INFO_CODEC).create();
@@ -36,11 +36,11 @@ public class HDMRegistries {
     public static final Registry<MapCodec<? extends IEquippableSlot>> EQUIPPABLE_SLOT_CODEC = new RegistryBuilder<>(Keys.EQUIPPABLE_SLOT_CODEC).create();
 
     public static final class Keys {
-        public static final ResourceKey<Registry<MomentType<?>>> MOMENT_TYPE = HeavenDestinyMoment.asResourceKey("moment_type");
-        public static final ResourceKey<Registry<IBarRenderType>> BAR_RENDER_TYPE = HeavenDestinyMoment.asResourceKey("bar_render_type");
+        public static final ResourceKey<Registry<MomentType>> MOMENT_TYPE = HeavenDestinyMoment.asResourceKey("moment_type");
 
+        public static final ResourceKey<Registry<MapCodec<? extends IBarRenderType>>> BAR_RENDER_TYPE_CODEC = HeavenDestinyMoment.asResourceKey("bar_render_type_codec");
         public static final ResourceKey<Registry<MapCodec<? extends Area>>> AREA_CODEC = HeavenDestinyMoment.asResourceKey("area_codec");
-        public static final ResourceKey<Registry<MapCodec<? extends Moment>>> MOMENT_CODEC = HeavenDestinyMoment.asResourceKey("moment_codec");
+        public static final ResourceKey<Registry<MapCodec<? extends Moment<?>>>> MOMENT_CODEC = HeavenDestinyMoment.asResourceKey("moment_codec");
         public static final ResourceKey<Registry<MapCodec<? extends IAmount>>> AMOUNT_CODEC = HeavenDestinyMoment.asResourceKey("amount_codec");
         public static final ResourceKey<Registry<MapCodec<? extends ICondition>>> CONDITION_CODEC = HeavenDestinyMoment.asResourceKey("condition_codec");
         public static final ResourceKey<Registry<MapCodec<? extends IEntityInfo>>> ENTITY_INFO_CODEC = HeavenDestinyMoment.asResourceKey("entity_info_codec");
@@ -49,13 +49,14 @@ public class HDMRegistries {
         public static final ResourceKey<Registry<MapCodec<? extends IEquippableSlot>>> EQUIPPABLE_SLOT_CODEC = HeavenDestinyMoment.asResourceKey("equippable_slot_codec");
 
 
-        public static final ResourceKey<Registry<Moment>> MOMENT = HeavenDestinyMoment.asResourceKey("moment");
+        public static final ResourceKey<Registry<Moment<?>>> MOMENT = HeavenDestinyMoment.asResourceKey("moment");
 
     }
 
     public static final class Suppliers {
+        public static final Supplier<Registry<MapCodec<? extends IBarRenderType>>> BAR_RENDER_TYPE_CODEC = supplyRegistry(Keys.BAR_RENDER_TYPE_CODEC);
         public static final Supplier<Registry<MapCodec<? extends Area>>> AREA_CODEC = supplyRegistry(Keys.AREA_CODEC);
-        public static final Supplier<Registry<MapCodec<? extends Moment>>> MOMENT_CODEC = supplyRegistry(Keys.MOMENT_CODEC);
+        public static final Supplier<Registry<MapCodec<? extends Moment<?>>>> MOMENT_CODEC = supplyRegistry(Keys.MOMENT_CODEC);
         public static final Supplier<Registry<MapCodec<? extends IAmount>>> AMOUNT_CODEC = supplyRegistry(Keys.AMOUNT_CODEC);
         public static final Supplier<Registry<MapCodec<? extends ICondition>>> CONDITION_CODEC = supplyRegistry(Keys.CONDITION_CODEC);
         public static final Supplier<Registry<MapCodec<? extends IEntityInfo>>> ENTITY_INFO_CODEC = supplyRegistry(Keys.ENTITY_INFO_CODEC);
@@ -66,10 +67,10 @@ public class HDMRegistries {
 
 
     public static void registerRegistries(NewRegistryEvent event) {
+        event.register(BAR_RENDER_TYPE_CODEC);
         event.register(AREA_CODEC);
         event.register(MOMENT_CODEC);
         event.register(MOMENT_TYPE);
-        event.register(BAR_RENDER_TYPE);
         event.register(AMOUNT_CODEC);
         event.register(CONDITION_CODEC);
         event.register(ENTITY_INFO_CODEC);

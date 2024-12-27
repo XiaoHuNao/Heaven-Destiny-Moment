@@ -1,9 +1,18 @@
 package com.xiaohunao.heaven_destiny_moment.client.gui.bar.render;
 
+import com.mojang.serialization.MapCodec;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import net.minecraft.client.gui.GuiGraphics;
 
-public class TerrariaBarRenderType implements IBarRenderType{
+public class TerrariaBarRenderType implements IBarRenderType {
+    public static final MapCodec<TerrariaBarRenderType> CODEC = MapCodec.unit(new TerrariaBarRenderType());
+
+    @Override
+    public MapCodec<? extends IBarRenderType> codec() {
+        return HDMContextRegister.TERRA_BAR_RENDER_TYPE.get();
+    }
+
     @Override
     public void renderBar(GuiGraphics guiGraphics, MomentBar bar, int index) {
 //        Minecraft minecraft = Minecraft.getInstance();

@@ -31,12 +31,12 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public abstract class MomentInstance<T extends Moment> extends AttachmentHolder {
+public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHolder {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected final Level level;
-    protected final MomentType<?> type;
-    protected final ResourceKey<Moment> momentKey;
+    protected final MomentType type;
+    protected final ResourceKey<Moment<?>> momentKey;
     protected final UUID uuid;
 
 
@@ -47,22 +47,22 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
     protected final Set<Player> players = Sets.newHashSet();
     protected final Set<UUID> inAreaPlayers = Sets.newHashSet();
 
-    protected MomentInstance(MomentType<?> type, Level level, ResourceKey<Moment> momentKey) {
+    protected MomentInstance(MomentType type, Level level, ResourceKey<Moment<?>> momentKey) {
         this.uuid = UUID.randomUUID();
         this.type = type;
         this.level = level;
         this.momentKey = momentKey;
     }
 
-    protected MomentInstance(MomentType<?> type, UUID uuid, Level level, ResourceKey<Moment> momentKey) {
+    protected MomentInstance(MomentType type, UUID uuid, Level level, ResourceKey<Moment<?>> momentKey) {
         this.uuid = uuid;
         this.type = type;
         this.level = level;
         this.momentKey = momentKey;
     }
 
-    public static boolean create(ResourceKey<Moment> momentKey, ServerLevel serverLevel, BlockPos pos, @Nullable ServerPlayer serverPlayer, @Nullable Consumer<MomentInstance> modifier) {
-        Registry<Moment> registry = serverLevel.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
+    public static boolean create(ResourceKey<Moment<?>> momentKey, ServerLevel serverLevel, BlockPos pos, @Nullable ServerPlayer serverPlayer, @Nullable Consumer<MomentInstance<?>> modifier) {
+        Registry<Moment<?>> registry = serverLevel.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
         return Optional.ofNullable(registry.get(momentKey))
                 .map(moment -> moment.newMomentInstance(serverLevel,momentKey))
                 .map(instance -> {
@@ -72,12 +72,13 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
                     return MomentManager.of(serverLevel).addMoment(instance,serverLevel,pos,serverPlayer);
                 }).orElse(false);
     }
-    public static boolean create(ResourceKey<Moment> momentKey, ServerLevel serverLevel, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
+
+    public static boolean create(ResourceKey<Moment<?>> momentKey, ServerLevel serverLevel, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
         return create(momentKey,serverLevel,pos,serverPlayer,null);
     }
 
-    public static Registry<Moment> registryChecked(ResourceKey<Moment> momentKey, Level level) {
-        Registry<Moment> registry = level.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
+    public static Registry<Moment<?>> registryChecked(ResourceKey<Moment<?>> momentKey, Level level) {
+        Registry<Moment<?>> registry = level.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
         if (registry.getHolder(momentKey).isEmpty()) {
             HeavenDestinyMoment.LOGGER.error("Moment {} not found in registry", momentKey.location());
             return null;
@@ -86,9 +87,9 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
     }
 
     public Optional<T> moment() {
-        Registry<Moment> registry = level.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
-        Moment moment = registry.get(momentKey);
-        return Optional.ofNullable((T) moment);
+        Registry<Moment<?>> registry = level.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
+        Moment<?> moment = registry.get(momentKey);
+        return (Optional<T>) Optional.ofNullable(moment);
     }
     public void init(){
         initMomentBar();
@@ -160,10 +161,10 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
     private void serializeMetadata(CompoundTag compoundTag) {
         compoundTag.putUUID("uuid", uuid);
         compoundTag.putString("id", MomentInstance.getRegistryName(type).toString());
-        compoundTag.put("moment", ResourceKey.codec(HDMRegistries.Keys.MOMENT).encodeStart(NbtOps.INSTANCE, momentKey).getOrThrow());
+        compoundTag.put("moment", ResourceKey.codec(HDMRegistries.Keys.MOMENT).encodeStart(NbtOps.INSTANCE, (ResourceKey<Moment<?>>) momentKey).getOrThrow());
     }
 
-    public static ResourceLocation getRegistryName(MomentType<?> momentType) {
+    public static ResourceLocation getRegistryName(MomentType momentType) {
         return HDMRegistries.MOMENT_TYPE.getKey(momentType);
     }
 
@@ -225,7 +226,7 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
             }
         }
 
-        if (state == MomentState.READY){
+        if (state == MomentState.START){
             MomentEvent.Start start = (MomentEvent.Start)setState(MomentState.START);
             if (!start.isCanceled()){
                 start();
@@ -256,7 +257,7 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
 
 
     protected void ready() {
-
+        setState(MomentState.START);
     }
 
     protected void start() {
@@ -330,11 +331,14 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
 
         newPlayers.stream()
                 .filter(player -> !oldPlayers.contains(player))
-                .forEach(serverPlayer -> {
-                    if (MomentManager.of(level).addPlayerToMoment(serverPlayer,this)) {
+                .forEach(player1 -> {
+                    if (MomentManager.of(level).addPlayerToMoment(player1,this)) {
 //                        bar.addPlayer(serverPlayer);
-                        players.add(serverPlayer);
-                        playerUUIDs.add(serverPlayer.getUUID());
+                        players.add(player1);
+                        playerUUIDs.add(player1.getUUID());
+                        if (this.bar != null){
+                            this.bar.addPlayer(player1);
+                        }
                     }
                 });
         oldPlayers.stream()
@@ -345,6 +349,9 @@ public abstract class MomentInstance<T extends Moment> extends AttachmentHolder 
 //                      bar.removePlayer(player1);
                         players.remove(player1);
                         playerUUIDs.add(player1.getUUID());
+                        if (this.bar != null){
+                            this.bar.removePlayer(player1);
+                        }
                     }
                 });
 //        bar.getPlayers().forEach(player -> {

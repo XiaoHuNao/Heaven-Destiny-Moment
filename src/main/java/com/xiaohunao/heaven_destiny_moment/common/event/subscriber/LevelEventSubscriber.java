@@ -35,12 +35,12 @@ public class LevelEventSubscriber {
         MomentManager.of(level).tick();
 
         if (level instanceof ServerLevel serverLevel) {
-            Registry<Moment> moments = level.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
+            Registry<Moment<?>> moments = level.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
             moments.entrySet().forEach(resourceKeyMomentEntry -> {
-                Moment moment = resourceKeyMomentEntry.getValue();
+                Moment<?> moment = resourceKeyMomentEntry.getValue();
 
                 serverLevel.getPlayers(serverPlayer -> true).forEach(serverPlayer -> {
-                    moment.momentData
+                    moment.momentData()
                             .flatMap(MomentData::conditionGroup)
                             .flatMap(ConditionGroup::create)
                             .ifPresent(createCondition -> {

@@ -25,7 +25,6 @@ public class HeavenDestinyMoment {
 
     public HeavenDestinyMoment(IEventBus modEventBus, ModContainer modContainer) {
         HDMMomentTypes.MOMENT_TYPE.register(modEventBus);
-        HDMBarRenderTypes.BAR_RENDER_TYPE.register(modEventBus);
         HDMContextRegister.register(modEventBus);
         HDMAttachments.TYPES.register(modEventBus);
 

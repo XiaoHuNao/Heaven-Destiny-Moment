@@ -21,7 +21,7 @@ import java.util.function.Function;
 public class MomentBar {
     public static final Codec<MomentBar> CODEC = RecordCodecBuilder.create(inst -> inst.group(
             UUIDUtil.CODEC.fieldOf("uuid").forGetter(MomentBar::getID),
-            HDMRegistries.BAR_RENDER_TYPE.byNameCodec().fieldOf("type").forGetter(MomentBar::getType),
+            IBarRenderType.CODEC.fieldOf("type").forGetter(MomentBar::getType),
             Codec.FLOAT.fieldOf("progress").forGetter(MomentBar::getProgress),
             Codec.STRING.xmap(BossEvent.BossBarColor::valueOf, BossEvent.BossBarColor::name).fieldOf("color").forGetter(MomentBar::getColor)
     ).apply(inst, MomentBar::new));

@@ -145,7 +145,7 @@ public class MomentManager extends SavedData {
 
         boolean canAddPlayer = true;
         for (MomentInstance<?> momentInstance : playerMoments.get(playerUUID)) {
-            Optional<? extends Moment> moment = momentInstance.moment();
+            Optional<? extends Moment<?>> moment = momentInstance.moment();
             if (moment.isPresent()) {
                 if (momentInstance.getID().equals(instance.getID())) break;
 

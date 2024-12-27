@@ -11,11 +11,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
-public abstract class Moment implements IMoment {
+public abstract class Moment<T extends Moment<?>> implements IMoment {
     public Optional<IBarRenderType> barRenderType = Optional.empty();
     public Optional<Area> area = Optional.empty();
     public Optional<MomentData> momentData = Optional.empty();
@@ -34,7 +32,7 @@ public abstract class Moment implements IMoment {
     }
 
 
-    public abstract MomentInstance<? extends Moment> newMomentInstance(Level level, ResourceKey<Moment> momentResourceKey);
+    public abstract MomentInstance<?> newMomentInstance(Level level, ResourceKey<Moment<?>> momentResourceKey);
 
     public boolean isInArea(ServerLevel level, BlockPos blockPos) {
         return area.map(area1 -> area1.matches(level,blockPos)).orElse(true);
@@ -60,28 +58,28 @@ public abstract class Moment implements IMoment {
         return area;
     }
 
-    public Moment setBarRenderType(IBarRenderType barRenderType) {
+    public Moment<T> setBarRenderType(IBarRenderType barRenderType) {
         this.barRenderType = Optional.of(barRenderType);
         return this;
     }
 
-    public Moment setArea(Area area) {
+    public Moment<T> setArea(Area area) {
         this.area = Optional.of(area);
         return this;
     }
 
-    public Moment setMomentData(Function<MomentData.Builder,MomentData.Builder> momentData) {
+    public Moment<T> setMomentData(Function<MomentData.Builder,MomentData.Builder> momentData) {
         this.momentData = Optional.of(momentData.apply(new MomentData.Builder()).build());
         return this;
     }
 
 
-    public Moment setClientSettings(Function<ClientSettings.Builder,ClientSettings.Builder> clientSettings) {
+    public Moment<T> setClientSettings(Function<ClientSettings.Builder,ClientSettings.Builder> clientSettings) {
         this.clientSettings = Optional.of(clientSettings.apply(new ClientSettings.Builder()).build());
         return this;
     }
 
-    public Moment setTipSettings(Function<TipSettings.Builder,TipSettings.Builder> tipSettings) {
+    public Moment<T> setTipSettings(Function<TipSettings.Builder,TipSettings.Builder> tipSettings) {
         this.tipSettings = Optional.of(tipSettings.apply(new TipSettings.Builder()).build());
         return this;
     }

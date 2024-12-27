@@ -8,45 +8,32 @@ import javax.annotation.Nullable;
 import java.util.Set;
 import java.util.UUID;
 
-public class MomentType<T extends MomentInstance> {
-    private final MomentType.MomentSupplier<? extends T> factory;
-    private final Set<Class<? extends Moment>> validMoments;
+public class MomentType {
+    private final MomentSupplier factory;
 
-    public MomentType(MomentType.MomentSupplier<? extends T> factory, Set<Class<? extends Moment>> validMoments) {
+    public MomentType(MomentSupplier factory) {
         this.factory = factory;
-        this.validMoments = validMoments;
     }
 
     @Nullable
-    public T create(UUID uuid, Level level, ResourceKey<Moment> moment) {
+    public MomentInstance create(UUID uuid, Level level, ResourceKey<Moment<?>> moment) {
         return factory.create(uuid, level, moment);
     }
 
-    public boolean isValid(Moment moment) {
-        return validMoments.contains(moment.getClass());
-    }
 
-    @SafeVarargs
-    public static <T extends MomentInstance> Builder<T> builder(MomentSupplier<? extends T> factory, Class<? extends Moment>... validMoments) {
-        return new Builder<>(factory, ImmutableSet.copyOf(validMoments));
-    }
-
-    public static final class Builder<T extends MomentInstance> {
-        private final MomentSupplier<? extends T> factory;
-        private final Set<Class<? extends Moment>> validMoments;
-
-        private Builder(MomentSupplier<? extends T> factory, Set<Class<? extends Moment>> validMoments) {
+    public static final class Builder {
+        private final MomentSupplier factory;
+        public Builder(MomentSupplier factory) {
             this.factory = factory;
-            this.validMoments = validMoments;
         }
 
-        public MomentType<T> build() {
-            return new MomentType<>(factory, validMoments);
+        public MomentType build() {
+            return new MomentType(factory);
         }
     }
 
     @FunctionalInterface
-    public interface MomentSupplier<T extends MomentInstance> {
-        T create(UUID uuid, Level level, ResourceKey<Moment> moment);
+    public interface MomentSupplier {
+        MomentInstance create(UUID uuid, Level level, ResourceKey<Moment<?>> moment);
     }
 }
