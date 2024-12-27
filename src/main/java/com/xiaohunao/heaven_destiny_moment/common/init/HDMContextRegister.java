@@ -8,6 +8,11 @@ import com.xiaohunao.heaven_destiny_moment.common.context.amount.RandomAmount;
 import com.xiaohunao.heaven_destiny_moment.common.context.attachable.CommonAttachable;
 import com.xiaohunao.heaven_destiny_moment.common.context.attachable.IAttachable;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.*;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.common.AutoProbabilityCondition;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.common.WorldUniqueMomentCondition;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.LocationCondition;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.level.DifficultyCondition;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.level.TimeCondition;
 import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.EntityInfo;
 import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.IEntityInfo;
 import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.SlimeInfo;
@@ -46,6 +51,8 @@ public class HDMContextRegister {
     public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<? extends ICondition>> WORLD_UNIQUE_MOMENT = CONDITION_CODEC.register("world_unique_moment", () -> WorldUniqueMomentCondition.CODEC);
     public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<? extends ICondition>> AUTO_PROBABILITY = CONDITION_CODEC.register("auto_probability", () -> AutoProbabilityCondition.CODEC);
     public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<? extends ICondition>> PLAYER = CONDITION_CODEC.register("player", () -> PlayerCondition.CODEC);
+    public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<? extends ICondition>> DIFFICULTY = CONDITION_CODEC.register("difficulty", () -> DifficultyCondition.CODEC);
+    public static final DeferredHolder<MapCodec<? extends ICondition>, MapCodec<? extends ICondition>> LEVEL = CONDITION_CODEC.register("level", () -> LevelCondition.CODEC);
 
     public static final DeferredHolder<MapCodec<? extends IEntityInfo>, MapCodec<? extends IEntityInfo>> ENTITY_INFO = ENTITY_INFO_CODEC.register("entity_info", () -> EntityInfo.CODEC);
     public static final DeferredHolder<MapCodec<? extends IEntityInfo>, MapCodec<? extends IEntityInfo>> SLIME_INFO = ENTITY_INFO_CODEC.register("slime_info", () -> SlimeInfo.CODEC);

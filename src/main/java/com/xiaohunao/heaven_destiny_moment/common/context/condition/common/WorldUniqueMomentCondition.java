@@ -1,7 +1,7 @@
-package com.xiaohunao.heaven_destiny_moment.common.context.condition;
+package com.xiaohunao.heaven_destiny_moment.common.context.condition.common;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import com.xiaohunao.heaven_destiny_moment.common.context.condition.ICondition;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
@@ -10,7 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 import javax.annotation.Nullable;
 
-public class WorldUniqueMomentCondition implements ICondition{
+public class WorldUniqueMomentCondition implements ICondition {
     public static final WorldUniqueMomentCondition DEFAULT = new WorldUniqueMomentCondition();
     public static MapCodec<WorldUniqueMomentCondition> CODEC = MapCodec.unit(DEFAULT);
 
