@@ -5,9 +5,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
-import com.xiaohunao.heaven_destiny_moment.client.gui.hud.MomentBarOverlay;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
-import com.xiaohunao.heaven_destiny_moment.common.moment.MomentState;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.BossHealthOverlay;
 import net.minecraft.resources.ResourceLocation;
@@ -15,7 +13,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 
 import java.util.Locale;
-import java.util.function.Function;
 
 public class DefaultBarRenderType implements IBarRenderType{
     public static final Codec<BossEvent.BossBarOverlay> BOSS_BAR_OVERLAY_CODEC = Codec.STRING.xmap(overlay -> BossEvent.BossBarOverlay.valueOf(overlay.toUpperCase(Locale.ROOT)),

@@ -20,6 +20,7 @@ public abstract class Moment<T extends Moment<?>> implements IMoment {
     public Optional<TipSettings> tipSettings = Optional.empty();
     public Optional<ClientSettings> clientSettings = Optional.empty();
 
+
     public Moment() {}
 
     public Moment(Optional<IBarRenderType> renderType, Optional<Area> area, Optional<MomentData> momentData,

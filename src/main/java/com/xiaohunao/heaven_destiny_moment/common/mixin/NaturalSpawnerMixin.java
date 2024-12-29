@@ -2,12 +2,10 @@ package com.xiaohunao.heaven_destiny_moment.common.mixin;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.xiaohunao.heaven_destiny_moment.common.attachment.MomentEntityAttachment;
 import com.xiaohunao.heaven_destiny_moment.common.context.BiomeEntitySpawnSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.MobSpawnRule;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
-import com.xiaohunao.heaven_destiny_moment.common.init.HDMAttachments;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
@@ -15,9 +13,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.random.WeightedRandomList;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.*;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.NaturalSpawner;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -30,7 +33,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 @Mixin(NaturalSpawner.class)
@@ -182,5 +187,16 @@ public class NaturalSpawnerMixin {
                 ci.cancel();
             }
         }
+    }
+
+
+    @Inject(method = "spawnCategoryForChunk" ,at = @At(value = "HEAD"), cancellable = true)
+    private static void spawnCategoryForChunk(MobCategory category, ServerLevel level, LevelChunk chunk, NaturalSpawner.SpawnPredicate filter, NaturalSpawner.AfterSpawnCallback callback, CallbackInfo ci){
+//        MomentManager momentManager = MomentManager.of(level);
+//        for (MomentInstance<?> instance : momentManager.getImmutableRunMoments().values()) {
+//
+//        }
+//        NaturalSpawner.spawnCategoryForPosition(category, level, chunk, serverPlayer.blockPosition(), filter, callback);
+//        ci.cancel();
     }
 }

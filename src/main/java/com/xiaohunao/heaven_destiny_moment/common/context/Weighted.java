@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.WeightedEntry;
-import net.minecraft.util.random.WeightedRandom;
 
 import java.util.List;
 import java.util.Optional;

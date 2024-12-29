@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.render.IBarRenderType;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMRegistries;
-import net.minecraft.resources.ResourceLocation;
 
 import java.util.Optional;
 import java.util.function.Function;

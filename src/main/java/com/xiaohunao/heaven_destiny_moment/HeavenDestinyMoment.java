@@ -2,7 +2,10 @@ package com.xiaohunao.heaven_destiny_moment;
 
 import com.mojang.logging.LogUtils;
 import com.xiaohunao.heaven_destiny_moment.client.gui.hud.MomentBarOverlay;
-import com.xiaohunao.heaven_destiny_moment.common.init.*;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMAttachments;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMMomentTypes;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;

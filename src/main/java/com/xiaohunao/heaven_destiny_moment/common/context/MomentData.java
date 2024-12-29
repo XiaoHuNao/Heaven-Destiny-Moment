@@ -7,7 +7,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.common.context.reward.IReward;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public record MomentData(Optional<List<IReward>> rewards, Optional<ConditionGroup> conditionGroup,
                          Optional<EntitySpawnSettings> entitySpawnSettingsContext) {

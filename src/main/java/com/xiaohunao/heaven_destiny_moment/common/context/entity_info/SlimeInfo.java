@@ -13,7 +13,6 @@ import net.minecraft.world.entity.monster.Slime;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 
