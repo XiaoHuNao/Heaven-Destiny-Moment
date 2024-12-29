@@ -27,7 +27,7 @@ public class MomentEntityAttachment implements INBTSerializable<CompoundTag> {
         CompoundTag compoundTag = new CompoundTag();
 
         if (momentUid != null) {
-            compoundTag.putUUID("momentUid", momentUid);
+            compoundTag.putUUID("momentUid", this.momentUid);
         }
 
         return compoundTag;

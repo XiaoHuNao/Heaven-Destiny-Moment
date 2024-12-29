@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.WeightedEntry;
+import net.minecraft.util.random.WeightedRandom;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,7 @@ public record Weighted<T>(int totalWeight, List<WeightedEntry.Wrapper<T>> list) 
             return getWeightedItem(this.list, index);
         }
     }
+
     public Optional<T> getRandomValue(RandomSource random) {
         return getRandom(random).map(WeightedEntry.Wrapper::data);
     }

@@ -7,12 +7,14 @@ import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.ICondition;
+import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.IEntityInfo;
 import com.xiaohunao.heaven_destiny_moment.common.event.MomentEvent;
 import com.xiaohunao.heaven_destiny_moment.common.event.PlayerMomentAreaEvent;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMAttachments;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMRegistries;
 import com.xiaohunao.heaven_destiny_moment.common.moment.moment.instance.DefaultInstance;
 import com.xiaohunao.heaven_destiny_moment.common.network.MomentManagerSyncPayload;
+import com.xiaohunao.heaven_destiny_moment.common.spawn_algorithm.ISpawnAlgorithm;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.*;
@@ -311,10 +313,6 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
         return player -> !player.isSpectator();
     }
 
-    public boolean canSpawnEntity(ServerLevel serverLevel, Entity entity, BlockPos pos){
-        return true;
-    }
-
     public List<Player> getPlayers(Predicate<? super Player> predicate) {
         List<Player> list = Lists.newArrayList();
 
@@ -434,5 +432,19 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
 
     public boolean isClientOnlyMoment() {
         return moment().map(Moment::isClientOnlyMoment).orElse(false);
+    }
+
+    public boolean canSpawnEntity(Level level, Entity entity, BlockPos pos){
+        return true;
+    }
+
+    public void setEntityTagMark(Entity entity){
+        entity.setData(HDMAttachments.MOMENT_ENTITY,entity.getData(HDMAttachments.MOMENT_ENTITY).setUid(this.uuid));
+    }
+
+    public void spawnEntity(Entity entity) {
+        setEntityTagMark(entity);
+        finalizeSpawn(entity);
+
     }
 }

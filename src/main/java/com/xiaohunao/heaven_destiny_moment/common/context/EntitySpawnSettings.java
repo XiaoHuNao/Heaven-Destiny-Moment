@@ -5,10 +5,13 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.EntityInfo;
 import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.IEntityInfo;
 import net.minecraft.util.random.WeightedRandomList;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 
 import java.util.Collections;
@@ -27,6 +30,35 @@ public record EntitySpawnSettings(Optional<List<List<IEntityInfo>>> entitySpawnL
                     MobSpawnRule.CODEC.optionalFieldOf("spawn_rule").forGetter(EntitySpawnSettings::rule)
             ).apply(builder, EntitySpawnSettings::new)
     );
+
+    public List<Entity> spawnList(Level level, int wave){
+        List<Entity> list = Lists.newArrayList();
+
+        entitySpawnList.ifPresent(entitySpawnList -> {
+            List<IEntityInfo> infoList = entitySpawnList.get(wave);
+            int sum = infoList.stream()
+                    .filter(entityInfo -> entityInfo instanceof EntityInfo)
+                    .mapToInt(entityInfo -> ((EntityInfo) entityInfo).weight().orElse(0))
+                    .sum();
+
+            for (IEntityInfo info : infoList) {
+                if (!(info instanceof EntityInfo entityInfo)) {
+                    return;
+                }
+
+                if (entityInfo.weight().isPresent()) {
+                    int weight = entityInfo.weight().get();
+                    sum -= weight;
+                    if (sum <= 0) {
+                        list.addAll(info.spawn(level));
+                    }
+                }
+            }
+        });
+        return list;
+    }
+
+
 
     public WeightedRandomList<MobSpawnSettings.SpawnerData> adjustmentBiomeEntitySpawnSettings(MobCategory mobCategory, List<MobSpawnSettings.SpawnerData> originalSpawnerData) {
         biomeEntitySpawnSettings.flatMap(BiomeEntitySpawnSettings::biomeMobSpawnSettings)

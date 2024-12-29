@@ -177,13 +177,7 @@ public class NaturalSpawnerMixin {
         MomentManager momentManager = MomentManager.of(serverLevel.getLevel());
         for (MomentInstance<?> instance : momentManager.getImmutableRunMoments().values()) {
             if (instance.canSpawnEntity(serverLevel,mob,pos)) {
-                instance.moment()
-                        .filter(moment -> moment.isInArea(serverLevel, mob.blockPosition()))
-                        .ifPresent(moment -> {
-                            MomentEntityAttachment data = mob.getData(HDMAttachments.MOMENT_ENTITY);
-                            mob.setData(HDMAttachments.MOMENT_ENTITY,data.setUid(instance.getID()));
-                            instance.finalizeSpawn(mob);
-                        });
+                instance.setEntityTagMark(mob);
             }else {
                 ci.cancel();
             }

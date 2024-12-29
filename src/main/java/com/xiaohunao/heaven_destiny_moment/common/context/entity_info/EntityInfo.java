@@ -10,12 +10,16 @@ import com.xiaohunao.heaven_destiny_moment.common.context.amount.RandomAmount;
 import com.xiaohunao.heaven_destiny_moment.common.context.attachable.IAttachable;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
-public record EntityInfo(EntityType<?> entityType, Optional<IAmount> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches) implements IEntityInfo {
+public class EntityInfo implements IEntityInfo {
     public static final MapCodec<EntityInfo> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("entity_type").forGetter(EntityInfo::entityType),
             IAmount.CODEC.optionalFieldOf("amount").forGetter(EntityInfo::amount),
@@ -23,28 +27,55 @@ public record EntityInfo(EntityType<?> entityType, Optional<IAmount> amount, Opt
             IAttachable.CODEC.listOf().optionalFieldOf("attaches").forGetter(EntityInfo::attaches)
     ).apply(instance, EntityInfo::new));
 
+    private final EntityType<?> entityType;
+    private final Optional<IAmount> amount;
+    private final Optional<Integer> weight;
+    private final Optional<List<IAttachable>> attaches;
+
+    public EntityInfo(EntityType<?> entityType, Optional<IAmount> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches) {
+        this.entityType = entityType;
+        this.amount = amount;
+        this.weight = weight;
+        this.attaches = attaches;
+    }
 
 
-
-//    @Override
-//    public Entity crateEntity(Level level) {
-//        Entity entity = entityType.create(level);
-//        if (entity instanceof LivingEntity livingEntity) {
-//            attaches.ifPresent(attaches -> {
-//                for (IAttachable attach : attaches) {
-//                    attach.attachToEntity(livingEntity);
-//                }
-//            });
-//        }
-//        return entity;
-//    }
-
+    @Override
+    public List<Entity> spawn(Level level) {
+        List<Entity> arrayList = Lists.newArrayList();
+        IAmount amount = amount().orElse(new IntegerAmount(1));
+        for (int i = 0; i < amount.getAmount(); i++) {
+            Entity entity = entityType.create(level);
+            attaches.ifPresent(attaches -> {
+                if (entity instanceof LivingEntity livingEntity) {
+                    attaches.forEach(attachable -> attachable.attachToEntity(livingEntity));
+                }
+            });
+            arrayList.add(entity);
+        }
+        return arrayList;
+    }
 
     @Override
     public MapCodec<? extends IEntityInfo> codec() {
         return HDMContextRegister.ENTITY_INFO.get();
     }
 
+    public EntityType<?> entityType() {
+        return entityType;
+    }
+
+    public Optional<IAmount> amount() {
+        return amount;
+    }
+
+    public Optional<Integer> weight() {
+        return weight;
+    }
+
+    public Optional<List<IAttachable>> attaches() {
+        return attaches;
+    }
 
     public static class Builder {
         protected EntityType<?> entityType;
@@ -56,22 +87,22 @@ public record EntityInfo(EntityType<?> entityType, Optional<IAmount> amount, Opt
             this.entityType = (entityType);
         }
 
-        public Builder amount(IAmount amount){
+        public Builder amount(IAmount amount) {
             this.amount = Optional.of(amount);
             return this;
         }
 
-        public Builder amount(int amount){
+        public Builder amount(int amount) {
             this.amount = Optional.of(new IntegerAmount(amount));
             return this;
         }
 
-        public Builder amount(int min,int max){
-            this.amount = Optional.of(new RandomAmount(min,max));
+        public Builder amount(int min, int max) {
+            this.amount = Optional.of(new RandomAmount(min, max));
             return this;
         }
 
-        public Builder weight(int weight){
+        public Builder weight(int weight) {
             this.weight = Optional.of(weight);
             return this;
         }
