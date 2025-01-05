@@ -45,13 +45,13 @@ public class MomentBar {
     public void updateProgress(float progress) {
         if (progress != this.progress) {
             this.progress = progress;
-            broadcast(MomentBarSyncPayload::update);
+            broadcast(MomentBarSyncPayload::updateProgress);
         }
     }
 
     public void addPlayer(Player player) {
         if (this.players.add(player)) {
-            broadcast(MomentBarSyncPayload::update);
+            broadcast(MomentBarSyncPayload::addPlayer);
         }
     }
 

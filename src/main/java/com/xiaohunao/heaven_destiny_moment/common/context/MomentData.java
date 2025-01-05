@@ -12,12 +12,13 @@ import java.util.Optional;
 import java.util.Set;
 
 public record MomentData(Optional<List<IReward>> rewards, Optional<ConditionGroup> conditionGroup,
-                         Optional<EntitySpawnSettings> entitySpawnSettingsContext) {
+                         Optional<EntitySpawnSettings> entitySpawnSettings) {
 
     public static final Codec<MomentData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.list(IReward.CODEC).optionalFieldOf("rewards").forGetter(MomentData::rewards),
             ConditionGroup.CODEC.optionalFieldOf("conditionGroup").forGetter(MomentData::conditionGroup),
-            EntitySpawnSettings.CODEC.optionalFieldOf("entity_spawn_settings").forGetter(MomentData::entitySpawnSettingsContext)
+            EntitySpawnSettings.CODEC.optionalFieldOf("entity_spawn_settings").forGetter(MomentData::entitySpawnSettings)
+
     ).apply(instance, MomentData::new));
     public static final MomentData EMPTY = new MomentData(Optional.empty(),Optional.empty(),Optional.empty());
 

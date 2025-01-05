@@ -7,6 +7,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.EntityInfo;
 import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.IEntityInfo;
+import com.xiaohunao.heaven_destiny_moment.common.spawn_algorithm.ISpawnAlgorithm;
+import com.xiaohunao.heaven_destiny_moment.common.spawn_algorithm.OpenAreaSpawnAlgorithm;
 import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -20,14 +22,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public record EntitySpawnSettings(Optional<List<List<IEntityInfo>>> entitySpawnList, Optional<BiomeEntitySpawnSettings> biomeEntitySpawnSettings, Optional<MobSpawnRule> rule) {
-    public static final EntitySpawnSettings EMPTY = new EntitySpawnSettings(Optional.empty(),Optional.empty(),Optional.empty());
-
+public record EntitySpawnSettings(Optional<List<List<IEntityInfo>>> entitySpawnList, Optional<BiomeEntitySpawnSettings> biomeEntitySpawnSettings, Optional<MobSpawnRule> rule, Optional<ISpawnAlgorithm> spawnAlgorithm) {
     public static final Codec<EntitySpawnSettings> CODEC = RecordCodecBuilder.create(builder ->
             builder.group(
                     IEntityInfo.CODEC.listOf().listOf().optionalFieldOf("entity_spawn_list").forGetter(EntitySpawnSettings::entitySpawnList),
                     BiomeEntitySpawnSettings.CODEC.optionalFieldOf("biome_entity_Spawn_settings").forGetter(EntitySpawnSettings::biomeEntitySpawnSettings),
-                    MobSpawnRule.CODEC.optionalFieldOf("spawn_rule").forGetter(EntitySpawnSettings::rule)
+                    MobSpawnRule.CODEC.optionalFieldOf("spawn_rule").forGetter(EntitySpawnSettings::rule),
+                    ISpawnAlgorithm.CODEC.optionalFieldOf("spawn_algorithm").forGetter(EntitySpawnSettings::spawnAlgorithm)
             ).apply(builder, EntitySpawnSettings::new)
     );
 
@@ -36,9 +37,10 @@ public record EntitySpawnSettings(Optional<List<List<IEntityInfo>>> entitySpawnL
 
         entitySpawnList.ifPresent(entitySpawnList -> {
             List<IEntityInfo> infoList = entitySpawnList.get(wave);
+
             int sum = infoList.stream()
                     .filter(entityInfo -> entityInfo instanceof EntityInfo)
-                    .mapToInt(entityInfo -> ((EntityInfo) entityInfo).weight().orElse(0))
+                    .mapToInt(entityInfo -> ((EntityInfo) entityInfo).weight().orElse(1))
                     .sum();
 
             for (IEntityInfo info : infoList) {
@@ -46,12 +48,15 @@ public record EntitySpawnSettings(Optional<List<List<IEntityInfo>>> entitySpawnL
                     return;
                 }
 
+                int weight;
                 if (entityInfo.weight().isPresent()) {
-                    int weight = entityInfo.weight().get();
-                    sum -= weight;
-                    if (sum <= 0) {
-                        list.addAll(info.spawn(level));
-                    }
+                    weight = entityInfo.weight().get();
+                }else {
+                    weight = 1;
+                }
+                sum -= weight;
+                if (sum <= 0) {
+                    list.addAll(info.spawn(level));
                 }
             }
         });
@@ -108,6 +113,7 @@ public record EntitySpawnSettings(Optional<List<List<IEntityInfo>>> entitySpawnL
         private List<List<IEntityInfo>> entitySpawnList;
         private BiomeEntitySpawnSettings biomeEntitySpawnSettings;
         private MobSpawnRule rule;
+        private ISpawnAlgorithm spawnAlgorithm = new OpenAreaSpawnAlgorithm(10,32);
 
         public Builder biomeEntitySpawnSettings(Function<BiomeEntitySpawnSettings.Builder,BiomeEntitySpawnSettings.Builder> biomeEntitySpawnSettings) {
             this.biomeEntitySpawnSettings = biomeEntitySpawnSettings.apply(new BiomeEntitySpawnSettings.Builder()).build();
@@ -115,7 +121,7 @@ public record EntitySpawnSettings(Optional<List<List<IEntityInfo>>> entitySpawnL
         }
 
         public Builder entitySpawnList(IEntityInfo... entityInfoContexts) {
-            if (entitySpawnList.isEmpty()){
+            if (entitySpawnList == null){
                 entitySpawnList = Lists.newArrayList();
             }
             Collections.addAll(entitySpawnList, List.of(entityInfoContexts));
@@ -127,9 +133,14 @@ public record EntitySpawnSettings(Optional<List<List<IEntityInfo>>> entitySpawnL
             return this;
         }
 
+        public Builder spawnAlgorithm(ISpawnAlgorithm spawnAlgorithm){
+            this.spawnAlgorithm = spawnAlgorithm;
+            return this;
+        }
+
 
         public EntitySpawnSettings build() {
-            return new EntitySpawnSettings(Optional.ofNullable(entitySpawnList),Optional.ofNullable(biomeEntitySpawnSettings),Optional.ofNullable(rule));
+            return new EntitySpawnSettings(Optional.ofNullable(entitySpawnList),Optional.ofNullable(biomeEntitySpawnSettings),Optional.ofNullable(rule),Optional.ofNullable(spawnAlgorithm));
         }
     }
 

@@ -29,6 +29,8 @@ import com.xiaohunao.heaven_destiny_moment.common.moment.area.Area;
 import com.xiaohunao.heaven_destiny_moment.common.moment.area.LocationArea;
 import com.xiaohunao.heaven_destiny_moment.common.moment.moment.DefaultMoment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.moment.RaidMoment;
+import com.xiaohunao.heaven_destiny_moment.common.spawn_algorithm.ISpawnAlgorithm;
+import com.xiaohunao.heaven_destiny_moment.common.spawn_algorithm.OpenAreaSpawnAlgorithm;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -43,6 +45,7 @@ public class HDMContextRegister {
     public static final DeferredRegister<MapCodec<? extends IReward>> REWARD_CODEC = DeferredRegister.create(HDMRegistries.Keys.REWARD_CODEC, HeavenDestinyMoment.MODID);
     public static final DeferredRegister<MapCodec<? extends IEquippableSlot>> EQUIPPABLE_SLOT_CODEC = DeferredRegister.create(HDMRegistries.Keys.EQUIPPABLE_SLOT_CODEC, HeavenDestinyMoment.MODID);
     public static final DeferredRegister<MapCodec<? extends IAttachable>> ATTACHABLE_CODEC = DeferredRegister.create(HDMRegistries.Keys.ATTACHABLE_CODEC, HeavenDestinyMoment.MODID);
+    public static final DeferredRegister<MapCodec<? extends ISpawnAlgorithm>> SPAWN_ALGORITHM_CODEC = DeferredRegister.create(HDMRegistries.Keys.SPAWN_ALGORITHM_CODEC, HeavenDestinyMoment.MODID);
 
 
     public static final DeferredHolder<MapCodec<? extends IBarRenderType>, MapCodec<? extends IBarRenderType>> DEFAULT_BAR_RENDER_TYPE = BAR_RENDER_TYPE_CODEC.register("default", () -> DefaultBarRenderType.CODEC);
@@ -81,6 +84,10 @@ public class HDMContextRegister {
 
     public static final DeferredHolder<MapCodec<? extends IEquippableSlot>, MapCodec<? extends IEquippableSlot>> VANILLA_EQUIPPABLE_SLOT = EQUIPPABLE_SLOT_CODEC.register("vanilla", () -> VanillaEquippableSlot.CODEC);
 
+
+    public static final DeferredHolder<MapCodec<? extends ISpawnAlgorithm>, MapCodec<? extends ISpawnAlgorithm>> OPEN_AREA_SPAWN_ALGORITHM = SPAWN_ALGORITHM_CODEC.register("open_area", () -> OpenAreaSpawnAlgorithm.CODEC);
+
+
     public static void register(IEventBus modEventBus) {
         BAR_RENDER_TYPE_CODEC.register(modEventBus);
         AMOUNT_CODEC.register(modEventBus);
@@ -89,5 +96,6 @@ public class HDMContextRegister {
         REWARD_CODEC.register(modEventBus);
         AREA_CODEC.register(modEventBus);
         MOMENT_CODEC.register(modEventBus);
+        SPAWN_ALGORITHM_CODEC.register(modEventBus);
     }
 }

@@ -47,7 +47,7 @@ public class NaturalSpawnerMixin {
             instance.moment()
                     .filter(moment -> moment.isInArea(serverLevel, pos))
                     .flatMap(Moment::momentData)
-                    .flatMap(MomentData::entitySpawnSettingsContext)
+                    .flatMap(MomentData::entitySpawnSettings)
                     .ifPresent(entitySpawnSettingsContext -> {
                         List<MobSpawnSettings.SpawnerData> unwrap = new ArrayList<>(cir.getReturnValue().unwrap());
                         cir.setReturnValue(entitySpawnSettingsContext.adjustmentBiomeEntitySpawnSettings(mobCategory, unwrap));
@@ -80,7 +80,7 @@ public class NaturalSpawnerMixin {
             instance.moment()
                     .filter(moment -> moment.isInArea((ServerLevel) level, pos))
                     .flatMap(Moment::momentData)
-                    .flatMap(MomentData::entitySpawnSettingsContext)
+                    .flatMap(MomentData::entitySpawnSettings)
                     .ifPresent(entitySpawnSettingsContext -> {
                         MobSpawnSettings mobSettings = cir.getReturnValue().getMobSettings();
                         entitySpawnSettingsContext.biomeEntitySpawnSettings().flatMap(BiomeEntitySpawnSettings::biomeMobSpawnSettings).ifPresent(mobSpawnSettings -> {
@@ -127,7 +127,7 @@ public class NaturalSpawnerMixin {
             instance.moment()
                     .filter(moment -> moment.isInArea(serverLevel, pos))
                     .flatMap(Moment::momentData)
-                    .flatMap(MomentData::entitySpawnSettingsContext)
+                    .flatMap(MomentData::entitySpawnSettings)
                     .flatMap(EntitySpawnSettings::rule)
                     .flatMap(MobSpawnRule::ignoreDistance)
                     .ifPresent(cir::setReturnValue);
@@ -146,7 +146,7 @@ public class NaturalSpawnerMixin {
 //            instance.getMoment()
 //                    .filter(moment -> moment.isInArea((ServerLevel) level, returnValue))
 //                    .map(Moment::getMomentDataContext)
-//                    .flatMap(MomentDataContext::entitySpawnSettingsContext)
+//                    .flatMap(MomentDataContext::entitySpawnSettings)
 //                    .flatMap(EntitySpawnSettingsContext::rule)
 //                    .flatMap(MobSpawnRule::forceSurfaceSpawning)
 //                    .ifPresent(mobSpawnSettingsContext -> {

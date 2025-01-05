@@ -65,7 +65,7 @@ public class SlimeInfo extends EntityInfo{
 
         @Override
         public IEntityInfo build() {
-            return new SlimeInfo(entityType, amount, weight, attaches, size);
+            return new SlimeInfo(entityType, Optional.ofNullable(amount), Optional.ofNullable(weight), Optional.ofNullable(attaches), size);
         }
     }
 }

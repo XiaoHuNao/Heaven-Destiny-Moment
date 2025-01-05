@@ -32,7 +32,7 @@ public class SlimeMixin {
                 instance.moment()
                         .filter(moment -> moment.isInArea(serverLevel, pos))
                         .flatMap(Moment::momentData)
-                        .flatMap(MomentData::entitySpawnSettingsContext)
+                        .flatMap(MomentData::entitySpawnSettings)
                         .flatMap(EntitySpawnSettings::rule)
                         .flatMap(MobSpawnRule::slimesSpawnEverywhere)
                         .ifPresent(slimesSpawnEverywhere -> {

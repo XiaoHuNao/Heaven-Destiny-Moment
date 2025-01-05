@@ -12,6 +12,7 @@ import com.xiaohunao.heaven_destiny_moment.common.context.reward.IReward;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentType;
 import com.xiaohunao.heaven_destiny_moment.common.moment.area.Area;
+import com.xiaohunao.heaven_destiny_moment.common.spawn_algorithm.ISpawnAlgorithm;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -34,6 +35,7 @@ public class HDMRegistries {
     public static final Registry<MapCodec<? extends IReward>> REWARD_CODEC = new RegistryBuilder<>(Keys.REWARD_CODEC).create();
     public static final Registry<MapCodec<? extends IAttachable>> ATTACHABLE_CODEC = new RegistryBuilder<>(Keys.ATTACHABLE_CODEC).create();
     public static final Registry<MapCodec<? extends IEquippableSlot>> EQUIPPABLE_SLOT_CODEC = new RegistryBuilder<>(Keys.EQUIPPABLE_SLOT_CODEC).create();
+    public static final Registry<MapCodec<? extends ISpawnAlgorithm>> SPAWN_ALGORITHM_CODEC = new RegistryBuilder<>(Keys.SPAWN_ALGORITHM_CODEC).create();
 
     public static final class Keys {
         public static final ResourceKey<Registry<MomentType<?>>> MOMENT_TYPE = HeavenDestinyMoment.asResourceKey("moment_type");
@@ -47,6 +49,7 @@ public class HDMRegistries {
         public static final ResourceKey<Registry<MapCodec<? extends IReward>>> REWARD_CODEC = HeavenDestinyMoment.asResourceKey("reward_codec");
         public static final ResourceKey<Registry<MapCodec<? extends IAttachable>>> ATTACHABLE_CODEC = HeavenDestinyMoment.asResourceKey("attachable_codec");
         public static final ResourceKey<Registry<MapCodec<? extends IEquippableSlot>>> EQUIPPABLE_SLOT_CODEC = HeavenDestinyMoment.asResourceKey("equippable_slot_codec");
+        public static final ResourceKey<Registry<MapCodec<? extends ISpawnAlgorithm>>> SPAWN_ALGORITHM_CODEC = HeavenDestinyMoment.asResourceKey("spawn_algorithm_codec");
 
 
         public static final ResourceKey<Registry<Moment<?>>> MOMENT = HeavenDestinyMoment.asResourceKey("moment");
@@ -63,20 +66,23 @@ public class HDMRegistries {
         public static final Supplier<Registry<MapCodec<? extends IReward>>> REWARD_CODEC = supplyRegistry(Keys.REWARD_CODEC);
         public static final Supplier<Registry<MapCodec<? extends IAttachable>>> ATTACHABLE_CODEC = supplyRegistry(Keys.ATTACHABLE_CODEC);
         public static final Supplier<Registry<MapCodec<? extends IEquippableSlot>>> EQUIPPABLE_SLOT_CODEC = supplyRegistry(Keys.EQUIPPABLE_SLOT_CODEC);
+        public static final Supplier<Registry<MapCodec<? extends ISpawnAlgorithm>>> SPAWN_ALGORITHM_CODEC = supplyRegistry(Keys.SPAWN_ALGORITHM_CODEC);
     }
 
 
     public static void registerRegistries(NewRegistryEvent event) {
+        event.register(MOMENT_TYPE);
+
         event.register(BAR_RENDER_TYPE_CODEC);
         event.register(AREA_CODEC);
         event.register(MOMENT_CODEC);
-        event.register(MOMENT_TYPE);
         event.register(AMOUNT_CODEC);
         event.register(CONDITION_CODEC);
         event.register(ENTITY_INFO_CODEC);
         event.register(REWARD_CODEC);
         event.register(ATTACHABLE_CODEC);
         event.register(EQUIPPABLE_SLOT_CODEC);
+        event.register(SPAWN_ALGORITHM_CODEC);
     }
 
 

@@ -27,7 +27,7 @@ public class MonsterMixin {
             instance.moment()
                     .filter(moment -> moment.isInArea(level,pos))
                     .flatMap(Moment::momentData)
-                    .flatMap(MomentData::entitySpawnSettingsContext)
+                    .flatMap(MomentData::entitySpawnSettings)
                     .flatMap(EntitySpawnSettings::rule)
                     .flatMap(MobSpawnRule::ignoreLightLevel)
                     .ifPresent(cir::setReturnValue);

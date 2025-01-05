@@ -10,6 +10,7 @@ import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentState;
 import com.xiaohunao.heaven_destiny_moment.common.moment.moment.RaidMoment;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 
 import java.util.Set;
@@ -37,11 +38,10 @@ public class RaidInstance extends MomentInstance<RaidMoment> {
     @Override
     public void init() {
         super.init();
-        this.readyTime = moment().map(RaidMoment::readyTime).orElse(100);
         moment().ifPresent(raidMoment -> {
             this.readyTime = raidMoment.readyTime();
             this.totalWaves = raidMoment.momentData()
-                                    .flatMap(MomentData::entitySpawnSettingsContext)
+                                    .flatMap(MomentData::entitySpawnSettings)
                                     .flatMap(EntitySpawnSettings::entitySpawnList)
                                     .orElse(Lists.newArrayList())
                                     .size();
@@ -58,7 +58,15 @@ public class RaidInstance extends MomentInstance<RaidMoment> {
             }
             this.bar.updateProgress(1 - (float) this.readyTime / readyTime);
             this.readyTime--;
+        }else {
+            setState(MomentState.END);
         }
+    }
+
+    @Override
+    protected void ongoing() {
+        checkNextWave();
+        updateWave();
     }
 
     protected void checkNextWave(){
@@ -72,18 +80,23 @@ public class RaidInstance extends MomentInstance<RaidMoment> {
         }
     }
 
-    protected void spawnWave() {
+    protected void updateWave() {
         if (enemies.isEmpty() && state == MomentState.ONGOING){
             moment().flatMap(Moment::momentData)
-                    .flatMap(MomentData::entitySpawnSettingsContext)
+                    .flatMap(MomentData::entitySpawnSettings)
                     .ifPresent(entitySpawnSettings -> {
                         entitySpawnSettings.spawnList(level, currentWave).forEach(entity -> {
                             enemies.add(entity.getId());
+                            entity.setGlowingTag(true);
                             spawnEntity(entity);
                         });
                     });
         }
-        enemies.removeIf(id -> level.getEntity(id) == null);
+        enemies.removeIf(id -> {
+            Entity entity = level.getEntity(id);
+            this.bar.updateProgress(enemies.size() / (float) totalEnemy);
+            return entity == null;
+        });
     }
 
     public int getReadyTime() {

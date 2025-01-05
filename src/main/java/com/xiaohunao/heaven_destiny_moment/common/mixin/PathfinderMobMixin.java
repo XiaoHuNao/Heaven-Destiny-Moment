@@ -27,7 +27,7 @@ public class PathfinderMobMixin {
             instance.moment()
                     .filter(moment -> moment.isInArea(serverLevel, mob.blockPosition()))
                     .flatMap(Moment::momentData)
-                    .flatMap(MomentData::entitySpawnSettingsContext)
+                    .flatMap(MomentData::entitySpawnSettings)
                     .flatMap(EntitySpawnSettings::rule)
                     .flatMap(MobSpawnRule::ignoreLightLevel)
                     .ifPresent(cir::setReturnValue);

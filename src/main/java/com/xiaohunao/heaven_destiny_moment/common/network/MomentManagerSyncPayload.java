@@ -17,11 +17,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 
-public record MomentManagerSyncPayload(CompoundTag runMoment,boolean isRemove) implements CustomPacketPayload {
+public record MomentManagerSyncPayload(CompoundTag runMoment) implements CustomPacketPayload {
     public static final Type<MomentManagerSyncPayload> TYPE = new Type<>(HeavenDestinyMoment.asResource("moment_manager_sync"));
     public static final StreamCodec<ByteBuf, MomentManagerSyncPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.fromCodec(CompoundTag.CODEC), MomentManagerSyncPayload::runMoment,
-            ByteBufCodecs.BOOL,MomentManagerSyncPayload::isRemove,
             MomentManagerSyncPayload::new
     );
 
@@ -37,16 +36,9 @@ public record MomentManagerSyncPayload(CompoundTag runMoment,boolean isRemove) i
                 MomentManager momentManager = MomentManager.of(level);
                 Optional<MomentInstance<?>> momentInstance = Optional.ofNullable(MomentInstance.loadStatic(level, runMoment));
                 momentInstance.ifPresent(instance -> {
-                    if (!isRemove) {
-                        if (instance.getBar() != null){
-                            MomentBarOverlay.barMap.put(instance.getID(), instance.getBar());
-                        }
-                        momentManager.getRunMoments().put(instance.getID(), instance);
-                    } else {
-                        MomentBarOverlay.barMap.remove(instance.getID());
-                        momentManager.getRunMoments().remove(instance.getID());
-                    }
+                    momentManager.getRunMoments().put(instance.getID(), instance);
                 });
+                momentManager.setDirty();
             }
         }).exceptionally(e -> {
             context.disconnect(Component.translatable("neoforge.network.invalid_flow", e.getMessage()));

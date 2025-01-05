@@ -12,6 +12,7 @@ import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.common.AutoProbabilityCondition;
 import com.xiaohunao.heaven_destiny_moment.common.mixed.MomentManagerContainer;
 import com.xiaohunao.heaven_destiny_moment.common.network.ClientOnlyMomentSyncPayload;
+import com.xiaohunao.heaven_destiny_moment.common.network.MomentBarSyncPayload;
 import com.xiaohunao.heaven_destiny_moment.common.network.MomentManagerSyncPayload;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -71,7 +72,6 @@ public class MomentManager extends SavedData {
         ListTag listTag = new ListTag();
         runMoments.values().forEach(momentInstance -> listTag.add(momentInstance.serializeNBT()));
         compoundTag.put("moment", listTag);
-        MomentBarOverlay.barMap.clear();
         return compoundTag;
     }
 
@@ -83,8 +83,11 @@ public class MomentManager extends SavedData {
             if (instance != null) {
                 UUID uuid = instance.getID();
                 manager.runMoments.put(uuid, instance);
-                PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(instance.serializeNBT(),false));
-                manager.setDirty();
+                PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(instance.serializeNBT()));
+                if (instance.getBar() != null){
+                    PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentBarSyncPayload(instance.bar, MomentBarSyncPayload.SyncType.ADD));
+                }
+//                manager.setDirty();
             }
         });
         return manager;
@@ -95,13 +98,18 @@ public class MomentManager extends SavedData {
         momentInstances.forEach(instance -> {
             if (instance.state == MomentState.END) {
                 if (!level.isClientSide){
+                    ServerLevel serverLevel = (ServerLevel) instance.getLevel();
                     removeMoment(instance);
-                    PacketDistributor.sendToPlayersInDimension((ServerLevel) instance.getLevel(), new ClientOnlyMomentSyncPayload(instance.serializeNBT(),true));
+                    PacketDistributor.sendToPlayersInDimension(serverLevel, new ClientOnlyMomentSyncPayload(instance.serializeNBT(),true));
+                    if (instance.getBar() != null){
+                        PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentBarSyncPayload(instance.bar, MomentBarSyncPayload.SyncType.REMOVE));
+                    }
                 }
                 runMoments.remove(instance.getID());
             }
             instance.baseTick();
         });
+        setDirty();
     }
 
     public void removeMoment(MomentInstance<?> instance) {
@@ -111,10 +119,10 @@ public class MomentManager extends SavedData {
                 playerMoments.remove(player.getUUID(),instance);
             }
         });
-        PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new MomentManagerSyncPayload(instance.serializeNBT(),false));
+        PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new MomentManagerSyncPayload(instance.serializeNBT()));
     }
 
-    public boolean addMoment(MomentInstance<?> instance, ServerLevel serverLevel, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
+    public boolean addMoment(MomentInstance<?> instance, ServerLevel serverLevel, @Nullable BlockPos pos, @Nullable ServerPlayer serverPlayer) {
         UUID uuid = instance.getID();
         Boolean conditionMatch = instance.moment()
                 .flatMap(Moment::momentData)
@@ -130,7 +138,7 @@ public class MomentManager extends SavedData {
         if (canCreate && conditionMatch) {
             instance.init();
             runMoments.put(uuid, instance);
-            PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(instance.serializeNBT(),false));
+            PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(instance.serializeNBT()));
             setDirty();
             return true;
         }

@@ -78,44 +78,44 @@ public class EntityInfo implements IEntityInfo {
 
     public static class Builder {
         protected EntityType<?> entityType;
-        protected Optional<IAmount> amount;
-        protected Optional<List<IAttachable>> attaches;
-        protected Optional<Integer> weight;
+        protected IAmount amount;
+        protected List<IAttachable> attaches;
+        protected Integer weight;
 
         public Builder(EntityType<?> entityType) {
             this.entityType = (entityType);
         }
 
         public Builder amount(IAmount amount) {
-            this.amount = Optional.of(amount);
+            this.amount = amount;
             return this;
         }
 
         public Builder amount(int amount) {
-            this.amount = Optional.of(new IntegerAmount(amount));
+            this.amount = new IntegerAmount(amount);
             return this;
         }
 
         public Builder amount(int min, int max) {
-            this.amount = Optional.of(new RandomAmount(min, max));
+            this.amount = new RandomAmount(min, max);
             return this;
         }
 
         public Builder weight(int weight) {
-            this.weight = Optional.of(weight);
+            this.weight = weight;
             return this;
         }
 
         public Builder attachable(IAttachable... attachable) {
-            if (attaches.isEmpty()) {
-                attaches = Optional.of(Lists.newArrayList());
+            if (attaches == null) {
+                attaches = Lists.newArrayList();
             }
-            attaches.get().addAll(List.of(attachable));
+            attaches.addAll(List.of(attachable));
             return this;
         }
 
         public IEntityInfo build() {
-            return new EntityInfo(entityType, amount, weight, attaches);
+            return new EntityInfo(entityType, Optional.ofNullable(amount), Optional.ofNullable(weight), Optional.ofNullable(attaches));
         }
     }
 }
