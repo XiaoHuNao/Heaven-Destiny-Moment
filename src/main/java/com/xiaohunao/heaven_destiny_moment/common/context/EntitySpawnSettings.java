@@ -16,13 +16,12 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public record EntitySpawnSettings(Optional<List<List<IEntityInfo>>> entitySpawnList, Optional<BiomeEntitySpawnSettings> biomeEntitySpawnSettings, Optional<MobSpawnRule> rule, Optional<ISpawnAlgorithm> spawnAlgorithm) {
+    private static final Random RANDOM = new Random();
+
     public static final Codec<EntitySpawnSettings> CODEC = RecordCodecBuilder.create(builder ->
             builder.group(
                     IEntityInfo.CODEC.listOf().listOf().optionalFieldOf("entity_spawn_list").forGetter(EntitySpawnSettings::entitySpawnList),
@@ -54,9 +53,9 @@ public record EntitySpawnSettings(Optional<List<List<IEntityInfo>>> entitySpawnL
                 }else {
                     weight = 1;
                 }
-                sum -= weight;
-                if (sum <= 0) {
-                    list.addAll(info.spawn(level));
+
+                if (RANDOM.nextInt(sum) < weight) {
+                    list.addAll(entityInfo.spawn(level));
                 }
             }
         });

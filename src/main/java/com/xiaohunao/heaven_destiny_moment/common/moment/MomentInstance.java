@@ -49,10 +49,10 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
     protected MomentBar bar;
     protected long tick = -1L;
     protected MomentState state;
-    protected final Set<UUID> playerUUIDs = Sets.newHashSet();
-    protected final Set<Player> players = Sets.newHashSet();
-    protected final Set<UUID> inAreaPlayers = Sets.newHashSet();
-    protected final Set<Vec3> spawnPosList = Sets.newHashSet();
+    protected Set<UUID> playerUUIDs = Sets.newHashSet();
+    protected Set<Player> players = Sets.newHashSet();
+    protected Set<UUID> inAreaPlayers = Sets.newHashSet();
+    protected Set<Vec3> spawnPosList = Sets.newHashSet();
 
     protected MomentInstance(MomentType<?> type, Level level, ResourceKey<Moment<?>> momentKey) {
         this.uuid = UUID.randomUUID();
@@ -101,6 +101,7 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
 
     public void init(){
         initMomentBar();
+        initSpawnPosList();
     }
 
     public void initMomentBar(){

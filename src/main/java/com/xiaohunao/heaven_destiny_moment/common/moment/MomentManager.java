@@ -134,9 +134,9 @@ public class MomentManager extends SavedData {
         boolean canCreate = instance.canCreate(runMoments, serverLevel, pos, serverPlayer);
         if (canCreate && conditionMatch) {
             instance.init();
+            PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(instance.serializeNBT()));
             runMoments.put(uuid, instance);
             runMomentKeyes.add(instance.momentKey);
-            PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(instance.serializeNBT()));
             setDirty();
             return true;
         }
