@@ -9,6 +9,7 @@ import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
@@ -21,16 +22,14 @@ public record AttributeReward(Weighted<AttributeElement> attributes) implements 
             .codec());
 
     @Override
-    public void createReward(MomentInstance momentInstance, Player player) {
-        Level serverLevel = momentInstance.getLevel();
-        attributes.getRandomValue(serverLevel.random).ifPresent(reward -> {
-            reward.attributeModifiers().forEach(attributeModifier -> {
-                AttributeInstance instance = player.getAttribute(reward.attribute());
-                if (instance != null) {
-                    instance.removeModifier(attributeModifier);
-                    instance.addPermanentModifier(attributeModifier);
-                }
-            });
+    public void createReward(MomentInstance<?> momentInstance, Player player) {
+        attributes.getRandomValue().ifPresent(reward -> {
+            AttributeModifier attributeModifier = reward.attributeModifier();
+            AttributeInstance instance = player.getAttribute(reward.attribute());
+            if (instance != null) {
+                instance.removeModifier(attributeModifier);
+                instance.addPermanentModifier(attributeModifier);
+            }
         });
     }
 

@@ -4,11 +4,13 @@ import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.WeightedEntry;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public record Weighted<T>(int totalWeight, List<WeightedEntry.Wrapper<T>> list) {
+    private static final Random random = new Random();
+
     private static int calculateTotalWeight(List<? extends WeightedEntry> entries) {
         long total = 0;
         for (WeightedEntry entry : entries) {
@@ -20,7 +22,21 @@ public record Weighted<T>(int totalWeight, List<WeightedEntry.Wrapper<T>> list) 
         return (int) total;
     }
 
-    public Optional<WeightedEntry.Wrapper<T>> getRandom(RandomSource random) {
+    public List<T> getRandomSubset() {
+        ArrayList<T> subSet = Lists.newArrayList();
+        if (this.totalWeight == 0) {
+            return subSet;
+        } else {
+            for (WeightedEntry.Wrapper<T> entry : this.list) {
+                if (random.nextInt(this.totalWeight) < entry.getWeight().asInt()) {
+                    subSet.add(entry.data());
+                }
+            }
+        }
+        return subSet;
+    }
+
+    public Optional<WeightedEntry.Wrapper<T>> getRandom() {
         if (this.totalWeight == 0) {
             return Optional.empty();
         } else {
@@ -29,8 +45,8 @@ public record Weighted<T>(int totalWeight, List<WeightedEntry.Wrapper<T>> list) 
         }
     }
 
-    public Optional<T> getRandomValue(RandomSource random) {
-        return getRandom(random).map(WeightedEntry.Wrapper::data);
+    public Optional<T> getRandomValue() {
+        return getRandom().map(WeightedEntry.Wrapper::data);
     }
 
     private static <T extends WeightedEntry> Optional<T> getWeightedItem(List<T> entries, int weight) {

@@ -9,6 +9,16 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 
 public record VanillaEquippableSlot(EquipmentSlot slot) implements IEquippableSlot{
+    public static final VanillaEquippableSlot MAINHAND = new VanillaEquippableSlot(EquipmentSlot.MAINHAND);
+    public static final VanillaEquippableSlot OFFHAND = new VanillaEquippableSlot(EquipmentSlot.OFFHAND);
+    public static final VanillaEquippableSlot HEAD = new VanillaEquippableSlot(EquipmentSlot.HEAD);
+    public static final VanillaEquippableSlot CHEST = new VanillaEquippableSlot(EquipmentSlot.CHEST);
+    public static final VanillaEquippableSlot LEGS = new VanillaEquippableSlot(EquipmentSlot.LEGS);
+    public static final VanillaEquippableSlot FEET = new VanillaEquippableSlot(EquipmentSlot.FEET);
+    public static final VanillaEquippableSlot BODY = new VanillaEquippableSlot(EquipmentSlot.BODY);
+
+
+
     public static final MapCodec<VanillaEquippableSlot> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             EquipmentSlot.CODEC.fieldOf("slot").forGetter(VanillaEquippableSlot::slot)
     ).apply(instance, VanillaEquippableSlot::new));
@@ -26,8 +36,6 @@ public record VanillaEquippableSlot(EquipmentSlot slot) implements IEquippableSl
 
     @Override
     public void wear(LivingEntity livingEntity, ItemStack stack) {
-        if (livingEntity instanceof Mob mob){
-            mob.equipItemIfPossible(stack);
-        }
+        livingEntity.setItemSlot(slot,stack);
     }
 }

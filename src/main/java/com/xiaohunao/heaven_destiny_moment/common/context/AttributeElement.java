@@ -11,18 +11,16 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 
 import java.util.List;
 
-public record AttributeElement(Holder<Attribute> attribute, List<AttributeModifier> attributeModifiers) {
+public record AttributeElement(Holder<Attribute> attribute, AttributeModifier attributeModifier) {
         public final static Codec<AttributeElement> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 BuiltInRegistries.ATTRIBUTE.holderByNameCodec().fieldOf("attribute").forGetter(AttributeElement::attribute),
-                AttributeModifier.CODEC.listOf().fieldOf("attribute_modifier").forGetter(AttributeElement::attributeModifiers)
+                AttributeModifier.CODEC.fieldOf("attribute_modifier").forGetter(AttributeElement::attributeModifier)
         ).apply(instance, AttributeElement::new));
 
         public void addAttribute(LivingEntity livingEntity) {
              AttributeInstance attributeInstance = livingEntity.getAttribute(attribute);
-             for (AttributeModifier attributeModifier : attributeModifiers) {
-                 if (attributeInstance != null) {
-                     attributeInstance.addOrReplacePermanentModifier(attributeModifier);
-                 }
-             }
+            if (attributeInstance != null) {
+                attributeInstance.addOrReplacePermanentModifier(attributeModifier);
+            }
         }
 }

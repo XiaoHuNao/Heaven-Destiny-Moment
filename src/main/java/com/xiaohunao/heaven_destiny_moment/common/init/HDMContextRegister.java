@@ -18,9 +18,7 @@ import com.xiaohunao.heaven_destiny_moment.common.context.condition.common.AutoP
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.common.WorldUniqueMomentCondition;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.level.DifficultyCondition;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.level.TimeCondition;
-import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.EntityInfo;
-import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.IEntityInfo;
-import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.SlimeInfo;
+import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.*;
 import com.xiaohunao.heaven_destiny_moment.common.context.equippable_slot.IEquippableSlot;
 import com.xiaohunao.heaven_destiny_moment.common.context.equippable_slot.VanillaEquippableSlot;
 import com.xiaohunao.heaven_destiny_moment.common.context.reward.*;
@@ -71,6 +69,8 @@ public class HDMContextRegister {
 
     public static final DeferredHolder<MapCodec<? extends IEntityInfo>, MapCodec<? extends IEntityInfo>> ENTITY_INFO = ENTITY_INFO_CODEC.register("entity_info", () -> EntityInfo.CODEC);
     public static final DeferredHolder<MapCodec<? extends IEntityInfo>, MapCodec<? extends IEntityInfo>> SLIME_INFO = ENTITY_INFO_CODEC.register("slime_info", () -> SlimeInfo.CODEC);
+    public static final DeferredHolder<MapCodec<? extends IEntityInfo>, MapCodec<? extends IEntityInfo>> PIGLIN_INFO = ENTITY_INFO_CODEC.register("piglin_info", () -> PigLinInfo.CODEC);
+    public static final DeferredHolder<MapCodec<? extends IEntityInfo>, MapCodec<? extends IEntityInfo>> HOGLIN_INFO = ENTITY_INFO_CODEC.register("hoglin_info", () -> HoglinInfo.CODEC);
 
 
     public static final DeferredHolder<MapCodec<? extends IReward>, MapCodec<? extends IReward>> XP_REWARD = REWARD_CODEC.register("xp", () -> XpReward.CODEC);
@@ -96,6 +96,8 @@ public class HDMContextRegister {
         REWARD_CODEC.register(modEventBus);
         AREA_CODEC.register(modEventBus);
         MOMENT_CODEC.register(modEventBus);
+        ATTACHABLE_CODEC.register(modEventBus);
         SPAWN_ALGORITHM_CODEC.register(modEventBus);
+        EQUIPPABLE_SLOT_CODEC.register(modEventBus);
     }
 }

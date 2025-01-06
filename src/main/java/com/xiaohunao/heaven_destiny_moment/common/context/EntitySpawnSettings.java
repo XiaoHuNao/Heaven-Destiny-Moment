@@ -37,6 +37,14 @@ public record EntitySpawnSettings(Optional<List<List<IEntityInfo>>> entitySpawnL
         entitySpawnList.ifPresent(entitySpawnList -> {
             List<IEntityInfo> infoList = entitySpawnList.get(wave);
 
+            Weighted.Builder<IEntityInfo> builder = new Weighted.Builder<>();
+            infoList.forEach(entityInfo -> {
+                if (entityInfo instanceof EntityInfo){
+                    builder.add(entityInfo, ((EntityInfo) entityInfo).weight().orElse(1));
+                }
+            });
+
+
             int sum = infoList.stream()
                     .filter(entityInfo -> entityInfo instanceof EntityInfo)
                     .mapToInt(entityInfo -> ((EntityInfo) entityInfo).weight().orElse(1))

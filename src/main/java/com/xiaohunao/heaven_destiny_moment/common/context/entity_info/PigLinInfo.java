@@ -10,36 +10,36 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.monster.Slime;
+import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-
-public class SlimeInfo extends EntityInfo{
-    public static final MapCodec<SlimeInfo> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+public class PigLinInfo extends EntityInfo{
+    public static final MapCodec<PigLinInfo> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("entity_type").forGetter(EntityInfo::entityType),
             IAmount.CODEC.optionalFieldOf("amount").forGetter(EntityInfo::amount),
             Codec.INT.optionalFieldOf("weight").forGetter(EntityInfo::weight),
             IAttachable.CODEC.listOf().optionalFieldOf("attaches").forGetter(EntityInfo::attaches),
             Codec.unboundedMap(EquipmentSlot.CODEC,Codec.FLOAT).optionalFieldOf("canDropEquippable").forGetter(EntityInfo::canDropEquippable),
-            Codec.INT.fieldOf("size").forGetter(SlimeInfo::size)
-    ).apply(instance, SlimeInfo::new));
-    private final Integer size;
+            Codec.BOOL.fieldOf("immuneZombification").forGetter(PigLinInfo::immuneZombification)
+    ).apply(instance, PigLinInfo::new));
 
-    public SlimeInfo(EntityType<?> entityType, Optional<IAmount> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches, Optional<Map<EquipmentSlot, Float>> canDropEquippable, Integer size) {
+    private final boolean immuneZombification;
+
+    public PigLinInfo(EntityType<?> entityType, Optional<IAmount> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches, Optional<Map<EquipmentSlot, Float>> canDropEquippable, boolean immuneZombification) {
         super(entityType, amount, weight, attaches, canDropEquippable);
-        this.size = size;
+        this.immuneZombification = immuneZombification;
     }
 
     @Override
     public List<Entity> spawn(Level level) {
         List<Entity> spawn = super.spawn(level);
         spawn.forEach(entity -> {
-            if (entity instanceof Slime slime){
-                slime.setSize(size,false);
+            if (entity instanceof AbstractPiglin piglin){
+                piglin.setImmuneToZombification(immuneZombification);
             }
         });
         return spawn;
@@ -47,28 +47,28 @@ public class SlimeInfo extends EntityInfo{
 
     @Override
     public MapCodec<? extends IEntityInfo> codec() {
-        return HDMContextRegister.SLIME_INFO.get();
+        return HDMContextRegister.PIGLIN_INFO.get();
     }
 
-    public Integer size() {
-        return size;
+    public boolean immuneZombification() {
+        return immuneZombification;
     }
 
     public static class Builder extends EntityInfo.Builder {
-        private Integer size = 1;
+        private boolean immuneZombification = false;
 
         public Builder(EntityType<?> entityType) {
             super(entityType);
         }
 
-        public Builder size(int size) {
-            this.size = size;
+        public Builder immuneZombification(boolean immuneZombification) {
+            this.immuneZombification = immuneZombification;
             return this;
         }
 
         @Override
-        public IEntityInfo build() {
-            return new SlimeInfo(entityType, Optional.ofNullable(amount), Optional.ofNullable(weight), Optional.ofNullable(attaches), Optional.ofNullable(canDropEquippable), size);
+        public PigLinInfo build() {
+            return new PigLinInfo(entityType, Optional.ofNullable(amount), Optional.ofNullable(weight), Optional.ofNullable(attaches), Optional.ofNullable(canDropEquippable), immuneZombification);
         }
     }
 }

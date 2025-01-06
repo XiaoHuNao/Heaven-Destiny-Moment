@@ -1,6 +1,7 @@
 package com.xiaohunao.heaven_destiny_moment.common.context.entity_info;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -10,32 +11,35 @@ import com.xiaohunao.heaven_destiny_moment.common.context.amount.RandomAmount;
 import com.xiaohunao.heaven_destiny_moment.common.context.attachable.IAttachable;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class EntityInfo implements IEntityInfo {
     public static final MapCodec<EntityInfo> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("entity_type").forGetter(EntityInfo::entityType),
             IAmount.CODEC.optionalFieldOf("amount").forGetter(EntityInfo::amount),
             Codec.INT.optionalFieldOf("weight").forGetter(EntityInfo::weight),
-            IAttachable.CODEC.listOf().optionalFieldOf("attaches").forGetter(EntityInfo::attaches)
+            IAttachable.CODEC.listOf().optionalFieldOf("attaches").forGetter(EntityInfo::attaches),
+            Codec.unboundedMap(EquipmentSlot.CODEC,Codec.FLOAT).optionalFieldOf("canDropEquippable").forGetter(EntityInfo::canDropEquippable)
     ).apply(instance, EntityInfo::new));
 
     private final EntityType<?> entityType;
     private final Optional<IAmount> amount;
     private final Optional<Integer> weight;
     private final Optional<List<IAttachable>> attaches;
+    private final Optional<Map<EquipmentSlot,Float>> canDropEquippable;
 
-    public EntityInfo(EntityType<?> entityType, Optional<IAmount> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches) {
+    public EntityInfo(EntityType<?> entityType, Optional<IAmount> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches, Optional<Map<EquipmentSlot, Float>> canDropEquippable) {
         this.entityType = entityType;
         this.amount = amount;
         this.weight = weight;
         this.attaches = attaches;
+        this.canDropEquippable = canDropEquippable;
     }
 
 
@@ -50,6 +54,15 @@ public class EntityInfo implements IEntityInfo {
                     attaches.forEach(attachable -> attachable.attachToEntity(livingEntity));
                 }
             });
+
+            canDropEquippable.ifPresent(canDropEquippable ->{
+                canDropEquippable.forEach((slot, chance) -> {
+                    if (entity instanceof Mob mob) {
+                        mob.setDropChance(slot, chance);
+                    }
+                });
+            });
+
             arrayList.add(entity);
         }
         return arrayList;
@@ -76,11 +89,16 @@ public class EntityInfo implements IEntityInfo {
         return attaches;
     }
 
+    public Optional<Map<EquipmentSlot, Float>> canDropEquippable() {
+        return canDropEquippable;
+    }
+
     public static class Builder {
         protected EntityType<?> entityType;
         protected IAmount amount;
         protected List<IAttachable> attaches;
         protected Integer weight;
+        protected Map<EquipmentSlot,Float> canDropEquippable;
 
         public Builder(EntityType<?> entityType) {
             this.entityType = (entityType);
@@ -114,8 +132,17 @@ public class EntityInfo implements IEntityInfo {
             return this;
         }
 
+        public Builder canDropEquippable(EquipmentSlot slot,float chance) {
+            if (this.canDropEquippable == null){
+                this.canDropEquippable = Maps.newHashMap();
+            }
+            this.canDropEquippable.put(slot,chance);
+            return this;
+        }
+
+
         public IEntityInfo build() {
-            return new EntityInfo(entityType, Optional.ofNullable(amount), Optional.ofNullable(weight), Optional.ofNullable(attaches));
+            return new EntityInfo(entityType, Optional.ofNullable(amount), Optional.ofNullable(weight), Optional.ofNullable(attaches), Optional.ofNullable(canDropEquippable));
         }
     }
 }

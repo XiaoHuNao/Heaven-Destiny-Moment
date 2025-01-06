@@ -17,8 +17,8 @@ public record EffectReward(Weighted<MobEffectInstance> effectInstances) implemen
             .codec());
 
     @Override
-    public void createReward(MomentInstance momentInstance, Player player) {
-        effectInstances.getRandomValue(momentInstance.getLevel().random).ifPresent(player::addEffect);
+    public void createReward(MomentInstance<?> momentInstance, Player player) {
+        effectInstances.getRandomValue().ifPresent(player::addEffect);
     }
 
     @Override

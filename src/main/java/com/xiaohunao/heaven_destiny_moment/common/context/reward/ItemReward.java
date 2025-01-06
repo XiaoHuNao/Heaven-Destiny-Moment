@@ -14,8 +14,8 @@ public record ItemReward(Weighted<ItemStack> reward) implements IReward {
             .codec());
 
     @Override
-    public void createReward(MomentInstance moment, Player player) {
-        reward.getRandomValue(moment.getLevel().random).ifPresent(item -> {
+    public void createReward(MomentInstance<?> moment, Player player) {
+        reward.getRandomValue().ifPresent(item -> {
             player.getInventory().add(item);
         });
     }
