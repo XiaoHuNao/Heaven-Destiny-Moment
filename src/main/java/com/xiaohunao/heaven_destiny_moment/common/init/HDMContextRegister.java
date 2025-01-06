@@ -69,7 +69,7 @@ public class HDMContextRegister {
 
     public static final DeferredHolder<MapCodec<? extends IEntityInfo>, MapCodec<? extends IEntityInfo>> ENTITY_INFO = ENTITY_INFO_CODEC.register("entity_info", () -> EntityInfo.CODEC);
     public static final DeferredHolder<MapCodec<? extends IEntityInfo>, MapCodec<? extends IEntityInfo>> SLIME_INFO = ENTITY_INFO_CODEC.register("slime_info", () -> SlimeInfo.CODEC);
-    public static final DeferredHolder<MapCodec<? extends IEntityInfo>, MapCodec<? extends IEntityInfo>> PIGLIN_INFO = ENTITY_INFO_CODEC.register("piglin_info", () -> PigLinInfo.CODEC);
+    public static final DeferredHolder<MapCodec<? extends IEntityInfo>, MapCodec<? extends IEntityInfo>> PIGLIN_INFO = ENTITY_INFO_CODEC.register("piglin_info", () -> PiglinInfo.CODEC);
     public static final DeferredHolder<MapCodec<? extends IEntityInfo>, MapCodec<? extends IEntityInfo>> HOGLIN_INFO = ENTITY_INFO_CODEC.register("hoglin_info", () -> HoglinInfo.CODEC);
 
 

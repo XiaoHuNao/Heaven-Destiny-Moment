@@ -17,19 +17,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class PigLinInfo extends EntityInfo{
-    public static final MapCodec<PigLinInfo> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+public class PiglinInfo extends EntityInfo{
+    public static final MapCodec<PiglinInfo> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("entity_type").forGetter(EntityInfo::entityType),
             IAmount.CODEC.optionalFieldOf("amount").forGetter(EntityInfo::amount),
             Codec.INT.optionalFieldOf("weight").forGetter(EntityInfo::weight),
             IAttachable.CODEC.listOf().optionalFieldOf("attaches").forGetter(EntityInfo::attaches),
             Codec.unboundedMap(EquipmentSlot.CODEC,Codec.FLOAT).optionalFieldOf("canDropEquippable").forGetter(EntityInfo::canDropEquippable),
-            Codec.BOOL.fieldOf("immuneZombification").forGetter(PigLinInfo::immuneZombification)
-    ).apply(instance, PigLinInfo::new));
+            Codec.BOOL.fieldOf("immuneZombification").forGetter(PiglinInfo::immuneZombification)
+    ).apply(instance, PiglinInfo::new));
 
     private final boolean immuneZombification;
 
-    public PigLinInfo(EntityType<?> entityType, Optional<IAmount> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches, Optional<Map<EquipmentSlot, Float>> canDropEquippable, boolean immuneZombification) {
+    public PiglinInfo(EntityType<?> entityType, Optional<IAmount> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches, Optional<Map<EquipmentSlot, Float>> canDropEquippable, boolean immuneZombification) {
         super(entityType, amount, weight, attaches, canDropEquippable);
         this.immuneZombification = immuneZombification;
     }
@@ -67,8 +67,8 @@ public class PigLinInfo extends EntityInfo{
         }
 
         @Override
-        public PigLinInfo build() {
-            return new PigLinInfo(entityType, Optional.ofNullable(amount), Optional.ofNullable(weight), Optional.ofNullable(attaches), Optional.ofNullable(canDropEquippable), immuneZombification);
+        public PiglinInfo build() {
+            return new PiglinInfo(entityType, Optional.ofNullable(amount), Optional.ofNullable(weight), Optional.ofNullable(attaches), Optional.ofNullable(canDropEquippable), immuneZombification);
         }
     }
 }
