@@ -37,7 +37,7 @@ public record PlayerCondition(Type type, Optional<MinMaxBounds.Ints> level, Opti
                               Optional<Object2BooleanMap<ResourceLocation>> recipes, Optional<Map<ResourceLocation, PlayerPredicate.AdvancementPredicate>> advancements
                                 ) implements ICondition {
     public static final MapCodec<PlayerCondition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Type.CODEC.fieldOf("type").forGetter(PlayerCondition::type),
+            Type.CODEC.fieldOf("player_type").forGetter(PlayerCondition::type),
             MinMaxBounds.Ints.CODEC.optionalFieldOf("level").forGetter(PlayerCondition::level),
             GameType.CODEC.listOf().optionalFieldOf("gameType").forGetter(PlayerCondition::gameType),
             PlayerPredicate.StatMatcher.CODEC.listOf().optionalFieldOf("stats").forGetter(PlayerCondition::statMatchers),
@@ -74,7 +74,6 @@ public record PlayerCondition(Type type, Optional<MinMaxBounds.Ints> level, Opti
                 matchesStats(serverPlayer) &&
                 matchesRecipe(serverPlayer) &&
                 matchesAdvancements(serverPlayer);
-
     }
 
 
@@ -154,10 +153,6 @@ public record PlayerCondition(Type type, Optional<MinMaxBounds.Ints> level, Opti
         private ImmutableList.Builder<PlayerPredicate.StatMatcher<?>> stats;
         private Object2BooleanMap<ResourceLocation> recipes;
         private Map<ResourceLocation, PlayerPredicate.AdvancementPredicate> advancements = Maps.newHashMap();
-
-        public static PlayerPredicate.Builder player() {
-            return new PlayerPredicate.Builder();
-        }
 
         public Builder(Type type) {
             this.type = type;

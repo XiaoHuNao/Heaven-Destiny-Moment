@@ -121,6 +121,9 @@ public class MomentManager extends SavedData {
 
     public boolean addMoment(MomentInstance<?> instance, ServerLevel serverLevel, @Nullable BlockPos pos, @Nullable ServerPlayer serverPlayer) {
         UUID uuid = instance.getID();
+
+        instance.updatePlayers();
+
         Boolean conditionMatch = instance.moment()
                 .flatMap(Moment::momentData)
                 .flatMap(MomentData::conditionGroup)

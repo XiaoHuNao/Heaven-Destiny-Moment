@@ -355,7 +355,7 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
         return list;
     }
 
-    private void updatePlayers() {
+    public void updatePlayers() {
         if (bar != null){
 
         }

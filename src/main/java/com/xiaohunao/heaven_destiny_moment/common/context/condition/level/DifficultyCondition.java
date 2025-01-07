@@ -12,6 +12,11 @@ import net.minecraft.world.Difficulty;
 import org.jetbrains.annotations.Nullable;
 
 public record DifficultyCondition(Difficulty difficulty) implements ICondition {
+    public static final DifficultyCondition PEACEFUL = new DifficultyCondition(Difficulty.PEACEFUL);
+    public static final DifficultyCondition EASY = new DifficultyCondition(Difficulty.EASY);
+    public static final DifficultyCondition NORMAL = new DifficultyCondition(Difficulty.NORMAL);
+    public static final DifficultyCondition HARD = new DifficultyCondition(Difficulty.HARD);
+
     public static final MapCodec<DifficultyCondition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Difficulty.CODEC.fieldOf("difficulty").forGetter(DifficultyCondition::difficulty)
     ).apply(instance, DifficultyCondition::new));
