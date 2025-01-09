@@ -6,16 +6,21 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import java.util.Optional;
 
-public record OpenAreaSpawnAlgorithm(int attempt, int spawnRange) implements ISpawnAlgorithm {
-    public static final OpenAreaSpawnAlgorithm DEFAULT = new OpenAreaSpawnAlgorithm(10, 32);
+public record OpenAreaSpawnAlgorithm(int maxTry, int range, Optional<Direction> dir) implements ISpawnAlgorithm {
+    public static final OpenAreaSpawnAlgorithm DEFAULT = new OpenAreaSpawnAlgorithm(16, 32,Optional.empty());
 
     public static final MapCodec<OpenAreaSpawnAlgorithm> CODEC =  RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.INT.fieldOf("attempt").forGetter(OpenAreaSpawnAlgorithm::attempt),
-            Codec.INT.fieldOf("spawnRange").forGetter(OpenAreaSpawnAlgorithm::spawnRange)
+            Codec.INT.optionalFieldOf("maxTry",16).forGetter(OpenAreaSpawnAlgorithm::maxTry),
+            Codec.INT.optionalFieldOf("range",32).forGetter(OpenAreaSpawnAlgorithm::range),
+            Direction.CODEC.optionalFieldOf("dir").forGetter(OpenAreaSpawnAlgorithm::dir)
     ).apply(instance, OpenAreaSpawnAlgorithm::new));
 
 
@@ -24,24 +29,35 @@ public record OpenAreaSpawnAlgorithm(int attempt, int spawnRange) implements ISp
         Level level = momentInstance.getLevel();
         Vec3 pos = momentInstance.getRandomSpawnPos();
 
-        for (int i = 0; i < attempt; i++) {
+        BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+        for(int i = 0; i < maxTry; ++i) {
+            Vec3i directionVector = dir.map(Direction::getNormal)
+                    .map(vec3i -> {
+                        double dx = vec3i.getX() * level.getRandom().nextInt(range);
+                        double dz = vec3i.getZ() * level.getRandom().nextInt(range);
+                        return new Vec3i((int) dx, 0,(int) dz);
+                    })
+                    .orElseGet(() -> {
+                        float angle = level.random.nextFloat() * (float) Math.PI * 2F;
+                        double dx = Math.cos(angle) * level.getRandom().nextInt(range);
+                        double dz = Math.sin(angle) * level.getRandom().nextInt(range);
+                        return new Vec3i((int) dx, 0,(int) dz);
+                    });
 
-            double x = pos.x() + (level.random.nextDouble() - level.random.nextDouble()) * spawnRange + 0.5D;
+            double x = pos.x() + directionVector.getX() + level.random.nextInt(5);
+            double z = pos.z() + directionVector.getZ() + level.random.nextInt(5);
             double y = pos.y();
-            double z = pos.z() + (level.random.nextDouble() - level.random.nextDouble()) * spawnRange + 0.5D;
+            mutableBlockPos.move((int) x, (int) y, (int) z);
 
-            while (level.getBlockState(BlockPos.containing(x, y - 1, z)).isAir() && y > level.getMinBuildHeight()) {
-                y--;
+            //TODO :调整生成算法
+            if (SpawnPlacementTypes.ON_GROUND.isSpawnPositionOk(level,mutableBlockPos,entity.getType())){
+                return Vec3.atCenterOf(mutableBlockPos);
             }
-
-            while (!noBlockCollision(level, getAABB(entity, x, y, z))) {
-                y++;
-            }
-
-            if (noBlockCollision(level, getAABB(entity, x, y, z))) return new Vec3(x, y, z);
         }
-        return null;
+
+        return Vec3.ZERO;
     }
+
 
     @Override
     public MapCodec<? extends ISpawnAlgorithm> codec() {

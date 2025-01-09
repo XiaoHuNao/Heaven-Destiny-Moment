@@ -120,7 +120,7 @@ public record EntitySpawnSettings(Optional<List<List<IEntityInfo>>> entitySpawnL
         private List<List<IEntityInfo>> entitySpawnList;
         private BiomeEntitySpawnSettings biomeEntitySpawnSettings;
         private MobSpawnRule rule;
-        private ISpawnAlgorithm spawnAlgorithm = new OpenAreaSpawnAlgorithm(10,32);
+        private ISpawnAlgorithm spawnAlgorithm = OpenAreaSpawnAlgorithm.DEFAULT;
 
         public Builder biomeEntitySpawnSettings(Function<BiomeEntitySpawnSettings.Builder,BiomeEntitySpawnSettings.Builder> biomeEntitySpawnSettings) {
             this.biomeEntitySpawnSettings = biomeEntitySpawnSettings.apply(new BiomeEntitySpawnSettings.Builder()).build();
