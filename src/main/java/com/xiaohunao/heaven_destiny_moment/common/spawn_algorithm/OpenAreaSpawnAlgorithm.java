@@ -63,4 +63,29 @@ public record OpenAreaSpawnAlgorithm(int maxTry, int range, Optional<Direction> 
     public MapCodec<? extends ISpawnAlgorithm> codec() {
         return HDMContextRegister.OPEN_AREA_SPAWN_ALGORITHM.get();
     }
+
+    public static class Builder {
+        private int maxTry = 16;
+        private int range = 32;
+        private Direction dir;
+
+        public OpenAreaSpawnAlgorithm build() {
+            return new OpenAreaSpawnAlgorithm(maxTry, range, Optional.ofNullable(dir));
+        }
+
+        public Builder maxTry(int maxTry) {
+            this.maxTry = maxTry;
+            return this;
+        }
+
+        public Builder range(int range) {
+            this.range = range;
+            return this;
+        }
+
+        public Builder direction(Direction dir) {
+            this.dir = dir;
+            return this;
+        }
+    }
 }

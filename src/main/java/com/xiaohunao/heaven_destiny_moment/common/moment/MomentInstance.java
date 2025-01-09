@@ -53,6 +53,7 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
     protected Set<Player> players = Sets.newHashSet();
     protected Set<UUID> inAreaPlayers = Sets.newHashSet();
     protected Set<Vec3> spawnPosList = Sets.newHashSet();
+    protected CompoundTag persistentData = new CompoundTag();
 
     protected MomentInstance(MomentType<?> type, Level level, ResourceKey<Moment<?>> momentKey) {
         this.uuid = UUID.randomUUID();
@@ -161,6 +162,7 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
 
         serializeMetaData(compoundTag);
         serializeBar(compoundTag);
+        compoundTag.put("persistentData", this.persistentData);
         compoundTag.putLong("tick", tick);
         if (state != null) {
             compoundTag.putString("state", state.name());
@@ -188,6 +190,7 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
     public void deserializeNBT(CompoundTag compoundTag) {
         deserializeBar(compoundTag);
 
+        this.persistentData = compoundTag.getCompound("persistentData");
         this.tick = compoundTag.getLong("tick");
         if (compoundTag.contains("state")) {
             this.state = MomentState.valueOf(compoundTag.getString("state"));
@@ -201,6 +204,10 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
         compoundTag.putUUID("uuid", uuid);
         compoundTag.putString("id", MomentInstance.getRegistryName(type).toString());
         compoundTag.put("moment", ResourceKey.codec(HDMRegistries.Keys.MOMENT).encodeStart(NbtOps.INSTANCE, momentKey).getOrThrow());
+    }
+
+    public CompoundTag getPersistentData() {
+        return persistentData;
     }
 
     public static ResourceLocation getRegistryName(MomentType<?> momentType) {
