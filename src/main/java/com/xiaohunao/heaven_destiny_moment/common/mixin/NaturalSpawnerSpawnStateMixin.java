@@ -1,8 +1,7 @@
 package com.xiaohunao.heaven_destiny_moment.common.mixin;
 
-import com.xiaohunao.heaven_destiny_moment.common.context.BiomeEntitySpawnSettings;
-import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettings;
-import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
+import com.xiaohunao.heaven_destiny_moment.common.context.*;
+import com.xiaohunao.heaven_destiny_moment.common.mixed.SpawnCategoryMultiplierInstanceMixed;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
@@ -46,12 +45,19 @@ public class NaturalSpawnerSpawnStateMixin {
                     .flatMap(EntitySpawnSettings::biomeEntitySpawnSettings)
                     .flatMap(BiomeEntitySpawnSettings::spawnCategoryMultiplier)
                     .ifPresent(multiplierMap -> {
-                        Double spawnMultiplier = multiplierMap.getOrDefault(mobCategory, 1.0);
-                        int maxLimit = (int) (maxInstancesPerChunk * (this.spawnableChunkCount * spawnMultiplier) / NaturalSpawner.MAGIC_NUMBER);
-                        if (currentCount >= maxLimit) {
-                            cir.setReturnValue(false);
-                        } else {
-                            cir.setReturnValue(this.localMobCapCalculator.canSpawn(mobCategory, chunkPos));
+                        SpawnCategoryMultiplierInstanceMixed spawnCategoryMultiplierInstanceMixed = (SpawnCategoryMultiplierInstanceMixed) level;
+                        SpawnCategoryMultiplierInstance multiplierInstance = spawnCategoryMultiplierInstanceMixed.getMobCategoryMultiplierInstance(mobCategory);
+
+                        SpawnCategoryMultiplierModifier multiplierModifier = multiplierMap.get(mobCategory);
+                        if (multiplierModifier != null){
+                            multiplierInstance.addModifier(multiplierModifier);
+                            double spawnMultiplier = multiplierInstance.getValue();
+                            int maxLimit = (int) (maxInstancesPerChunk * (this.spawnableChunkCount * spawnMultiplier) / NaturalSpawner.MAGIC_NUMBER);
+                            if (currentCount >= maxLimit) {
+                                cir.setReturnValue(false);
+                            } else {
+                                cir.setReturnValue(this.localMobCapCalculator.canSpawn(mobCategory, chunkPos));
+                            }
                         }
                     });
         }

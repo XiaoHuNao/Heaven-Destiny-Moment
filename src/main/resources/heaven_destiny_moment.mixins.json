@@ -11,6 +11,7 @@
     "NaturalSpawnerMixin",
     "NaturalSpawnerSpawnStateMixin",
     "PathfinderMobMixin",
+    "ServerLevelMixin",
     "SlimeMixin"
   ],
   "client": [

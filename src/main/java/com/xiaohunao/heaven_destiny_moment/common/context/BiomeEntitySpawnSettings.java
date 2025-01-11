@@ -7,14 +7,15 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public record BiomeEntitySpawnSettings(Optional<MobSpawnSettings> biomeMobSpawnSettings, Optional<Map<MobCategory, Double>> spawnCategoryMultiplier, Optional<EntitySpawnList> entitySpawnListContext) {
+public record BiomeEntitySpawnSettings(Optional<MobSpawnSettings> biomeMobSpawnSettings, Optional<Map<MobCategory, SpawnCategoryMultiplierModifier>> spawnCategoryMultiplier, Optional<EntitySpawnList> entitySpawnListContext) {
     public static final Codec<BiomeEntitySpawnSettings> CODEC = RecordCodecBuilder.create(builder ->
             builder.group(
                     MobSpawnSettings.CODEC.codec().optionalFieldOf("biome_mob_spawn_settings").forGetter(BiomeEntitySpawnSettings::biomeMobSpawnSettings),
-                    Codec.unboundedMap(MobCategory.CODEC, Codec.DOUBLE).optionalFieldOf("spawn_category_multiplier").forGetter(BiomeEntitySpawnSettings::spawnCategoryMultiplier),
+                    Codec.unboundedMap(MobCategory.CODEC, SpawnCategoryMultiplierModifier.CODEC).optionalFieldOf("spawn_category_multiplier").forGetter(BiomeEntitySpawnSettings::spawnCategoryMultiplier),
                     EntitySpawnList.CODEC.optionalFieldOf("entitySpawnListContext").forGetter(BiomeEntitySpawnSettings::entitySpawnListContext)
             ).apply(builder, BiomeEntitySpawnSettings::new)
     );
@@ -22,7 +23,7 @@ public record BiomeEntitySpawnSettings(Optional<MobSpawnSettings> biomeMobSpawnS
 
     public static class Builder {
         private MobSpawnSettings biomeMobSpawnSettings;
-        private Map<MobCategory, Double> spawnCategoryMultiplier;
+        private Map<MobCategory, SpawnCategoryMultiplierModifier> spawnCategoryMultiplier;
         private EntitySpawnList entitySpawnList;
 
         public BiomeEntitySpawnSettings build() {
@@ -34,7 +35,7 @@ public record BiomeEntitySpawnSettings(Optional<MobSpawnSettings> biomeMobSpawnS
             return this;
         }
 
-        public Builder spawnCategoryMultiplier(MobCategory category, Double multiplier) {
+        public Builder spawnCategoryMultiplier(MobCategory category, SpawnCategoryMultiplierModifier multiplier) {
             if (spawnCategoryMultiplier == null){
                this.spawnCategoryMultiplier = Maps.newHashMap();
             }

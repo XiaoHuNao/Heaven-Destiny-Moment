@@ -1,8 +1,7 @@
 package com.xiaohunao.heaven_destiny_moment.common.mixin;
 
-import com.xiaohunao.heaven_destiny_moment.common.context.BiomeEntitySpawnSettings;
-import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettings;
-import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
+import com.xiaohunao.heaven_destiny_moment.common.context.*;
+import com.xiaohunao.heaven_destiny_moment.common.mixed.SpawnCategoryMultiplierInstanceMixed;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
@@ -50,8 +49,16 @@ public abstract class LocalMobCapCalculatorMixin {
                         .map(multiplierMap -> {
                             Object2IntMap<MobCategory> counts = localmobcapcalculator$mobcounts.counts;
                             final int currentCount = counts.getOrDefault(category, 0);
-                            double maxLimit = category.getMaxInstancesPerChunk() * multiplierMap.getOrDefault(category, 1.0);
-                            return currentCount < maxLimit;
+
+                            SpawnCategoryMultiplierInstanceMixed spawnCategoryMultiplierInstanceMixed = (SpawnCategoryMultiplierInstanceMixed) chunkMap.level;
+                            SpawnCategoryMultiplierInstance multiplierInstance = spawnCategoryMultiplierInstanceMixed.getMobCategoryMultiplierInstance(category);
+                            SpawnCategoryMultiplierModifier multiplierModifier = multiplierMap.get(category);
+                            if (multiplierModifier != null){
+                                multiplierInstance.addModifier(multiplierModifier);
+                                double maxLimit = category.getMaxInstancesPerChunk() * multiplierInstance.getValue();
+                                return currentCount < maxLimit;
+                            }
+                            return currentCount < category.getMaxInstancesPerChunk();
                         })
                         .orElse(false);
                 cir.setReturnValue(aBoolean);
