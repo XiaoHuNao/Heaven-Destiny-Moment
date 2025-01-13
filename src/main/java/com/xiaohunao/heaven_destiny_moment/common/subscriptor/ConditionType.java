@@ -7,8 +7,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.event.entity.EntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -25,7 +23,9 @@ public enum ConditionType implements StringRepresentable {
         public List<EventData> getData(MinecraftServer server, Event event) {
             if (event instanceof EntityEvent entityEvent) {
                 Entity entity = entityEvent.getEntity();
-                return new EventData(MomentManager.of(entity.level()), entity.blockPosition(), null).listOf();
+                if (!entity.level().isClientSide) {
+                    return new EventData(MomentManager.of(entity.level()), entity.blockPosition(), null).listOf();
+                }
             }
             return List.of();
         }
@@ -33,9 +33,8 @@ public enum ConditionType implements StringRepresentable {
     PLAYER {
         @Override
         public List<EventData> getData(MinecraftServer server, Event event) {
-            if (event instanceof PlayerEvent playerEvent) {
-                Player player = playerEvent.getEntity();
-                return new EventData(MomentManager.of(player.level()), player.blockPosition(), (ServerPlayer) player).listOf();
+            if (event instanceof PlayerEvent playerEvent && playerEvent.getEntity() instanceof ServerPlayer player) {
+                return new EventData(MomentManager.of(player.level()), player.blockPosition(), player).listOf();
             }
             return List.of();
         }
@@ -43,7 +42,7 @@ public enum ConditionType implements StringRepresentable {
     BLOCK {
         @Override
         public List<EventData> getData(MinecraftServer server, Event event) {
-            if (event instanceof BlockEvent blockEvent && blockEvent.getLevel() instanceof Level level) {
+            if (event instanceof BlockEvent blockEvent && blockEvent.getLevel() instanceof ServerLevel level) {
                 return new EventData(MomentManager.of(level), blockEvent.getPos(), null).listOf();
             }
             return List.of();
