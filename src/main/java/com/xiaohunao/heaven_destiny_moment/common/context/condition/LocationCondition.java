@@ -17,10 +17,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.levelgen.structure.Structure;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -45,9 +45,8 @@ public record LocationCondition(Optional<LocationPredicate.PositionPredicate> po
     ).apply(instance, LocationCondition::new));
 
     @Override
-    public boolean matches(MomentInstance<?> instance, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
-        Level level = instance.getLevel();
-        if (level instanceof ServerLevel serverLevel){
+    public boolean matches(MomentInstance<?> instance, @Nullable BlockPos pos, @Nullable ServerPlayer serverPlayer) {
+        if (pos != null && instance.getLevel() instanceof ServerLevel serverLevel){
            return matches(serverLevel,pos);
         }
         return false;

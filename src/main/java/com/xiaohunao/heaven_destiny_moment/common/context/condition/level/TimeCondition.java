@@ -11,8 +11,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 public record TimeCondition(Optional<Long> min, Optional<Long> max) implements ICondition {
@@ -62,7 +62,7 @@ public record TimeCondition(Optional<Long> min, Optional<Long> max) implements I
     }
 
     @Override
-    public boolean matches(MomentInstance<?> instance, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
+    public boolean matches(MomentInstance<?> instance, @Nullable BlockPos pos, @Nullable ServerPlayer serverPlayer) {
         Level level = instance.getLevel();
         return this.matches(level.getDayTime() % 24000);
     }

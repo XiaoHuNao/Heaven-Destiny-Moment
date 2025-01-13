@@ -7,15 +7,14 @@ import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class WorldUniqueMomentCondition implements ICondition {
     public static final WorldUniqueMomentCondition DEFAULT = new WorldUniqueMomentCondition();
     public static MapCodec<WorldUniqueMomentCondition> CODEC = MapCodec.unit(DEFAULT);
 
     @Override
-    public boolean matches(MomentInstance<?> instance, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
+    public boolean matches(MomentInstance<?> instance, @Nullable BlockPos pos, @Nullable ServerPlayer serverPlayer) {
         MomentManager momentManager = MomentManager.of(instance.getLevel());
        return momentManager.getImmutableRunMoments().values().stream().noneMatch(momentInstance ->
                momentInstance.getClass().isInstance(instance)

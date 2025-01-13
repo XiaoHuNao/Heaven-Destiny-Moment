@@ -94,6 +94,10 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
         return registry;
     }
 
+    public boolean is(ResourceKey<Moment<?>> key) {
+        return momentKey == key;
+    }
+
     public Optional<T> moment() {
         Registry<Moment<?>> registry = level.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
         Moment<?> moment = registry.get(momentKey);

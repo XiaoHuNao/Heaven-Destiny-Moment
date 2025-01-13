@@ -13,7 +13,7 @@ public enum MomentState implements StringRepresentable {
     VICTORY("victory", 3),
     LOSE("lose", 4),
     END("end", 5);
-    public static final Codec<MomentState> CODEC = Codec.STRING.xmap(name1 -> valueOf(name1.toUpperCase(Locale.ROOT)), state -> state.name().toLowerCase(Locale.ROOT));
+    public static final Codec<MomentState> CODEC = StringRepresentable.fromEnum(MomentState::values);
     private final String name;
     private final int index;
 
@@ -27,7 +27,7 @@ public enum MomentState implements StringRepresentable {
             return null;
         }
 
-        if (object instanceof MomentState state){
+        if (object instanceof MomentState state) {
             return state;
         }
 

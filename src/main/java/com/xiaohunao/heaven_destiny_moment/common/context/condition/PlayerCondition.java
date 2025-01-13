@@ -25,6 +25,7 @@ import net.minecraft.stats.StatsCounter;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.GameType;
+import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +36,7 @@ import java.util.Optional;
 
 public record PlayerCondition(Type type, Optional<MinMaxBounds.Ints> level, Optional<List<GameType>> gameType, Optional<List<PlayerPredicate.StatMatcher<?>>> statMatchers,
                               Optional<Object2BooleanMap<ResourceLocation>> recipes, Optional<Map<ResourceLocation, PlayerPredicate.AdvancementPredicate>> advancements
-                                ) implements ICondition {
+) implements ICondition {
     public static final MapCodec<PlayerCondition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Type.CODEC.fieldOf("player_type").forGetter(PlayerCondition::type),
             MinMaxBounds.Ints.CODEC.optionalFieldOf("level").forGetter(PlayerCondition::level),
@@ -43,39 +44,21 @@ public record PlayerCondition(Type type, Optional<MinMaxBounds.Ints> level, Opti
             PlayerPredicate.StatMatcher.CODEC.listOf().optionalFieldOf("stats").forGetter(PlayerCondition::statMatchers),
             ExtraCodecs.object2BooleanMap(ResourceLocation.CODEC).optionalFieldOf("recipes").forGetter(PlayerCondition::recipes),
             Codec.unboundedMap(ResourceLocation.CODEC, PlayerPredicate.AdvancementPredicate.CODEC).optionalFieldOf("advancements").forGetter(PlayerCondition::advancements)
-    ).apply(instance,PlayerCondition::new));
+    ).apply(instance, PlayerCondition::new));
 
     @Override
-    public boolean matches(MomentInstance<?> instance, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
-        return switch (type) {
-            case SINGLE -> checkPlayer(serverPlayer);
-            case ANY -> anyPlayer(instance);
-            case GLOBAL -> allPlayers(instance);
-        };
+    public boolean matches(MomentInstance<?> instance, @Nullable BlockPos pos, @Nullable ServerPlayer serverPlayer) {
+        return type.matches(instance, pos, serverPlayer, (momentInstance, pos1, serverPlayer1) -> checkPlayer(serverPlayer1));
     }
-
-    private boolean anyPlayer(MomentInstance<?> instance) {
-        return instance.getPlayers().stream()
-                .filter(player -> player instanceof ServerPlayer)
-                .anyMatch(serverPlayer -> checkPlayer((ServerPlayer) serverPlayer));
-    }
-
-    private boolean allPlayers(MomentInstance<?> instance) {
-        return instance.getPlayers().stream()
-                .filter(player -> player instanceof ServerPlayer)
-                .allMatch(serverPlayer -> checkPlayer((ServerPlayer) serverPlayer));
-    }
-
-
 
     private boolean checkPlayer(ServerPlayer serverPlayer) {
-        return  matchesLevel(serverPlayer) &&
+        return serverPlayer != null &&
+                matchesLevel(serverPlayer) &&
                 matchesGameType(serverPlayer) &&
                 matchesStats(serverPlayer) &&
                 matchesRecipe(serverPlayer) &&
                 matchesAdvancements(serverPlayer);
     }
-
 
     @Override
     public MapCodec<? extends ICondition> codec() {
@@ -85,9 +68,11 @@ public record PlayerCondition(Type type, Optional<MinMaxBounds.Ints> level, Opti
     private boolean matchesLevel(ServerPlayer serverplayer) {
         return this.level.map(level -> level.matches(serverplayer.experienceLevel)).orElse(true);
     }
+
     private boolean matchesGameType(ServerPlayer serverplayer) {
         return this.gameType.map(gameMode -> gameMode.contains(serverplayer.gameMode.getGameModeForPlayer())).orElse(true);
     }
+
     private boolean matchesStats(ServerPlayer serverplayer) {
         StatsCounter statscounter = serverplayer.getStats();
         return this.statMatchers.map(statMatchers -> {
@@ -99,7 +84,8 @@ public record PlayerCondition(Type type, Optional<MinMaxBounds.Ints> level, Opti
             return true;
         }).orElse(true);
     }
-    private boolean matchesRecipe(ServerPlayer serverPlayer){
+
+    private boolean matchesRecipe(ServerPlayer serverPlayer) {
         RecipeBook recipebook = serverPlayer.getRecipeBook();
 
         return this.recipes.map(recipe -> {
@@ -111,7 +97,8 @@ public record PlayerCondition(Type type, Optional<MinMaxBounds.Ints> level, Opti
             return true;
         }).orElse(true);
     }
-    private boolean matchesAdvancements(ServerPlayer serverPlayer){
+
+    private boolean matchesAdvancements(ServerPlayer serverPlayer) {
         return this.advancements.map(advancements -> {
             if (!advancements.isEmpty()) {
                 PlayerAdvancements playeradvancements = serverPlayer.getAdvancements();
@@ -198,7 +185,7 @@ public record PlayerCondition(Type type, Optional<MinMaxBounds.Ints> level, Opti
         }
 
         public PlayerCondition build() {
-            return new PlayerCondition(this.type,Optional.ofNullable(this.level), Optional.ofNullable(this.gameType),
+            return new PlayerCondition(this.type, Optional.ofNullable(this.level), Optional.ofNullable(this.gameType),
                     Optional.ofNullable(this.stats == null ? null : this.stats.build()), Optional.ofNullable(this.recipes),
                     Optional.ofNullable(this.advancements)
             );
@@ -206,11 +193,27 @@ public record PlayerCondition(Type type, Optional<MinMaxBounds.Ints> level, Opti
     }
 
 
-
     public enum Type implements StringRepresentable {
-        SINGLE,
-        GLOBAL,
-        ANY;
+        SINGLE {
+            @Override
+            public boolean matches(MomentInstance<?> instance, @Nullable BlockPos pos, @Nullable ServerPlayer serverPlayer, TriFunction<MomentInstance<?>, @Nullable BlockPos, @Nullable ServerPlayer, Boolean> function) {
+                return function.apply(instance, pos, serverPlayer);
+            }
+        },
+        GLOBAL {
+            @Override
+            public boolean matches(MomentInstance<?> instance, @Nullable BlockPos pos, @Nullable ServerPlayer serverPlayer, TriFunction<MomentInstance<?>, @Nullable BlockPos, @Nullable ServerPlayer, Boolean> function) {
+                return !instance.getLevel().isClientSide && instance.getPlayers().stream()
+                        .allMatch(player -> function.apply(instance, pos, (ServerPlayer) player));
+            }
+        },
+        ANY {
+            @Override
+            public boolean matches(MomentInstance<?> instance, @Nullable BlockPos pos, @Nullable ServerPlayer serverPlayer, TriFunction<MomentInstance<?>, @Nullable BlockPos, @Nullable ServerPlayer, Boolean> function) {
+                return !instance.getLevel().isClientSide && instance.getPlayers().stream()
+                        .anyMatch(player -> function.apply(instance, pos, (ServerPlayer) player));
+            }
+        };
 
         public static final Codec<Type> CODEC = Codec.STRING.xmap(type -> valueOf(type.toUpperCase(Locale.ROOT)), type -> type.name().toLowerCase(Locale.ROOT));
 
@@ -219,5 +222,7 @@ public record PlayerCondition(Type type, Optional<MinMaxBounds.Ints> level, Opti
         public String getSerializedName() {
             return name().toLowerCase(Locale.ROOT);
         }
+
+        public abstract boolean matches(MomentInstance<?> instance, @Nullable BlockPos pos, @Nullable ServerPlayer serverPlayer, TriFunction<MomentInstance<?>, @Nullable BlockPos, @Nullable ServerPlayer, Boolean> function);
     }
 }

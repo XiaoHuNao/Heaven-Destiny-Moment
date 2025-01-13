@@ -18,7 +18,7 @@ public record LevelCondition(Optional<DifficultyCondition> difficulty, Optional<
             TimeCondition.CODEC.codec().optionalFieldOf("time").forGetter(LevelCondition::time)
     ).apply(instance, LevelCondition::new));
     @Override
-    public boolean matches(MomentInstance<?> instance, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
+    public boolean matches(MomentInstance<?> instance,@Nullable BlockPos pos, @Nullable ServerPlayer serverPlayer) {
         return matchesCondition(difficulty,instance, pos, serverPlayer) &&
                 matchesCondition(time,instance, pos, serverPlayer);
     }
