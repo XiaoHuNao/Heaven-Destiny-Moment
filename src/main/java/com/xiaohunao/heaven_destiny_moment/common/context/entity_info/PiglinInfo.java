@@ -24,13 +24,14 @@ public class PiglinInfo extends EntityInfo{
             Codec.INT.optionalFieldOf("weight").forGetter(EntityInfo::weight),
             IAttachable.CODEC.listOf().optionalFieldOf("attaches").forGetter(EntityInfo::attaches),
             Codec.unboundedMap(EquipmentSlot.CODEC,Codec.FLOAT).optionalFieldOf("canDropEquippable").forGetter(EntityInfo::canDropEquippable),
+            IEntityInfo.CODEC.optionalFieldOf("vehicle").forGetter(EntityInfo::vehicle),
             Codec.BOOL.fieldOf("immuneZombification").forGetter(PiglinInfo::immuneZombification)
     ).apply(instance, PiglinInfo::new));
 
     private final boolean immuneZombification;
 
-    public PiglinInfo(EntityType<?> entityType, Optional<IAmount> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches, Optional<Map<EquipmentSlot, Float>> canDropEquippable, boolean immuneZombification) {
-        super(entityType, amount, weight, attaches, canDropEquippable);
+    public PiglinInfo(EntityType<?> entityType, Optional<IAmount> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches, Optional<Map<EquipmentSlot, Float>> canDropEquippable, Optional<IEntityInfo> vehicle, boolean immuneZombification) {
+        super(entityType, amount, weight, attaches, canDropEquippable, vehicle);
         this.immuneZombification = immuneZombification;
     }
 
@@ -68,7 +69,8 @@ public class PiglinInfo extends EntityInfo{
 
         @Override
         public PiglinInfo build() {
-            return new PiglinInfo(entityType, Optional.ofNullable(amount), Optional.ofNullable(weight), Optional.ofNullable(attaches), Optional.ofNullable(canDropEquippable), immuneZombification);
+            return new PiglinInfo(entityType, Optional.ofNullable(amount), Optional.ofNullable(weight), Optional.ofNullable(attaches),
+                    Optional.ofNullable(canDropEquippable),Optional.ofNullable(vehicle), immuneZombification);
         }
     }
 }

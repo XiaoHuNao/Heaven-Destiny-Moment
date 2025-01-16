@@ -12,6 +12,7 @@ import com.xiaohunao.heaven_destiny_moment.common.event.MomentEvent;
 import com.xiaohunao.heaven_destiny_moment.common.event.PlayerMomentAreaEvent;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMAttachments;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMRegistries;
+import com.xiaohunao.heaven_destiny_moment.common.network.MomentBarSyncPayload;
 import com.xiaohunao.heaven_destiny_moment.common.network.MomentManagerSyncPayload;
 import com.xiaohunao.heaven_destiny_moment.common.spawn_algorithm.ISpawnAlgorithm;
 import com.xiaohunao.heaven_destiny_moment.common.spawn_algorithm.OpenAreaSpawnAlgorithm;
@@ -127,6 +128,15 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
         return vec3s.get(level.random.nextInt(spawnPosList.size()));
     }
 
+
+    public void updateBarProgress(float progress){
+        if (this.bar != null){
+            this.bar.updateProgress(progress);
+            if (!level.isClientSide){
+                PacketDistributor.sendToPlayersInDimension((ServerLevel) level,new MomentBarSyncPayload(this.bar, MomentBarSyncPayload.SyncType.UPDATE_PROGRESS));
+            }
+        }
+    }
 
 
 

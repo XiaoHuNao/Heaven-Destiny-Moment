@@ -24,13 +24,14 @@ public class HoglinInfo extends EntityInfo{
             Codec.INT.optionalFieldOf("weight").forGetter(EntityInfo::weight),
             IAttachable.CODEC.listOf().optionalFieldOf("attaches").forGetter(EntityInfo::attaches),
             Codec.unboundedMap(EquipmentSlot.CODEC,Codec.FLOAT).optionalFieldOf("canDropEquippable").forGetter(EntityInfo::canDropEquippable),
+            IEntityInfo.CODEC.optionalFieldOf("vehicle").forGetter(EntityInfo::vehicle),
             Codec.BOOL.fieldOf("immuneZombification").forGetter(HoglinInfo::immuneZombification)
     ).apply(instance, HoglinInfo::new));
 
     private final boolean immuneZombification;
 
-    public HoglinInfo(EntityType<?> entityType, Optional<IAmount> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches, Optional<Map<EquipmentSlot, Float>> canDropEquippable, boolean immuneZombification) {
-        super(entityType, amount, weight, attaches, canDropEquippable);
+    public HoglinInfo(EntityType<?> entityType, Optional<IAmount> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches, Optional<Map<EquipmentSlot, Float>> canDropEquippable, Optional<IEntityInfo> vehicle, boolean immuneZombification) {
+        super(entityType, amount, weight, attaches, canDropEquippable, vehicle);
         this.immuneZombification = immuneZombification;
     }
 
@@ -68,7 +69,8 @@ public class HoglinInfo extends EntityInfo{
 
         @Override
         public HoglinInfo build() {
-            return new HoglinInfo(entityType, Optional.ofNullable(amount), Optional.ofNullable(weight), Optional.ofNullable(attaches),Optional.ofNullable(canDropEquippable), immuneZombification);
+            return new HoglinInfo(entityType, Optional.ofNullable(amount), Optional.ofNullable(weight), Optional.ofNullable(attaches),
+                    Optional.ofNullable(canDropEquippable), Optional.ofNullable(vehicle), immuneZombification);
         }
     }
 }

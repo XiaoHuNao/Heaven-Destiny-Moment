@@ -76,7 +76,7 @@ public class RaidInstance extends MomentInstance<RaidMoment> {
             if (this.readyTime <= 0) {
                 setState(MomentState.START);
             }
-            this.bar.updateProgress(1 - (float) this.readyTime / readyTime);
+            updateBarProgress(1 - (float) this.readyTime / readyTime);
             this.readyTime--;
         }else {
             setState(MomentState.END);
@@ -87,7 +87,20 @@ public class RaidInstance extends MomentInstance<RaidMoment> {
     protected void ongoing() {
         checkNextWave();
         updateWave();
+        debug();
+
     }
+    public void debug(){
+        System.out.println("Wave: " + currentWave + " / " + totalWaves);
+        System.out.println("Progress: " + enemies.size() + " / " + totalEnemy);
+        if (!enemies.isEmpty()){
+            enemies.forEach(id -> {
+                Entity entity = level.getEntity(id);
+                System.out.println(entity.position());
+            });
+        }
+    }
+
 
     @Override
     public void deserializeNBT(CompoundTag compoundTag) {
@@ -135,7 +148,7 @@ public class RaidInstance extends MomentInstance<RaidMoment> {
         }
         enemies.removeIf(id -> {
             Entity entity = level.getEntity(id);
-            this.bar.updateProgress(enemies.size() / (float) totalEnemy);
+            updateBarProgress(enemies.size() / (float) totalEnemy);
             return entity == null;
         });
     }

@@ -4,15 +4,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMRegistries;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Pose;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.VoxelShape;
+
 
 import java.util.function.Function;
 
@@ -23,32 +17,4 @@ public interface ISpawnAlgorithm {
     Vec3 spawn(MomentInstance<?> momentInstance, Entity entity);
 
     MapCodec<? extends ISpawnAlgorithm> codec();
-
-    default boolean noBlockCollision(Level level, AABB pCollisionBox) {
-        for (VoxelShape voxelshape : level.getBlockCollisions(null, pCollisionBox)) {
-            if (!voxelshape.isEmpty()) {
-                return false;
-            }
-
-        }
-
-        return true;
-    }
-
-    default boolean canStanding(Level level , BlockPos pos){
-        BlockState blockState = level.getBlockState(pos);
-        boolean air = blockState.isAir();
-        boolean buildHeight = pos.getY() < level.getMinBuildHeight();
-        boolean fluid = blockState.getFluidState().isSource();
-        return !air && !buildHeight && !fluid;
-    }
-
-    default boolean checkSpawnObstruction(Level level, Entity entity) {
-        return !level.containsAnyLiquid(entity.getBoundingBox()) && level.isUnobstructed(entity);
-    }
-
-
-    default AABB getAABB(Entity e, double x, double y, double z) {
-        return e.getDimensions(Pose.STANDING).makeBoundingBox(x, y, z);
-    }
 }

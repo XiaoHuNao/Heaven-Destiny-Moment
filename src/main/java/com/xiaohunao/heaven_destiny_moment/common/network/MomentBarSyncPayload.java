@@ -35,10 +35,10 @@ public record MomentBarSyncPayload(MomentBar bar,  SyncType syncType) implements
         context.enqueueWork(() -> {
             if (context.player().isLocalPlayer()) {
                 Map<UUID, MomentBar> barMap = MomentBarOverlay.barMap;
-                switch (syncType){
+                switch (syncType) {
                     case ADD -> barMap.put(bar.getID(), bar);
                     case REMOVE -> barMap.remove(bar.getID());
-                    case UPDATE_PROGRESS ->  barMap.get(bar.getID()).updateProgress(bar.getProgress());
+                    case UPDATE_PROGRESS -> barMap.get(bar.getID()).updateProgress(bar.getProgress());
                 }
             }
         }).exceptionally(e -> {
