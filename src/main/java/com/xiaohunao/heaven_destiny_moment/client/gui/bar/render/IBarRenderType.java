@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMRegistries;
+import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.function.Function;
@@ -13,5 +14,5 @@ public interface IBarRenderType {
 
     MapCodec<? extends IBarRenderType> codec();
 
-    void renderBar(GuiGraphics guiGraphics, MomentBar bar, int index);
+    void renderBar(GuiGraphics guiGraphics, MomentBar bar, MomentInstance<?> momentInstance, int index);
 }

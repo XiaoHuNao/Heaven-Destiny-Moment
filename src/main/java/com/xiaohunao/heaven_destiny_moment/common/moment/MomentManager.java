@@ -80,9 +80,8 @@ public class MomentManager extends SavedData {
                 manager.runMomentKeyes.add(instance.momentKey);
                 PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(instance.serializeNBT()));
                 if (instance.getBar() != null) {
-                    PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentBarSyncPayload(instance.bar, MomentBarSyncPayload.SyncType.ADD));
+                    PacketDistributor.sendToPlayersInDimension(serverLevel, MomentBarSyncPayload.addPlayer(instance.getBar()));
                 }
-//                manager.setDirty();
             }
         });
         return manager;
@@ -97,7 +96,7 @@ public class MomentManager extends SavedData {
                     removeMoment(instance);
                     PacketDistributor.sendToPlayersInDimension(serverLevel, new ClientOnlyMomentSyncPayload(instance.serializeNBT(), true));
                     if (instance.getBar() != null) {
-                        PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentBarSyncPayload(instance.bar, MomentBarSyncPayload.SyncType.REMOVE));
+                        PacketDistributor.sendToPlayersInDimension(serverLevel, MomentBarSyncPayload.removePlayer(instance.bar));
                     }
                 }
                 runMoments.remove(instance.getID());
@@ -222,5 +221,9 @@ public class MomentManager extends SavedData {
 
     public boolean hasMoment(ResourceKey<Moment<?>> key) {
         return runMomentKeyes.contains(key);
+    }
+
+    public MomentInstance<?> getMomentInstance(UUID uuid){
+        return runMoments.get(uuid);
     }
 }

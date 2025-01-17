@@ -66,6 +66,10 @@ public record OpenAreaSpawnAlgorithm(int maxTry, int range, int verticalSearchRa
                     continue;
                 }
 
+                if (!isChunkLoaded(level, x, z)) {
+                    continue;
+                }
+
                 AABB potentialSpawnBox = new AABB(
                         x - entityWidth/2, y, z - entityWidth/2,
                         x + entityWidth/2, y + entityHeight, z + entityWidth/2
@@ -79,6 +83,12 @@ public record OpenAreaSpawnAlgorithm(int maxTry, int range, int verticalSearchRa
         }
 
         return Vec3.ZERO;
+    }
+
+    private boolean isChunkLoaded(Level level, double x, double z) {
+        int chunkX = (int)Math.floor(x) >> 4;
+        int chunkZ = (int)Math.floor(z) >> 4;
+        return level.hasChunk(chunkX, chunkZ);
     }
 
 

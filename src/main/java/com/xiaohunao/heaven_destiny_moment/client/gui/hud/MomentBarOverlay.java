@@ -2,6 +2,8 @@ package com.xiaohunao.heaven_destiny_moment.client.gui.hud;
 
 import com.google.common.collect.Maps;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
+import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
+import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -23,9 +25,13 @@ public class MomentBarOverlay implements LayeredDraw.Layer {
         ClientLevel clientLevel = Minecraft.getInstance().level;
         if (clientLevel == null) return;
         int i = 0;
+        MomentManager momentManager = MomentManager.of(clientLevel);
         for (MomentBar bar : barMap.values()) {
-            bar.getType().renderBar(guiGraphics, bar, i);
-            i++;
+            MomentInstance<?> momentInstance = momentManager.getMomentInstance(bar.getID());
+            if (momentInstance != null){
+                bar.getType().renderBar(guiGraphics, bar, momentInstance, i);
+                i++;
+            }
         }
     }
 }

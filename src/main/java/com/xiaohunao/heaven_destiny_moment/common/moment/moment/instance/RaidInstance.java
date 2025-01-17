@@ -87,20 +87,7 @@ public class RaidInstance extends MomentInstance<RaidMoment> {
     protected void ongoing() {
         checkNextWave();
         updateWave();
-        debug();
-
     }
-    public void debug(){
-        System.out.println("Wave: " + currentWave + " / " + totalWaves);
-        System.out.println("Progress: " + enemies.size() + " / " + totalEnemy);
-        if (!enemies.isEmpty()){
-            enemies.forEach(id -> {
-                Entity entity = level.getEntity(id);
-                System.out.println(entity.position());
-            });
-        }
-    }
-
 
     @Override
     public void deserializeNBT(CompoundTag compoundTag) {
@@ -147,6 +134,11 @@ public class RaidInstance extends MomentInstance<RaidMoment> {
                     }));
         }
         enemies.removeIf(id -> {
+            //TODO :: 可能不是正确的解决办法
+            if (level.isClientSide){
+                return false;
+
+            }
             Entity entity = level.getEntity(id);
             updateBarProgress(enemies.size() / (float) totalEnemy);
             return entity == null;

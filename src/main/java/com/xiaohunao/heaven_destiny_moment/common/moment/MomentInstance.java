@@ -113,6 +113,11 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
     public void initMomentBar(){
         moment().flatMap(Moment::barRenderType).ifPresent(type ->
                 this.bar = new MomentBar(uuid,type));
+
+        if (!level.isClientSide){
+            PacketDistributor.sendToPlayersInDimension((ServerLevel) level,MomentBarSyncPayload.addPlayer(this.bar));
+        }
+
     }
 
     public void initSpawnPosList(){
@@ -133,12 +138,10 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
         if (this.bar != null){
             this.bar.updateProgress(progress);
             if (!level.isClientSide){
-                PacketDistributor.sendToPlayersInDimension((ServerLevel) level,new MomentBarSyncPayload(this.bar, MomentBarSyncPayload.SyncType.UPDATE_PROGRESS));
+                PacketDistributor.sendToPlayersInDimension((ServerLevel) level,MomentBarSyncPayload.updateProgress(this.bar));
             }
         }
     }
-
-
 
     @Nullable
     public static MomentInstance<?> loadStatic(Level level, CompoundTag compoundTag) {
@@ -182,9 +185,14 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
             compoundTag.putString("state", state.name());
         }
 
-        ListTag tags = new ListTag();
-        playerUUIDs.forEach(uuid -> tags.add(StringTag.valueOf(uuid.toString())));
-        compoundTag.put("player_uuids", tags);
+        ListTag playerUUIDTags = new ListTag();
+        playerUUIDs.forEach(uuid -> playerUUIDTags.add(StringTag.valueOf(uuid.toString())));
+        compoundTag.put("player_uuids", playerUUIDTags);
+
+        ListTag spawnPosListTag = new ListTag();
+        spawnPosList.forEach(vec3 -> spawnPosListTag.add(Vec3.CODEC.encodeStart(NbtOps.INSTANCE,vec3).getOrThrow()));
+        compoundTag.put("spawnPosList",spawnPosListTag);
+
 
         return compoundTag;
     }
@@ -210,8 +218,11 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
             this.state = MomentState.valueOf(compoundTag.getString("state"));
         }
 
-        ListTag tags = compoundTag.getList("player_uuids", Tag.TAG_STRING);
-        tags.forEach(tag -> playerUUIDs.add(UUID.fromString(tag.getAsString())));
+        ListTag playerUUIDTags = compoundTag.getList("player_uuids", Tag.TAG_LIST);
+        playerUUIDTags.forEach(tag -> playerUUIDs.add(UUID.fromString(tag.getAsString())));
+
+        ListTag spawnPosListTag = compoundTag.getList("spawnPosList", Tag.TAG_LIST);
+        spawnPosListTag.forEach(tag -> spawnPosList.add(Vec3.CODEC.decode(NbtOps.INSTANCE,tag).getOrThrow().getFirst()));
     }
 
     private void serializeMetaData(CompoundTag compoundTag) {
@@ -448,6 +459,10 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
 
     public MomentBar getBar() {
         return bar;
+    }
+
+    public MomentType<?> getType() {
+        return type;
     }
 
     public void finalizeSpawn(Entity entity) {
