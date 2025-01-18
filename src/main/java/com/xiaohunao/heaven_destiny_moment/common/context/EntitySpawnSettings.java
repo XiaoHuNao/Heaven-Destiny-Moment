@@ -19,12 +19,12 @@ import net.minecraft.world.level.biome.MobSpawnSettings;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public record EntitySpawnSettings(Optional<List<List<IEntityInfo>>> entitySpawnList, Optional<BiomeEntitySpawnSettings> biomeEntitySpawnSettings, Optional<MobSpawnRule> rule, Optional<ISpawnAlgorithm> spawnAlgorithm) {
+public record EntitySpawnSettings(Optional<List<Weighted<List<IEntityInfo>>>> entitySpawnList, Optional<BiomeEntitySpawnSettings> biomeEntitySpawnSettings, Optional<MobSpawnRule> rule, Optional<ISpawnAlgorithm> spawnAlgorithm) {
     private static final Random RANDOM = new Random();
 
     public static final Codec<EntitySpawnSettings> CODEC = RecordCodecBuilder.create(builder ->
             builder.group(
-                    IEntityInfo.CODEC.listOf().listOf().optionalFieldOf("entity_spawn_list").forGetter(EntitySpawnSettings::entitySpawnList),
+                    Codec.list(Weighted.codec(Codec.list(IEntityInfo.CODEC))).optionalFieldOf("entity_spawn_list").forGetter(EntitySpawnSettings::entitySpawnList),
                     BiomeEntitySpawnSettings.CODEC.optionalFieldOf("biome_entity_Spawn_settings").forGetter(EntitySpawnSettings::biomeEntitySpawnSettings),
                     MobSpawnRule.CODEC.optionalFieldOf("spawn_rule").forGetter(EntitySpawnSettings::rule),
                     ISpawnAlgorithm.CODEC.optionalFieldOf("spawn_algorithm").forGetter(EntitySpawnSettings::spawnAlgorithm)
@@ -35,37 +35,39 @@ public record EntitySpawnSettings(Optional<List<List<IEntityInfo>>> entitySpawnL
         List<Entity> list = Lists.newArrayList();
 
         entitySpawnList.ifPresent(entitySpawnList -> {
-            List<IEntityInfo> infoList = entitySpawnList.get(wave);
+            Weighted<List<IEntityInfo>> listWeighted = entitySpawnList.get(wave);
 
-            Weighted.Builder<IEntityInfo> builder = new Weighted.Builder<>();
-            infoList.forEach(entityInfo -> {
-                if (entityInfo instanceof EntityInfo){
-                    builder.add(entityInfo, ((EntityInfo) entityInfo).weight().orElse(1));
+            listWeighted.getRandomValue().ifPresent(infoList-> {
+                Weighted.Builder<IEntityInfo> builder = new Weighted.Builder<>();
+                infoList.forEach(entityInfo -> {
+                    if (entityInfo instanceof EntityInfo){
+                        builder.add(entityInfo, ((EntityInfo) entityInfo).weight().orElse(1));
+                    }
+                });
+
+
+                int sum = infoList.stream()
+                        .filter(entityInfo -> entityInfo instanceof EntityInfo)
+                        .mapToInt(entityInfo -> ((EntityInfo) entityInfo).weight().orElse(1))
+                        .sum();
+
+                for (IEntityInfo info : infoList) {
+                    if (!(info instanceof EntityInfo entityInfo)) {
+                        return;
+                    }
+
+                    int weight;
+                    if (entityInfo.weight().isPresent()) {
+                        weight = entityInfo.weight().get();
+                    }else {
+                        weight = 1;
+                    }
+
+                    if (RANDOM.nextInt(sum) < weight) {
+                        list.addAll(entityInfo.spawn(level));
+                    }
                 }
             });
-
-
-            int sum = infoList.stream()
-                    .filter(entityInfo -> entityInfo instanceof EntityInfo)
-                    .mapToInt(entityInfo -> ((EntityInfo) entityInfo).weight().orElse(1))
-                    .sum();
-
-            for (IEntityInfo info : infoList) {
-                if (!(info instanceof EntityInfo entityInfo)) {
-                    return;
-                }
-
-                int weight;
-                if (entityInfo.weight().isPresent()) {
-                    weight = entityInfo.weight().get();
-                }else {
-                    weight = 1;
-                }
-
-                if (RANDOM.nextInt(sum) < weight) {
-                    list.addAll(entityInfo.spawn(level));
-                }
-            }
         });
         return list;
     }
@@ -117,7 +119,7 @@ public record EntitySpawnSettings(Optional<List<List<IEntityInfo>>> entitySpawnL
 
 
     public static class Builder {
-        private List<List<IEntityInfo>> entitySpawnList;
+        private List<Weighted<List<IEntityInfo>>> entitySpawnList;
         private BiomeEntitySpawnSettings biomeEntitySpawnSettings;
         private MobSpawnRule rule;
         private ISpawnAlgorithm spawnAlgorithm = OpenAreaSpawnAlgorithm.DEFAULT;
@@ -127,13 +129,15 @@ public record EntitySpawnSettings(Optional<List<List<IEntityInfo>>> entitySpawnL
             return this;
         }
 
-        public Builder entitySpawnList(IEntityInfo... entityInfoContexts) {
+        public Builder entitySpawnList(Function<Weighted.Builder<List<IEntityInfo>>,Weighted.Builder<List<IEntityInfo>>> weightedEntityInfo) {
             if (entitySpawnList == null){
                 entitySpawnList = Lists.newArrayList();
             }
-            Collections.addAll(entitySpawnList, List.of(entityInfoContexts));
+
+            Collections.addAll(entitySpawnList, weightedEntityInfo.apply(new Weighted.Builder<>()).build());
             return this;
         }
+
 
         public Builder rule(Function<MobSpawnRule.Builder,MobSpawnRule.Builder> rule){
             this.rule = rule.apply(new MobSpawnRule.Builder()).build();

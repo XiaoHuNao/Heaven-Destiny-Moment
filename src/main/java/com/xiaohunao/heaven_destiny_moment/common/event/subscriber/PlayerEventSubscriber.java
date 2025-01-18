@@ -5,6 +5,7 @@ import com.xiaohunao.heaven_destiny_moment.client.gui.hud.MomentBarOverlay;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
@@ -33,10 +34,13 @@ public class PlayerEventSubscriber {
         if (hand != InteractionHand.MAIN_HAND) {
             return;
         }
-        Chicken chicken = EntityType.CHICKEN.create(level);
-        Zombie zombie = EntityType.ZOMBIE.create(level);
 
-        BlockPos spawnPos = level.getLevelData().getSpawnPos();
+
+
+//        Chicken chicken = EntityType.CHICKEN.create(level);
+//        Zombie zombie = EntityType.ZOMBIE.create(level);
+//
+//        BlockPos spawnPos = level.getLevelData().getSpawnPos();
 
 //        chicken.moveTo(Vec3.atLowerCornerOf(spawnPos));
 //        zombie.moveTo(Vec3.atLowerCornerOf(spawnPos));

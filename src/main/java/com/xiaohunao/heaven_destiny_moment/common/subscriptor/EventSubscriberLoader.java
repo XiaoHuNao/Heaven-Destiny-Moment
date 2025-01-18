@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
@@ -64,6 +65,7 @@ public class EventSubscriberLoader extends SimpleJsonResourceReloadListener {
 
     @SubscribeEvent
     public static void register(AddReloadListenerEvent event) {
+        RegistryAccess registryAccess = event.getRegistryAccess();
         event.addListener(INSTANCE);
     }
 }

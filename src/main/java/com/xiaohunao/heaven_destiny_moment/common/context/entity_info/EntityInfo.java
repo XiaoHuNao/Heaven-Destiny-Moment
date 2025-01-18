@@ -26,7 +26,6 @@ public class EntityInfo implements IEntityInfo {
             IAmount.CODEC.optionalFieldOf("amount").forGetter(EntityInfo::amount),
             Codec.INT.optionalFieldOf("weight").forGetter(EntityInfo::weight),
             IAttachable.CODEC.listOf().optionalFieldOf("attaches").forGetter(EntityInfo::attaches),
-            Codec.unboundedMap(EquipmentSlot.CODEC,Codec.FLOAT).optionalFieldOf("canDropEquippable").forGetter(EntityInfo::canDropEquippable),
             IEntityInfo.CODEC.optionalFieldOf("vehicle").forGetter(EntityInfo::vehicle)
     ).apply(instance, EntityInfo::new));
 
@@ -34,15 +33,13 @@ public class EntityInfo implements IEntityInfo {
     private final Optional<IAmount> amount;
     private final Optional<Integer> weight;
     private final Optional<List<IAttachable>> attaches;
-    private final Optional<Map<EquipmentSlot,Float>> canDropEquippable;
     private final Optional<IEntityInfo> vehicle;
 
-    public EntityInfo(EntityType<?> entityType, Optional<IAmount> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches, Optional<Map<EquipmentSlot, Float>> canDropEquippable, Optional<IEntityInfo> vehicle) {
+    public EntityInfo(EntityType<?> entityType, Optional<IAmount> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches, Optional<IEntityInfo> vehicle) {
         this.entityType = entityType;
         this.amount = amount;
         this.weight = weight;
         this.attaches = attaches;
-        this.canDropEquippable = canDropEquippable;
         this.vehicle = vehicle;
     }
 
@@ -57,14 +54,6 @@ public class EntityInfo implements IEntityInfo {
                 if (entity instanceof LivingEntity livingEntity) {
                     attaches.forEach(attachable -> attachable.attachToEntity(livingEntity));
                 }
-            });
-
-            canDropEquippable.ifPresent(canDropEquippable ->{
-                canDropEquippable.forEach((slot, chance) -> {
-                    if (entity instanceof Mob mob) {
-                        mob.setDropChance(slot, chance);
-                    }
-                });
             });
 
             vehicle.ifPresent(vehicle -> {
@@ -103,16 +92,12 @@ public class EntityInfo implements IEntityInfo {
         return vehicle;
     }
 
-    public Optional<Map<EquipmentSlot, Float>> canDropEquippable() {
-        return canDropEquippable;
-    }
 
     public static class Builder {
         protected EntityType<?> entityType;
         protected IAmount amount = new IntegerAmount(1);
         protected List<IAttachable> attaches;
         protected Integer weight;
-        protected Map<EquipmentSlot,Float> canDropEquippable;
         protected IEntityInfo vehicle;
 
         public Builder(EntityType<?> entityType) {
@@ -147,14 +132,6 @@ public class EntityInfo implements IEntityInfo {
             return this;
         }
 
-        public Builder canDropEquippable(EquipmentSlot slot,float chance) {
-            if (this.canDropEquippable == null){
-                this.canDropEquippable = Maps.newHashMap();
-            }
-            this.canDropEquippable.put(slot,chance);
-            return this;
-        }
-
         public Builder vehicle(IEntityInfo vehicle) {
             this.vehicle = vehicle;
             return this;
@@ -162,8 +139,7 @@ public class EntityInfo implements IEntityInfo {
 
 
         public IEntityInfo build() {
-            return new EntityInfo(entityType, Optional.ofNullable(amount), Optional.ofNullable(weight), Optional.ofNullable(attaches),
-                    Optional.ofNullable(canDropEquippable), Optional.ofNullable(vehicle)
+            return new EntityInfo(entityType, Optional.ofNullable(amount), Optional.ofNullable(weight), Optional.ofNullable(attaches), Optional.ofNullable(vehicle)
             );
         }
     }

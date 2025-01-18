@@ -23,10 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public record CommonAttachable(Optional<Weighted<MobEffectInstance>> effects, Optional<Weighted<Pair<IEquippableSlot, ItemStack>>> equipments, Optional<Weighted<AttributeElement>> attributes) implements IAttachable{
+public record CommonAttachable(Optional<Weighted<MobEffectInstance>> effects, Optional<Weighted<AttributeElement>> attributes) implements IAttachable{
     public final static MapCodec<CommonAttachable> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Weighted.codec(MobEffectInstance.CODEC).optionalFieldOf("effects").forGetter(CommonAttachable::effects),
-            Weighted.codec(Codec.pair(IEquippableSlot.CODEC,ItemStack.CODEC)).optionalFieldOf("equipments").forGetter(CommonAttachable::equipments),
             Weighted.codec(AttributeElement.CODEC).optionalFieldOf("attributes").forGetter(CommonAttachable::attributes)
     ).apply(instance, CommonAttachable::new));
 
@@ -35,9 +34,7 @@ public record CommonAttachable(Optional<Weighted<MobEffectInstance>> effects, Op
         effects.ifPresent(mobEffectInstances -> {
             mobEffectInstances.getRandomSubset().forEach(livingEntity::addEffect);
         });
-        equipments.ifPresent(equipment -> {
-            equipment.getRandomSubset().forEach((pair -> pair.getFirst().wear(livingEntity,pair.getSecond())));
-        });
+
         attributes.ifPresent(attributeContexts -> {
             attributeContexts.getRandomSubset().forEach(attributeElement -> {
                 attributeElement.addAttribute(livingEntity);
@@ -52,11 +49,10 @@ public record CommonAttachable(Optional<Weighted<MobEffectInstance>> effects, Op
 
     public static class Builder {
         private Weighted.Builder<MobEffectInstance> effects;
-        private Weighted.Builder<Pair<IEquippableSlot, ItemStack>> equipments;
         private Weighted.Builder<AttributeElement> attributes;
 
         public CommonAttachable build(){
-           return new CommonAttachable(Optional.ofNullable(effects.build()),Optional.ofNullable(equipments.build()),Optional.ofNullable(attributes.build()));
+           return new CommonAttachable(Optional.ofNullable(effects.build()),Optional.ofNullable(attributes.build()));
         }
 
 
@@ -73,22 +69,6 @@ public record CommonAttachable(Optional<Weighted<MobEffectInstance>> effects, Op
                 effects = new Weighted.Builder<>();
             }
             effects.add(new MobEffectInstance(effect,duration,amplifier),weight);
-            return this;
-        }
-
-        public Builder addEquipment(IEquippableSlot slot,ItemStack stack){
-            if (equipments == null) {
-                equipments = new Weighted.Builder<>();
-            }
-            equipments.add(new Pair<>(slot,stack),1);
-            return this;
-        }
-
-        public Builder addEquipment(IEquippableSlot slot,ItemStack stack, int weight){
-            if (equipments == null) {
-                equipments = new Weighted.Builder<>();
-            }
-            equipments.add(new Pair<>(slot,stack),weight);
             return this;
         }
 

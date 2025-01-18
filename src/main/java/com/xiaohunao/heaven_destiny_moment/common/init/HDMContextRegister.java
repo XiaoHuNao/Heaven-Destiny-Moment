@@ -9,6 +9,7 @@ import com.xiaohunao.heaven_destiny_moment.common.context.amount.IAmount;
 import com.xiaohunao.heaven_destiny_moment.common.context.amount.IntegerAmount;
 import com.xiaohunao.heaven_destiny_moment.common.context.amount.RandomAmount;
 import com.xiaohunao.heaven_destiny_moment.common.context.attachable.CommonAttachable;
+import com.xiaohunao.heaven_destiny_moment.common.context.attachable.EquipmentAttachable;
 import com.xiaohunao.heaven_destiny_moment.common.context.attachable.IAttachable;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.ICondition;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.LevelCondition;
@@ -80,6 +81,7 @@ public class HDMContextRegister {
 
 
     public static final DeferredHolder<MapCodec<? extends IAttachable>, MapCodec<? extends IAttachable>> COMMON_ATTACHABLE = ATTACHABLE_CODEC.register("common", () -> CommonAttachable.CODEC);
+    public static final DeferredHolder<MapCodec<? extends IAttachable>, MapCodec<? extends IAttachable>> EQUIPMENT_ATTACHABLE = ATTACHABLE_CODEC.register("equipment", () -> EquipmentAttachable.CODEC);
 
 
     public static final DeferredHolder<MapCodec<? extends IEquippableSlot>, MapCodec<? extends IEquippableSlot>> VANILLA_EQUIPPABLE_SLOT = EQUIPPABLE_SLOT_CODEC.register("vanilla", () -> VanillaEquippableSlot.CODEC);

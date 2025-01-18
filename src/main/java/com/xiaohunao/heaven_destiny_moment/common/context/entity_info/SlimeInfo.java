@@ -24,14 +24,13 @@ public class SlimeInfo extends EntityInfo{
             IAmount.CODEC.optionalFieldOf("amount").forGetter(EntityInfo::amount),
             Codec.INT.optionalFieldOf("weight").forGetter(EntityInfo::weight),
             IAttachable.CODEC.listOf().optionalFieldOf("attaches").forGetter(EntityInfo::attaches),
-            Codec.unboundedMap(EquipmentSlot.CODEC,Codec.FLOAT).optionalFieldOf("canDropEquippable").forGetter(EntityInfo::canDropEquippable),
             IEntityInfo.CODEC.optionalFieldOf("vehicle").forGetter(EntityInfo::vehicle),
             Codec.INT.fieldOf("size").forGetter(SlimeInfo::size)
     ).apply(instance, SlimeInfo::new));
     private final Integer size;
 
-    public SlimeInfo(EntityType<?> entityType, Optional<IAmount> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches, Optional<Map<EquipmentSlot, Float>> canDropEquippable, Optional<IEntityInfo> vehicle, Integer size) {
-        super(entityType, amount, weight, attaches, canDropEquippable, vehicle);
+    public SlimeInfo(EntityType<?> entityType, Optional<IAmount> amount, Optional<Integer> weight, Optional<List<IAttachable>> attaches, Optional<IEntityInfo> vehicle, Integer size) {
+        super(entityType, amount, weight, attaches, vehicle);
         this.size = size;
     }
 
@@ -70,7 +69,7 @@ public class SlimeInfo extends EntityInfo{
         @Override
         public IEntityInfo build() {
             return new SlimeInfo(entityType, Optional.ofNullable(amount), Optional.ofNullable(weight), Optional.ofNullable(attaches),
-                    Optional.ofNullable(canDropEquippable),Optional.ofNullable(vehicle), size);
+                    Optional.ofNullable(vehicle), size);
         }
     }
 }
