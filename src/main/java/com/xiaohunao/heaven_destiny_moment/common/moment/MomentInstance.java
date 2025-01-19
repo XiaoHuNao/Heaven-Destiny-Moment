@@ -360,6 +360,8 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
 
     }
 
+    public void end(){}
+
 
 
     public MomentEvent setState(MomentState state) {
@@ -466,7 +468,6 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
     }
 
     public void finalizeSpawn(Entity entity) {
-
     }
 
     public void addKillCount(LivingEntity livingEntity) {

@@ -91,6 +91,8 @@ public class MomentManager extends SavedData {
         CopyOnWriteArrayList<MomentInstance<?>> momentInstances = new CopyOnWriteArrayList<>(runMoments.values());
         momentInstances.forEach(instance -> {
             if (instance.state == MomentState.END) {
+                instance.end();
+
                 if (!level.isClientSide) {
                     ServerLevel serverLevel = (ServerLevel) instance.getLevel();
                     removeMoment(instance);

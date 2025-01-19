@@ -1,7 +1,7 @@
 package com.xiaohunao.heaven_destiny_moment.common.moment.moment.instance;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMMomentTypes;
@@ -10,16 +10,24 @@ import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentState;
 import com.xiaohunao.heaven_destiny_moment.common.moment.moment.RaidMoment;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
+import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.IntTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.ServerScoreboard;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.scores.PlayerTeam;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public class RaidInstance extends MomentInstance<RaidMoment> {
@@ -51,36 +59,77 @@ public class RaidInstance extends MomentInstance<RaidMoment> {
     @Override
     public void init() {
         super.init();
+
         moment().ifPresent(raidMoment -> {
             this.readyTime = raidMoment.readyTime();
             this.totalWaves = raidMoment.momentData()
-                                    .flatMap(MomentData::entitySpawnSettings)
-                                    .flatMap(EntitySpawnSettings::entitySpawnList)
-                                    .orElse(Lists.newArrayList())
-                                    .size();
-
-            raidMoment.momentData()
                     .flatMap(MomentData::entitySpawnSettings)
                     .flatMap(EntitySpawnSettings::entitySpawnList)
-                    .ifPresent(entitySpawnList -> {
-                        this.totalWaves = entitySpawnList.size();
-                    });
+                    .map(List::size)
+                    .orElse(0);
         });
     }
 
     @Override
-    protected void ready() {
-        if (this.bar != null){
-            int readyTime = moment().map(RaidMoment::readyTime).orElse(100);
+    public void finalizeSpawn(Entity entity) {
+        addRaidTeam(entity);
+        attackRandomPlayer(entity);
+    }
 
-            if (this.readyTime <= 0) {
-                setState(MomentState.START);
+
+
+
+
+
+    @Override
+    public void end() {
+        if (!level.isClientSide) {
+            ServerScoreboard scoreboard = ((ServerLevel)level).getServer().getScoreboard();
+            String teamName = getTeamName();
+            PlayerTeam playerTeam = scoreboard.getPlayerTeam(teamName);
+            if (playerTeam != null) {
+                scoreboard.removePlayerTeam(playerTeam);
             }
-            updateBarProgress(1 - (float) this.readyTime / readyTime);
-            this.readyTime--;
-        }else {
-            setState(MomentState.END);
         }
+    }
+
+    private void addRaidTeam(Entity entity){
+        if(!level.isClientSide) {
+            String teamName = getTeamName();
+            ServerScoreboard scoreboard = ((ServerLevel)level).getServer().getScoreboard();
+            PlayerTeam playerTeam = scoreboard.getPlayerTeam(teamName);
+            if (playerTeam == null){
+                PlayerTeam team = scoreboard.addPlayerTeam(teamName);
+                team.setColor(ChatFormatting.RED);
+                team.setDisplayName(Component.translatable(HeavenDestinyMoment.asDescriptionId("team." + teamName)));
+                team.setAllowFriendlyFire(false);
+            }else {
+                scoreboard.addPlayerToTeam(entity.getScoreboardName(), playerTeam);
+            }
+        }
+    }
+
+
+
+
+    private String getTeamName() {
+        return momentKey.location().toLanguageKey() + uuid;
+    }
+
+
+    @Override
+    protected void ready() {
+        if (this.bar == null) {
+            setState(MomentState.END);
+            return;
+        }
+        
+        int readyTime = moment().map(RaidMoment::readyTime).orElse(100);
+        if (this.readyTime <= 0) {
+            setState(MomentState.START);
+        }
+        updateBarProgress(1 - (float) this.readyTime / readyTime);
+        this.readyTime--;
     }
 
     @Override
@@ -152,5 +201,14 @@ public class RaidInstance extends MomentInstance<RaidMoment> {
     public RaidInstance setOriginalPos(Vec3 originalPos) {
         this.originalPos = originalPos;
         return this;
+    }
+
+    private void attackRandomPlayer(Entity entity) {
+        if (!level.isClientSide && entity instanceof Mob mob && !this.players.isEmpty()) {
+            List<Player> players = Lists.newArrayList(this.players);
+            Player target = players.get(level.random.nextInt(players.size()));
+            mob.getBrain().setMemory(MemoryModuleType.ANGRY_AT, target.getUUID());
+            mob.setTarget(target);
+        }
     }
 }
