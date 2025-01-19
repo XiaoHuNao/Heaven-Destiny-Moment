@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMRegistries;
@@ -82,7 +83,7 @@ public class DefaultBarRenderType implements IBarRenderType {
         if (momentInstance.moment().isPresent() && minecraft.level != null){
             ResourceLocation momentKey = minecraft.level.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT).getKey(momentInstance.moment().get());
             if (momentKey != null) {
-                Component name = Component.translatable("heaven_destiny_moment.bar." + momentKey.toLanguageKey());
+                Component name = Component.translatable(HeavenDestinyMoment.asDescriptionId("bar." + momentKey.toLanguageKey()));
                 int textWidth = minecraft.font.width(name);
                 int textX = (screenWidth - textWidth) / 2;
                 int textY = y - TEXT_OFFSET;
