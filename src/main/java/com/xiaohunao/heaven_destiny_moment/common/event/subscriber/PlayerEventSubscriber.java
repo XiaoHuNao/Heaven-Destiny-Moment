@@ -3,6 +3,7 @@ package com.xiaohunao.heaven_destiny_moment.common.event.subscriber;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.hud.MomentBarOverlay;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
+import com.xiaohunao.heaven_destiny_moment.compat.champions.ChampionsAffixAttachable;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -18,6 +19,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import top.theillusivec4.champions.api.AffixRegistry;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME, modid = HeavenDestinyMoment.MODID)
 public class PlayerEventSubscriber {
@@ -35,32 +37,15 @@ public class PlayerEventSubscriber {
             return;
         }
 
-
-
-//        Chicken chicken = EntityType.CHICKEN.create(level);
+//        ChampionsAffixAttachable affixAttachable = new ChampionsAffixAttachable.Builder()
+//                .addAffix(AffixRegistry.Keys.ADAPTABLE)
+//                .build();
 //        Zombie zombie = EntityType.ZOMBIE.create(level);
-//
-//        BlockPos spawnPos = level.getLevelData().getSpawnPos();
-
-//        chicken.moveTo(Vec3.atLowerCornerOf(spawnPos));
-//        zombie.moveTo(Vec3.atLowerCornerOf(spawnPos));
-
-//        chicken.startRiding(zombie);
-//        chicken.setPos(Vec3.atLowerCornerOf(event.getPos().above()));
-//        level.addFreshEntity(chicken);
-//        level.addFreshEntity(zombie);
-//        chicken.setPos(Vec3.atLowerCornerOf(event.getPos().above()));
-
-
-
-//        Zombie zombie = EntityType.ZOMBIE.create(level);
-//        if (chicken != null && zombie != null) {
-//            chicken.startRiding(zombie);
-//            chicken.moveTo(Vec3.atLowerCornerOf(event.getPos().below()));
-//            level.addFreshEntity(chicken);
+//        if (zombie != null){
+//            affixAttachable.attachToEntity(zombie);
+//            zombie.setPos(Vec3.atLowerCornerOf(event.getPos()));
+//            level.addFreshEntity(zombie);
 //        }
-
-
     }
 
 }

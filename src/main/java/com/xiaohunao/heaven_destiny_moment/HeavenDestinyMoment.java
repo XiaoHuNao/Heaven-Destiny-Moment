@@ -6,6 +6,7 @@ import com.xiaohunao.heaven_destiny_moment.common.init.HDMAttachments;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMMomentRegister;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMRegistries;
+import com.xiaohunao.heaven_destiny_moment.compat.LoadedCompat;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -30,6 +31,7 @@ public class HeavenDestinyMoment {
         HDMMomentRegister.register(modEventBus);
         HDMContextRegister.register(modEventBus);
         HDMAttachments.TYPES.register(modEventBus);
+        LoadedCompat.register(modEventBus);
 
         modEventBus.addListener(HDMRegistries::registerRegistries);
         modEventBus.addListener(HDMRegistries::registerDataPackRegistries);

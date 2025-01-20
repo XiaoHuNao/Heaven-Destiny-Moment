@@ -48,42 +48,27 @@ public record CommonAttachable(Optional<Weighted<MobEffectInstance>> effects, Op
     }
 
     public static class Builder {
-        private Weighted.Builder<MobEffectInstance> effects;
-        private Weighted.Builder<AttributeElement> attributes;
+        private Weighted.Builder<MobEffectInstance> effects = new Weighted.Builder<>();
+        private Weighted.Builder<AttributeElement> attributes = new Weighted.Builder<>();
 
         public CommonAttachable build(){
            return new CommonAttachable(Optional.ofNullable(effects.build()),Optional.ofNullable(attributes.build()));
         }
 
-
         public Builder addEffect(Holder<MobEffect> effect, int duration, int amplifier){
-            if (effects == null){
-                effects = new Weighted.Builder<>();
-            }
-            effects.add(new MobEffectInstance(effect,duration,amplifier),1);
-            return this;
+            return addEffect(effect,duration,amplifier,1);
         }
 
         public Builder addEffect(Holder<MobEffect> effect, int duration, int amplifier, int weight){
-            if (effects == null){
-                effects = new Weighted.Builder<>();
-            }
             effects.add(new MobEffectInstance(effect,duration,amplifier),weight);
             return this;
         }
 
         public Builder addAttribute(Holder<Attribute> attribute, ResourceLocation id, double amount, AttributeModifier.Operation operation){
-            if (attributes == null) {
-                attributes = new Weighted.Builder<>();
-            }
-            attributes.add(new AttributeElement(attribute,new AttributeModifier(id,amount,operation)),1);
-            return this;
+            return addAttribute(attribute,id,amount,operation,1);
         }
 
         public Builder addAttribute(Holder<Attribute> attribute, ResourceLocation id, double amount, AttributeModifier.Operation operation,int weight){
-            if (attributes == null) {
-                attributes = new Weighted.Builder<>();
-            }
             attributes.add(new AttributeElement(attribute,new AttributeModifier(id,amount,operation)),weight);
             return this;
         }

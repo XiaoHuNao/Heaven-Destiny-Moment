@@ -6,7 +6,6 @@ import com.xiaohunao.heaven_destiny_moment.client.gui.bar.render.IBarRenderType;
 import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.context.TipSettings;
-import com.xiaohunao.heaven_destiny_moment.common.init.HDMMomentRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.area.Area;
@@ -50,7 +49,7 @@ public class KubeJSMoment extends Moment<KubeJSMoment> {
 
     @Override
     public MapCodec<? extends Moment<?>> codec() {
-        return HDMMomentRegister.KUBEJS_MOMENT.get();
+        return MomentRegister.KUBEJS_MOMENT.get();
     }
 
     @FunctionalInterface
@@ -63,11 +62,11 @@ public class KubeJSMoment extends Moment<KubeJSMoment> {
         private final Map<String, MomentCallback<?, ?>> callbacks = new HashMap<>();
 
         protected KubeJSMomentInstance(Level level, ResourceKey<Moment<?>> momentKey) {
-            super(HDMMomentRegister.KUBEJS.get(), level, momentKey);
+            super(MomentRegister.KUBEJS.get(), level, momentKey);
         }
 
         public KubeJSMomentInstance(UUID uuid, Level level, ResourceKey<Moment<?>> momentKey) {
-            super(HDMMomentRegister.KUBEJS.get(), uuid, level, momentKey);
+            super(MomentRegister.KUBEJS.get(), uuid, level, momentKey);
         }
 
 

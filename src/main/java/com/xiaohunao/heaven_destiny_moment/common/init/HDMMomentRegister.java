@@ -20,7 +20,6 @@ public class HDMMomentRegister {
 
     public static final DeferredHolder<MapCodec<? extends Moment<?>>, MapCodec<Moment<Moment<?>>>> DEFAULT_MOMENT = MOMENT_CODEC.register("default", () -> DefaultMoment.CODEC);
     public static final DeferredHolder<MapCodec<? extends Moment<?>>, MapCodec<RaidMoment>> RAID_MOMENT = MOMENT_CODEC.register("raid", () -> RaidMoment.CODEC);
-    public static final DeferredHolder<MapCodec<? extends Moment<?>>, MapCodec<KubeJSMoment>> KUBEJS_MOMENT = MOMENT_CODEC.register("kubejs", () -> KubeJSMoment.CODEC);
 
     public static final DeferredHolder<MomentType<?>, MomentType<DefaultInstance>> DEFAULT = MOMENT_TYPE.register("default",
             () -> new MomentType.Builder<>(DefaultInstance::new).build());
@@ -28,8 +27,6 @@ public class HDMMomentRegister {
     public static final DeferredHolder<MomentType<?>, MomentType<RaidInstance>> RAID = MOMENT_TYPE.register("raid",
             () -> new MomentType.Builder<>(RaidInstance::new).build());
 
-    public static final DeferredHolder<MomentType<?>, MomentType<KubeJSMoment.KubeJSMomentInstance>> KUBEJS = MOMENT_TYPE.register("kubejs",
-            () -> new MomentType.Builder<>(KubeJSMoment.KubeJSMomentInstance::new).build());
 
     public static void register(IEventBus modEventBus){
         MOMENT_CODEC.register(modEventBus);
