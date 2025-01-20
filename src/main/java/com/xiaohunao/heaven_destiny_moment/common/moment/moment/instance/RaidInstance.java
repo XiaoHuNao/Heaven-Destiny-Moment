@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
-import com.xiaohunao.heaven_destiny_moment.common.init.HDMMomentTypes;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMMomentRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentState;
@@ -19,7 +19,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.ServerScoreboard;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.player.Player;
@@ -41,12 +40,12 @@ public class RaidInstance extends MomentInstance<RaidMoment> {
 
 
     public RaidInstance(Level level, ResourceKey<Moment<?>> momentKey) {
-        super(HDMMomentTypes.RAID.get(), level, momentKey);
+        super(HDMMomentRegister.RAID.get(), level, momentKey);
     }
 
 
     public RaidInstance(UUID uuid, Level level, ResourceKey<Moment<?>> momentResourceKey) {
-        super(HDMMomentTypes.RAID.get(), uuid, level, momentResourceKey);
+        super(HDMMomentRegister.RAID.get(), uuid, level, momentResourceKey);
     }
 
     @Override

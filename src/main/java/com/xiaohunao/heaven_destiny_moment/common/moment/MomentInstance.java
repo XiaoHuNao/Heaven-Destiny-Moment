@@ -71,15 +71,14 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
     }
 
     public static boolean create(ResourceKey<Moment<?>> momentKey, ServerLevel serverLevel, @Nullable BlockPos pos, @Nullable ServerPlayer serverPlayer, @Nullable Consumer<MomentInstance<?>> modifier) {
-        Registry<Moment<?>> registry = serverLevel.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
-        return Optional.ofNullable(registry.get(momentKey))
-                .map(moment -> moment.newMomentInstance(serverLevel,momentKey))
+        return Optional.ofNullable(serverLevel.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT))
+                .map(registry -> registry.get(momentKey))
+                .map(moment -> moment.newMomentInstance(serverLevel, momentKey))
                 .map(instance -> {
-                    if (modifier != null) {
-                        modifier.accept(instance);
-                    }
-                    return MomentManager.of(serverLevel).addMoment(instance,serverLevel,pos,serverPlayer);
-                }).orElse(false);
+                    Optional.ofNullable(modifier).ifPresent(m -> m.accept(instance));
+                    return MomentManager.of(serverLevel).addMoment(instance, serverLevel, pos, serverPlayer);
+                })
+                .orElse(false);
     }
 
     public static boolean create(ResourceKey<Moment<?>> momentKey, ServerLevel serverLevel, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
@@ -95,21 +94,36 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
         return registry;
     }
 
+    /**
+     * 检查是否为指定类型的时刻
+     * @param key 时刻注册键
+     * @return 是否匹配
+     */
     public boolean is(ResourceKey<Moment<?>> key) {
         return momentKey == key;
     }
 
+    /**
+     * 获取时刻实例
+     * @return 时刻实例的Optional包装
+     */
     public Optional<T> moment() {
         Registry<Moment<?>> registry = level.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT);
         Moment<?> moment = registry.get(momentKey);
         return (Optional<T>) Optional.ofNullable(moment);
     }
 
+    /**
+     * 初始化时刻实例
+     */
     public void init(){
         initMomentBar();
         initSpawnPosList();
     }
 
+    /**
+     * 初始化时刻进度条
+     */
     public void initMomentBar(){
         moment().flatMap(Moment::barRenderType).ifPresent(type ->
                 this.bar = new MomentBar(uuid,type));
@@ -120,10 +134,17 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
 
     }
 
+    /**
+     * 初始化生成点列表
+     */
     public void initSpawnPosList(){
 
     }
 
+    /**
+     * 获取随机生成点
+     * @return 随机生成点坐标
+     */
     public Vec3 getRandomSpawnPos() {
         if (spawnPosList.isEmpty()) {
             return Vec3.ZERO;
@@ -134,6 +155,10 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
     }
 
 
+    /**
+     * 更新进度条进度
+     * @param progress 进度值(0-1)
+     */
     public void updateBarProgress(float progress){
         if (this.bar != null){
             this.bar.updateProgress(progress);
@@ -143,6 +168,12 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
         }
     }
 
+    /**
+     * 从NBT标签加载时刻实例
+     * @param level 世界实例
+     * @param compoundTag NBT数据
+     * @return 加载的时刻实例
+     */
     @Nullable
     public static MomentInstance<?> loadStatic(Level level, CompoundTag compoundTag) {
         String id = compoundTag.getString("id");

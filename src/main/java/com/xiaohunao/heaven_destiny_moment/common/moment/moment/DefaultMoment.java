@@ -7,6 +7,7 @@ import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.context.TipSettings;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMMomentRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.area.Area;
@@ -42,6 +43,6 @@ public class DefaultMoment extends Moment<Moment<?>> {
 
     @Override
     public MapCodec<? extends Moment<?>> codec() {
-        return HDMContextRegister.DEFAULT_MOMENT.get();
+        return HDMMomentRegister.DEFAULT_MOMENT.get();
     }
 }

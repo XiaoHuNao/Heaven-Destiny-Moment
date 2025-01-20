@@ -120,7 +120,11 @@ repositories {
 dependencies {
     compileOnly "dev.latvian.mods:rhino:$rhino_version"
     compileOnly "dev.latvian.mods:kubejs-neoforge:$kubejs_version"
-    compileOnly("dev.architectury:architectury-neoforge:$architectury_version")
+    compileOnly "dev.architectury:architectury-neoforge:$architectury_version"
+
+    runtimeOnly "dev.latvian.mods:rhino:$rhino_version"
+    runtimeOnly "dev.latvian.mods:kubejs-neoforge:$kubejs_version"
+    runtimeOnly "dev.architectury:architectury-neoforge:$architectury_version"
 
     //runtimeOnly "dev.latvian.mods:rhino:$rhino_version"
     //runtimeOnly "dev.latvian.mods:kubejs-neoforge:$kubejs_version"

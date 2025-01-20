@@ -4,7 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.xiaohunao.heaven_destiny_moment.client.gui.hud.MomentBarOverlay;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMAttachments;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
-import com.xiaohunao.heaven_destiny_moment.common.init.HDMMomentTypes;
+import com.xiaohunao.heaven_destiny_moment.common.init.HDMMomentRegister;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -27,7 +27,7 @@ public class HeavenDestinyMoment {
 
 
     public HeavenDestinyMoment(IEventBus modEventBus, ModContainer modContainer) {
-        HDMMomentTypes.MOMENT_TYPE.register(modEventBus);
+        HDMMomentRegister.register(modEventBus);
         HDMContextRegister.register(modEventBus);
         HDMAttachments.TYPES.register(modEventBus);
 

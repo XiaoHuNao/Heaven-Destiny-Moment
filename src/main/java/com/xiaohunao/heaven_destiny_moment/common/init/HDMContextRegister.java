@@ -37,7 +37,6 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class HDMContextRegister {
     public static final DeferredRegister<MapCodec<? extends IBarRenderType>> BAR_RENDER_TYPE_CODEC = DeferredRegister.create(HDMRegistries.Keys.BAR_RENDER_TYPE_CODEC, HeavenDestinyMoment.MODID);
     public static final DeferredRegister<MapCodec<? extends Area>> AREA_CODEC = DeferredRegister.create(HDMRegistries.Keys.AREA_CODEC, HeavenDestinyMoment.MODID);
-    public static final DeferredRegister<MapCodec<? extends Moment<?>>> MOMENT_CODEC = DeferredRegister.create(HDMRegistries.Keys.MOMENT_CODEC, HeavenDestinyMoment.MODID);
     public static final DeferredRegister<MapCodec<? extends IAmount>> AMOUNT_CODEC = DeferredRegister.create(HDMRegistries.Keys.AMOUNT_CODEC, HeavenDestinyMoment.MODID);
     public static final DeferredRegister<MapCodec<? extends ICondition>> CONDITION_CODEC = DeferredRegister.create(HDMRegistries.Keys.CONDITION_CODEC, HeavenDestinyMoment.MODID);
     public static final DeferredRegister<MapCodec<? extends IEntityInfo>> ENTITY_INFO_CODEC = DeferredRegister.create(HDMRegistries.Keys.ENTITY_INFO_CODEC, HeavenDestinyMoment.MODID);
@@ -52,9 +51,6 @@ public class HDMContextRegister {
 
 
     public static final DeferredHolder<MapCodec<? extends Area>, MapCodec<? extends Area>> LOCATION_AREA = AREA_CODEC.register("location", () -> LocationArea.CODEC);
-
-    public static final DeferredHolder<MapCodec<? extends Moment<?>>, MapCodec<Moment<Moment<?>>>> DEFAULT_MOMENT = MOMENT_CODEC.register("default", () -> DefaultMoment.CODEC);
-    public static final DeferredHolder<MapCodec<? extends Moment<?>>, MapCodec<RaidMoment>> RAID_MOMENT = MOMENT_CODEC.register("raid", () -> RaidMoment.CODEC);
 
 
     public static final DeferredHolder<MapCodec<? extends IAmount>, MapCodec<? extends IAmount>> INTEGER_AMOUNT = AMOUNT_CODEC.register("integer", () -> IntegerAmount.CODEC);
@@ -97,7 +93,6 @@ public class HDMContextRegister {
         ENTITY_INFO_CODEC.register(modEventBus);
         REWARD_CODEC.register(modEventBus);
         AREA_CODEC.register(modEventBus);
-        MOMENT_CODEC.register(modEventBus);
         ATTACHABLE_CODEC.register(modEventBus);
         SPAWN_ALGORITHM_CODEC.register(modEventBus);
         EQUIPPABLE_SLOT_CODEC.register(modEventBus);
