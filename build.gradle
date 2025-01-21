@@ -127,7 +127,7 @@ dependencies {
     runtimeOnly "dev.architectury:architectury-neoforge:$architectury_version"
 
     compileOnly "curse.maven:champions-unofficial-1074990:6086086"
-    runtimeOnly "curse.maven:champions-unofficial-1074990:6086086"
+//    runtimeOnly "curse.maven:champions-unofficial-1074990:6086086"
 
 
     // Example mod dependency using a mod jar from ./libs with a flat dir repository

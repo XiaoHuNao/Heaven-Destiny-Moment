@@ -11,9 +11,8 @@ import com.xiaohunao.heaven_destiny_moment.common.moment.MomentState;
 import com.xiaohunao.heaven_destiny_moment.common.moment.moment.RaidMoment;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.minecraft.ChatFormatting;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.nbt.IntTag;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.ServerScoreboard;
@@ -102,6 +101,7 @@ public class RaidInstance extends MomentInstance<RaidMoment> {
                 team.setColor(ChatFormatting.RED);
                 team.setDisplayName(Component.translatable(HeavenDestinyMoment.asDescriptionId("team." + teamName)));
                 team.setAllowFriendlyFire(false);
+                scoreboard.addPlayerToTeam(entity.getScoreboardName(), team);
             }else {
                 scoreboard.addPlayerToTeam(entity.getScoreboardName(), playerTeam);
             }
@@ -145,6 +145,11 @@ public class RaidInstance extends MomentInstance<RaidMoment> {
         this.totalWaves = compoundTag.getInt("totalWaves");
         this.totalEnemy = compoundTag.getInt("totalEnemy");
         this.readyTime = compoundTag.getInt("readyTime");
+        if (compoundTag.contains("originalPos")) {
+            this.originalPos = Vec3.CODEC.decode(NbtOps.INSTANCE, compoundTag.getCompound("originalPos")).getOrThrow().getFirst();
+        }
+
+        compoundTag.getList("enemies", Tag.TAG_INT).forEach(id -> enemies.add(((IntTag)id).getAsInt()));
     }
 
     @Override
@@ -155,6 +160,14 @@ public class RaidInstance extends MomentInstance<RaidMoment> {
         compoundTag.put("totalWaves",IntTag.valueOf(totalWaves));
         compoundTag.put("totalEnemy",IntTag.valueOf(totalEnemy));
         compoundTag.put("readyTime",IntTag.valueOf(readyTime));
+        if (compoundTag.contains("originalPos")) {
+            compoundTag.put("originalPos", Vec3.CODEC.encodeStart(NbtOps.INSTANCE, this.originalPos).getOrThrow());
+        }
+
+        ListTag enemiesListTag = new ListTag();
+        enemies.forEach(id -> enemiesListTag.add(IntTag.valueOf(id)));
+        compoundTag.put("enemies",enemiesListTag);
+
         return compoundTag;
     }
 
