@@ -1,46 +1,46 @@
 package com.xiaohunao.heaven_destiny_moment.compat.champions;
 
-
 import com.google.common.collect.Lists;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.common.context.attachable.IAttachable;
-import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.Tuple;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.entity.LivingEntity;
-import top.theillusivec4.champions.api.*;
+import top.theillusivec4.champions.Champions;
+import top.theillusivec4.champions.api.AffixRegistry;
+import top.theillusivec4.champions.api.IAffix;
 import top.theillusivec4.champions.common.capability.ChampionAttachment;
-import top.theillusivec4.champions.common.rank.Rank;
 import top.theillusivec4.champions.common.util.ChampionBuilder;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
-public record ChampionsAffixAttachable(List<ResourceKey<IAffix>> affixes) implements IAttachable {
+public record ChampionsAffixAttachable(List<ResourceKey<IAffix>> affixes, int tier) implements IAttachable {
     public final static MapCodec<ChampionsAffixAttachable> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ResourceKey.codec(AffixRegistry.AFFIX_REGISTRY_KEY).listOf().fieldOf("affixes").forGetter(ChampionsAffixAttachable::affixes)
+            ResourceKey.codec(AffixRegistry.AFFIX_REGISTRY_KEY).listOf().fieldOf("affixes").forGetter(ChampionsAffixAttachable::affixes),
+            ExtraCodecs.POSITIVE_INT.optionalFieldOf("tier", 1).forGetter(ChampionsAffixAttachable::tier)
     ).apply(instance, ChampionsAffixAttachable::new));
+
 
     @Override
     public void attachToEntity(LivingEntity livingEntity) {
-        if (!livingEntity.level().isClientSide()) {
-            ChampionAttachment.getAttachment(livingEntity).ifPresent((champion) -> {
-                IChampion.Server serverChampion = champion.getServer();
-                Optional<Rank> maybeRank = serverChampion.getRank();
-                if (maybeRank.isEmpty()) {
-                    ChampionBuilder.spawn(champion);
-                }
+        ChampionAttachment.getAttachment(livingEntity).ifPresent(champion -> {
+            List<IAffix> affixList = new ArrayList<>();
 
-                serverChampion.getAffixes().forEach((affix) -> affix.onSpawn(champion));
-                serverChampion.getRank().ifPresent((rank) -> {
-                    List<Tuple<Holder<MobEffect>, Integer>> effects = rank.getEffects();
-                    effects.forEach((effectPair) -> champion.getLivingEntity().addEffect(new MobEffectInstance(effectPair.getA(), 200, (Integer)effectPair.getB())));
+            for (ResourceKey<IAffix> key : affixes) {
+                Champions.API.getAffix(key.location()).ifPresent(affix -> {
+                    if (affix.canApply(champion)) {
+                        affixList.add(affix);
+                    }
                 });
-            });
-        }
+            }
+
+            if (!affixList.isEmpty()) {
+                ChampionBuilder.spawnPreset(champion, tier, affixList);
+            }
+        });
     }
 
     @Override
@@ -48,16 +48,33 @@ public record ChampionsAffixAttachable(List<ResourceKey<IAffix>> affixes) implem
         return MomentRegister.CHAMPIONS_ATTACHABLE.get();
     }
 
-    public static class Builder {
-        private List<ResourceKey<IAffix>> affixes = Lists.newArrayList();
 
-        public ChampionsAffixAttachable build(){
-            return new ChampionsAffixAttachable(affixes);
+    public static class Builder {
+        private final List<ResourceKey<IAffix>> affixes = Lists.newArrayList();
+        private int tier = 1;
+
+
+        public Builder tier(int tier) {
+            this.tier = Math.max(1, Math.min(5, tier));
+            return this;
         }
 
-        public Builder addAffix(ResourceKey<IAffix> key){
-            affixes.add(key);
+        public Builder addAffix(ResourceKey<IAffix>... key) {
+            if (key != null) {
+                affixes.addAll(List.of(key));
+            }
             return this;
+        }
+
+
+        public Builder addAffixes(Collection<ResourceKey<IAffix>> keys) {
+            if (keys != null) {
+                keys.forEach(this::addAffix);
+            }
+            return this;
+        }
+        public ChampionsAffixAttachable build() {
+            return new ChampionsAffixAttachable(affixes, tier);
         }
     }
 }
