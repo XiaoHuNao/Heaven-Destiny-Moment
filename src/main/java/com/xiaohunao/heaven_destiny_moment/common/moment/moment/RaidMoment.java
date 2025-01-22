@@ -7,7 +7,6 @@ import com.xiaohunao.heaven_destiny_moment.client.gui.bar.render.IBarRenderType;
 import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.context.TipSettings;
-import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMMomentRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
@@ -24,7 +23,7 @@ public class RaidMoment extends Moment<RaidMoment> {
             Area.CODEC.optionalFieldOf("area").forGetter(Moment::area),
             MomentData.CODEC.optionalFieldOf("moment_data_context").forGetter(Moment::momentData),
             TipSettings.CODEC.optionalFieldOf("tips").forGetter(Moment::tipSettings),
-            ClientSettings.CODEC.optionalFieldOf("clientSettingsContext").forGetter(Moment::clientSettings),
+            ClientSettings.CODEC.optionalFieldOf("clientSettings").forGetter(Moment::clientSettings),
             Codec.INT.optionalFieldOf("readyTime",100).forGetter(RaidMoment::readyTime)
     ).apply(instance, RaidMoment::new));
 
@@ -36,9 +35,9 @@ public class RaidMoment extends Moment<RaidMoment> {
     }
 
     public RaidMoment(Optional<IBarRenderType> renderType, Optional<Area> area, Optional<MomentData> momentDataContext,
-                      Optional<TipSettings> tipSettingsContext, Optional<ClientSettings> clientSettingsContext,
+                      Optional<TipSettings> tipSettingsContext, Optional<ClientSettings> clientSettings,
                       int readyTime) {
-        super(renderType, area, momentDataContext, tipSettingsContext, clientSettingsContext);
+        super(renderType, area, momentDataContext, tipSettingsContext, clientSettings);
         this.readyTime = readyTime;
     }
 

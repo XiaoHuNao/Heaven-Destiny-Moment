@@ -7,7 +7,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 

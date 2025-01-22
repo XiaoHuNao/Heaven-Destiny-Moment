@@ -120,7 +120,7 @@ public class MomentManager extends SavedData {
         PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new MomentManagerSyncPayload(instance.serializeNBT()));
     }
 
-    public boolean addMoment(MomentInstance<?> instance, ServerLevel serverLevel, @Nullable BlockPos pos, @Nullable ServerPlayer serverPlayer) {
+    public MomentInstance<?> addMoment(MomentInstance<?> instance, ServerLevel serverLevel, @Nullable BlockPos pos, @Nullable ServerPlayer serverPlayer) {
         UUID uuid = instance.getID();
 
         instance.updatePlayers();
@@ -142,9 +142,9 @@ public class MomentManager extends SavedData {
             runMoments.put(uuid, instance);
             runMomentKeyes.add(instance.momentKey);
             setDirty();
-            return true;
+            return instance;
         }
-        return false;
+        return null;
     }
 
     public boolean addPlayerToMoment(Player player, MomentInstance<?> instance) {

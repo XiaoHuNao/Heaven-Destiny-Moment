@@ -3,6 +3,8 @@ package com.xiaohunao.heaven_destiny_moment.compat.kubejs;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.render.IBarRenderType;
+import com.xiaohunao.heaven_destiny_moment.common.callback.MomentCallbackManager;
+import com.xiaohunao.heaven_destiny_moment.common.callback.MomentInstanceCallback;
 import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.context.TipSettings;
@@ -25,7 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.*;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 
 public class KubeJSMoment extends Moment<KubeJSMoment> {
@@ -34,7 +37,7 @@ public class KubeJSMoment extends Moment<KubeJSMoment> {
             Area.CODEC.optionalFieldOf("area").forGetter(Moment::area),
             MomentData.CODEC.optionalFieldOf("moment_data_context").forGetter(Moment::momentData),
             TipSettings.CODEC.optionalFieldOf("tips").forGetter(Moment::tipSettings),
-            ClientSettings.CODEC.optionalFieldOf("clientSettingsContext").forGetter(Moment::clientSettings)
+            ClientSettings.CODEC.optionalFieldOf("clientSettings").forGetter(Moment::clientSettings)
     ).apply(instance, KubeJSMoment::new));
 
     public KubeJSMoment(Optional<IBarRenderType> renderType, Optional<Area> area, Optional<MomentData> momentData, 
@@ -52,14 +55,8 @@ public class KubeJSMoment extends Moment<KubeJSMoment> {
         return MomentRegister.KUBEJS_MOMENT.get();
     }
 
-    @FunctionalInterface
-    public interface MomentCallback<T, R> {
-        R execute(KubeJSMomentInstance instance, T param);
-    }
-
-
     public static class KubeJSMomentInstance extends MomentInstance<KubeJSMoment> {
-        private final Map<String, MomentCallback<?, ?>> callbacks = new HashMap<>();
+        private final Map<String, MomentInstanceCallback<?, ?>> callbacks = new HashMap<>();
 
         protected KubeJSMomentInstance(Level level, ResourceKey<Moment<?>> momentKey) {
             super(MomentRegister.KUBEJS.get(), level, momentKey);
@@ -67,15 +64,16 @@ public class KubeJSMoment extends Moment<KubeJSMoment> {
 
         public KubeJSMomentInstance(UUID uuid, Level level, ResourceKey<Moment<?>> momentKey) {
             super(MomentRegister.KUBEJS.get(), uuid, level, momentKey);
+            MomentCallbackManager.getMomentInstanceCallback(uuid).forEach(this::registerCallback);
         }
 
 
-        public <T, R> void registerCallback(String key, MomentCallback<T, R> callback) {
+        public <T, R> void registerCallback(String key, MomentInstanceCallback<T, R> callback) {
             callbacks.put(key, callback);
         }
 
         private <T, R> R executeCallback(String key, T param, Supplier<R> defaultAction) {
-            MomentCallback<T, R> callback = (MomentCallback<T, R>) callbacks.get(key);
+            MomentInstanceCallback<T, R> callback = (MomentInstanceCallback<T, R>) callbacks.get(key);
             return callback != null ? callback.execute(this, param) : defaultAction.get();
         }
 

@@ -1,40 +1,21 @@
 package com.xiaohunao.heaven_destiny_moment.common.context.attachable;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.xiaohunao.heaven_destiny_moment.common.context.AttributeElement;
 import com.xiaohunao.heaven_destiny_moment.common.context.Weighted;
-import com.xiaohunao.heaven_destiny_moment.common.context.entity_info.EntityInfo;
 import com.xiaohunao.heaven_destiny_moment.common.context.equippable_slot.IEquippableSlot;
-import com.xiaohunao.heaven_destiny_moment.common.context.equippable_slot.VanillaEquippableSlot;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.*;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.tags.EnchantmentTags;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.EnchantmentInstance;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public record EquipmentAttachable(Weighted<Pair<IEquippableSlot, ItemStack>> equipments, Optional<Map<EquipmentSlot,Float>> canDropEquippable) implements IAttachable {
     public final static MapCodec<EquipmentAttachable> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -45,7 +26,7 @@ public record EquipmentAttachable(Weighted<Pair<IEquippableSlot, ItemStack>> equ
 
     @Override
     public void attachToEntity(LivingEntity livingEntity) {
-        equipments.getRandomSubset().forEach((pair -> pair.getFirst().wear(livingEntity, pair.getSecond())));
+        equipments.getRandomWeighted().forEach((pair -> pair.getFirst().wear(livingEntity, pair.getSecond())));
 
 
         canDropEquippable.ifPresent(canDropEquippable -> {
@@ -68,6 +49,11 @@ public record EquipmentAttachable(Weighted<Pair<IEquippableSlot, ItemStack>> equ
 
         public EquipmentAttachable build(){
             return new EquipmentAttachable(equipments.build(),Optional.ofNullable(canDropEquippable));
+        }
+
+        public Builder randomType(Weighted.RandomType randomType){
+            equipments.randomType(randomType);
+            return this;
         }
 
         public Builder addEquipment(IEquippableSlot slot, Item item) {

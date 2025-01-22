@@ -9,12 +9,10 @@ import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class HoglinInfo extends EntityInfo{

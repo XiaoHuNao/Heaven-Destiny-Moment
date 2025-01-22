@@ -1,10 +1,13 @@
 package com.xiaohunao.heaven_destiny_moment.compat.kubejs.builder;
 
+import com.xiaohunao.heaven_destiny_moment.common.callback.MomentCallbackManager;
+import com.xiaohunao.heaven_destiny_moment.common.callback.MomentInstanceCallback;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentType;
 import com.xiaohunao.heaven_destiny_moment.compat.kubejs.KubeJSMoment;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,7 +16,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.nbt.CompoundTag;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -25,7 +27,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class MomentTypeKubeJSBuilder extends BuilderBase<MomentType<?>> {
-    private final Map<String, KubeJSMoment.MomentCallback<?, ?>> callbacks = new HashMap<>();
+    private final Map<String, MomentInstanceCallback<?, ?>> callbacks = new HashMap<>();
 
     public MomentTypeKubeJSBuilder(ResourceLocation id) {
         super(id);
@@ -34,9 +36,10 @@ public class MomentTypeKubeJSBuilder extends BuilderBase<MomentType<?>> {
     @Override
     public MomentType<?> createObject() {
         return new MomentType.Builder<>((uuid, level, key) -> {
-            KubeJSMoment.KubeJSMomentInstance instance = new KubeJSMoment.KubeJSMomentInstance(uuid, level, key);
-            callbacks.forEach(instance::registerCallback);
-            return instance;
+            callbacks.forEach((methodName, callback) -> {
+                MomentCallbackManager.registerMomentInstanceCallback(uuid, methodName, callback);
+            });
+            return new KubeJSMoment.KubeJSMomentInstance(uuid, level, key);
         }).build();
     }
 

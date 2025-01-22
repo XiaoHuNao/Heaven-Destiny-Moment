@@ -5,7 +5,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 
 public record VanillaEquippableSlot(EquipmentSlot slot) implements IEquippableSlot{

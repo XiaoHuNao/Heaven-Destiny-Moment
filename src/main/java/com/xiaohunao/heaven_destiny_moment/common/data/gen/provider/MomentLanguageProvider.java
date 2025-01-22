@@ -6,16 +6,11 @@ import com.xiaohunao.heaven_destiny_moment.common.context.TipSettings;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMRegistries;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentState;
-import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.levelgen.structure.Structure;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import org.jetbrains.annotations.NotNull;
 

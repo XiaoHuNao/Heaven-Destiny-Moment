@@ -1,14 +1,9 @@
 package com.xiaohunao.heaven_destiny_moment.common.context.attachable;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.common.context.AttributeElement;
 import com.xiaohunao.heaven_destiny_moment.common.context.Weighted;
-import com.xiaohunao.heaven_destiny_moment.common.context.equippable_slot.IEquippableSlot;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
@@ -17,10 +12,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.item.ItemStack;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public record CommonAttachable(Optional<Weighted<MobEffectInstance>> effects, Optional<Weighted<AttributeElement>> attributes) implements IAttachable{
@@ -32,11 +24,11 @@ public record CommonAttachable(Optional<Weighted<MobEffectInstance>> effects, Op
     @Override
     public void attachToEntity(LivingEntity livingEntity) {
         effects.ifPresent(mobEffectInstances -> {
-            mobEffectInstances.getRandomSubset().forEach(livingEntity::addEffect);
+            mobEffectInstances.getRandomWeighted().forEach(livingEntity::addEffect);
         });
 
         attributes.ifPresent(attributeContexts -> {
-            attributeContexts.getRandomSubset().forEach(attributeElement -> {
+            attributeContexts.getRandomWeighted().forEach(attributeElement -> {
                 attributeElement.addAttribute(livingEntity);
             });
         });
@@ -48,11 +40,21 @@ public record CommonAttachable(Optional<Weighted<MobEffectInstance>> effects, Op
     }
 
     public static class Builder {
-        private Weighted.Builder<MobEffectInstance> effects = new Weighted.Builder<>();
-        private Weighted.Builder<AttributeElement> attributes = new Weighted.Builder<>();
+        private final Weighted.Builder<MobEffectInstance> effects = new Weighted.Builder<>();
+        private final Weighted.Builder<AttributeElement> attributes = new Weighted.Builder<>();
 
         public CommonAttachable build(){
            return new CommonAttachable(Optional.ofNullable(effects.build()),Optional.ofNullable(attributes.build()));
+        }
+
+        public Builder effectsRandomType(Weighted.RandomType randomType){
+            effects.randomType(randomType);
+            return this;
+        }
+
+        public Builder attributesRandomType(Weighted.RandomType randomType){
+            attributes.randomType(randomType);
+            return this;
         }
 
         public Builder addEffect(Holder<MobEffect> effect, int duration, int amplifier){

@@ -7,15 +7,15 @@ import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-public record ItemReward(Weighted<ItemStack> reward) implements IReward {
+public record ItemReward(Weighted<ItemStack> items) implements IReward {
     public static final MapCodec<ItemReward> CODEC = MapCodec.assumeMapUnsafe(Weighted.codec(ItemStack.CODEC)
             .fieldOf("items")
-            .xmap(ItemReward::new, ItemReward::reward)
+            .xmap(ItemReward::new, ItemReward::items)
             .codec());
 
     @Override
     public void createReward(MomentInstance<?> moment, Player player) {
-        reward.getRandomValue().ifPresent(item -> {
+        items.getRandomWeighted().forEach(item -> {
             player.getInventory().add(item);
         });
     }
@@ -27,6 +27,20 @@ public record ItemReward(Weighted<ItemStack> reward) implements IReward {
 
     public static class Builder {
         private final Weighted.Builder<ItemStack> builder = new Weighted.Builder<>();
+
+        public Builder randomType(Weighted.RandomType randomType){
+            builder.randomType(randomType);
+            return this;
+        }
+
+        public ItemReward build() {
+            return new ItemReward(builder.build());
+        }
+
+        public Builder add(ItemStack itemStack, int weight) {
+            builder.add(itemStack, weight);
+            return this;
+        }
 
 
     }

@@ -31,8 +31,8 @@ public abstract class LevelRendererMixin {
         Float moonSize = momentManager.getClientOnlyMoment()
                 .flatMap(MomentInstance::moment)
                 .flatMap(Moment::clientSettings)
-                .flatMap(ClientSettings::clientMoonSettingsContext)
-                .flatMap(ClientMoonSettings::MoonSize)
+                .flatMap(ClientSettings::clientMoonSettings)
+                .flatMap(ClientMoonSettings::moonSize)
                 .orElse(null);
 
         if (moonSize != null) {
@@ -47,8 +47,8 @@ public abstract class LevelRendererMixin {
         ResourceLocation moonTexture = momentManager.getClientOnlyMoment()
                 .flatMap(MomentInstance::moment)
                 .flatMap(Moment::clientSettings)
-                .flatMap(ClientSettings::clientMoonSettingsContext)
-                .flatMap(ClientMoonSettings::MoonTexture)
+                .flatMap(ClientSettings::clientMoonSettings)
+                .flatMap(ClientMoonSettings::moonTexture)
                 .orElse(originaResourceLocation);
 
         RenderSystem.setShaderTexture(moonTextureId, moonTexture);
@@ -60,7 +60,7 @@ public abstract class LevelRendererMixin {
         Integer moonColor = momentManager.getClientOnlyMoment()
                 .flatMap(MomentInstance::moment)
                 .flatMap(Moment::clientSettings)
-                .flatMap(ClientSettings::clientMoonSettingsContext)
+                .flatMap(ClientSettings::clientMoonSettings)
                 .flatMap(ClientMoonSettings::moonColor)
                 .orElse(null);
 

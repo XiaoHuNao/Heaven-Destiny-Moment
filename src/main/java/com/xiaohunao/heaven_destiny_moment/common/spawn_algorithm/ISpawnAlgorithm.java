@@ -7,7 +7,6 @@ import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
-
 import java.util.function.Function;
 
 

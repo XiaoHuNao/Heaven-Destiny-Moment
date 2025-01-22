@@ -11,7 +11,6 @@ import com.xiaohunao.heaven_destiny_moment.common.moment.MomentState;
 import com.xiaohunao.heaven_destiny_moment.common.moment.moment.RaidMoment;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;

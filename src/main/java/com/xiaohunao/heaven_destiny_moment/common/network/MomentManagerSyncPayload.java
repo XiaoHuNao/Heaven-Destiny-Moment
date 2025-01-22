@@ -1,7 +1,6 @@
 package com.xiaohunao.heaven_destiny_moment.common.network;
 
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
-import com.xiaohunao.heaven_destiny_moment.client.gui.hud.MomentBarOverlay;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentManager;
 import io.netty.buffer.ByteBuf;

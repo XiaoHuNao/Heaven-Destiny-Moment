@@ -13,6 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
 import java.util.Optional;
 
 public record OpenAreaSpawnAlgorithm(int maxTry, int range, int verticalSearchRange, Optional<Direction> dir) implements ISpawnAlgorithm {

@@ -7,7 +7,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.MobCategory;
 
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;

@@ -13,7 +13,7 @@ public record XpReward(int xp) implements IReward {
     ).apply(instance, XpReward::new)));
 
     @Override
-    public void createReward(MomentInstance moment, Player player) {
+    public void createReward(MomentInstance<?> moment, Player player) {
         player.giveExperiencePoints(xp);
     }
 

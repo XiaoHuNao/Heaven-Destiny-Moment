@@ -9,8 +9,6 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 
-import java.util.List;
-
 public record AttributeElement(Holder<Attribute> attribute, AttributeModifier attributeModifier) {
         public final static Codec<AttributeElement> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 BuiltInRegistries.ATTRIBUTE.holderByNameCodec().fieldOf("attribute").forGetter(AttributeElement::attribute),

@@ -6,16 +6,16 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.Optional;
 
-public record ClientMoonSettings(Optional<Integer> moonColor, Optional<Float> MoonSize, Optional<ResourceLocation> MoonTexture) {
+public record ClientMoonSettings(Optional<Integer> moonColor, Optional<Float> moonSize, Optional<ResourceLocation> moonTexture) {
     public static final ClientMoonSettings EMPTY = new ClientMoonSettings(Optional.empty(),Optional.empty(),Optional.empty());
     public static final Codec<ClientMoonSettings> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.INT.optionalFieldOf("moon_color").forGetter(ClientMoonSettings::moonColor),
-            Codec.FLOAT.optionalFieldOf("moon_size").forGetter(ClientMoonSettings::MoonSize),
-            ResourceLocation.CODEC.optionalFieldOf("moon_texture").forGetter(ClientMoonSettings::MoonTexture)
+            Codec.FLOAT.optionalFieldOf("moon_size").forGetter(ClientMoonSettings::moonSize),
+            ResourceLocation.CODEC.optionalFieldOf("moon_texture").forGetter(ClientMoonSettings::moonTexture)
     ).apply(instance, ClientMoonSettings::new));
 
     public boolean isEmpty() {
-        return moonColor.isPresent() || MoonSize.isPresent() ||MoonTexture.isPresent();
+        return moonColor.isPresent() || moonSize.isPresent() || moonTexture.isPresent();
     }
 
 

@@ -1,28 +1,49 @@
 package com.xiaohunao.heaven_destiny_moment.common.context;
 
 import com.google.common.collect.Lists;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import net.minecraft.util.RandomSource;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.random.WeightedEntry;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-public record Weighted<T>(int totalWeight, List<WeightedEntry.Wrapper<T>> list) {
+public record Weighted<T>(RandomType type,int totalWeight, List<WeightedEntry.Wrapper<T>> list) {
     private static final Random random = new Random();
 
-    private static int calculateTotalWeight(List<? extends WeightedEntry> entries) {
-        long total = 0;
-        for (WeightedEntry entry : entries) {
-            total += entry.getWeight().asInt();
+    public enum RandomType implements StringRepresentable{
+        SINGLE,
+        SUBSET,
+        ALL;
+        public static final Codec<RandomType> CODEC = StringRepresentable.fromEnum(RandomType::values);
+
+        @Override @NotNull
+        public String getSerializedName() {
+            return name().toLowerCase(Locale.ROOT);
         }
-        if (total > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException("Sum of weights must be <= 2147483647");
-        }
-        return (int) total;
     }
 
-    public List<T> getRandomSubset() {
+    public List<T> getRandomWeighted() {
+        if (this.totalWeight == 0) {
+            return Lists.newArrayList();
+        }
+
+        return switch (type) {
+            case SINGLE -> getRandomValue().map(Lists::newArrayList).orElse(Lists.newArrayList());
+            case SUBSET -> getRandomSubset();
+            case ALL -> getAll();
+        };
+    }
+
+    private List<T> getAll() {
+        return this.list.stream()
+                .map(WeightedEntry.Wrapper::data)
+                .collect(Collectors.toList());
+    }
+
+    private List<T> getRandomSubset() {
         ArrayList<T> subSet = Lists.newArrayList();
         if (this.totalWeight == 0) {
             return subSet;
@@ -36,7 +57,18 @@ public record Weighted<T>(int totalWeight, List<WeightedEntry.Wrapper<T>> list) 
         return subSet;
     }
 
-    public Optional<WeightedEntry.Wrapper<T>> getRandom() {
+    private static int calculateTotalWeight(List<? extends WeightedEntry> entries) {
+        long total = 0;
+        for (WeightedEntry entry : entries) {
+            total += entry.getWeight().asInt();
+        }
+        if (total > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Sum of weights must be <= 2147483647");
+        }
+        return (int) total;
+    }
+
+    private Optional<WeightedEntry.Wrapper<T>> getRandom() {
         if (this.totalWeight == 0) {
             return Optional.empty();
         } else {
@@ -45,7 +77,7 @@ public record Weighted<T>(int totalWeight, List<WeightedEntry.Wrapper<T>> list) 
         }
     }
 
-    public Optional<T> getRandomValue() {
+    private Optional<T> getRandomValue() {
         return getRandom().map(WeightedEntry.Wrapper::data);
     }
 
@@ -58,26 +90,37 @@ public record Weighted<T>(int totalWeight, List<WeightedEntry.Wrapper<T>> list) 
         }
         return Optional.empty();
     }
-    public List<WeightedEntry.Wrapper<T>> unwrap() {
-        return this.list;
-    }
 
     public static <T> Codec<Weighted<T>> codec(Codec<T> codec) {
-        return WeightedEntry.Wrapper.codec(codec).listOf()
-                .xmap(wrappers -> new Weighted<>(calculateTotalWeight(wrappers), wrappers), Weighted::unwrap);
+        return Codec.pair(
+                RandomType.CODEC.fieldOf("type").codec(),
+                WeightedEntry.Wrapper.codec(codec).listOf().fieldOf("entries").codec()
+        ).xmap(
+                pair -> new Weighted<>(
+                        pair.getFirst(),
+                        calculateTotalWeight(pair.getSecond()),
+                        pair.getSecond()
+                ),
+                weighted -> Pair.of(weighted.type(), weighted.list())
+        );
     }
 
     public static class Builder<T> {
         private final List<WeightedEntry.Wrapper<T>> list = Lists.newArrayList();
-        
+        private RandomType type = RandomType.ALL;
+
+        public Builder<T> randomType(RandomType type) {
+            this.type = type;
+            return this;
+        }
+
         public Builder<T> add(T t, int weight) {
             list.add(WeightedEntry.wrap(t, weight));
             return this;
         }
 
         public Weighted<T> build(){
-            return new Weighted<>(calculateTotalWeight(list), list);
+            return new Weighted<>(type,calculateTotalWeight(list), list);
         }
     }
-
 }

@@ -8,7 +8,6 @@ import com.xiaohunao.heaven_destiny_moment.common.moment.moment.DefaultMoment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.moment.RaidMoment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.moment.instance.DefaultInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.moment.instance.RaidInstance;
-import com.xiaohunao.heaven_destiny_moment.compat.kubejs.KubeJSMoment;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;

@@ -37,7 +37,7 @@ public record EntitySpawnSettings(Optional<List<Weighted<List<IEntityInfo>>>> en
         entitySpawnList.ifPresent(entitySpawnList -> {
             Weighted<List<IEntityInfo>> listWeighted = entitySpawnList.get(wave);
 
-            listWeighted.getRandomValue().ifPresent(infoList-> {
+            listWeighted.getRandomWeighted().forEach(infoList-> {
                 Weighted.Builder<IEntityInfo> builder = new Weighted.Builder<>();
                 infoList.forEach(entityInfo -> {
                     if (entityInfo instanceof EntityInfo){
@@ -129,13 +129,19 @@ public record EntitySpawnSettings(Optional<List<Weighted<List<IEntityInfo>>>> en
             return this;
         }
 
-        public Builder entitySpawnList(Function<Weighted.Builder<List<IEntityInfo>>,Weighted.Builder<List<IEntityInfo>>> weightedEntityInfo) {
+        public Builder entitySpawnList(Weighted.RandomType randomType, Function<Weighted.Builder<List<IEntityInfo>>, Weighted.Builder<List<IEntityInfo>>> weightedEntityInfo) {
             if (entitySpawnList == null){
                 entitySpawnList = Lists.newArrayList();
             }
+            Weighted.Builder<List<IEntityInfo>> builder = new Weighted.Builder<>();
+            builder.randomType(randomType);
 
-            Collections.addAll(entitySpawnList, weightedEntityInfo.apply(new Weighted.Builder<>()).build());
+            Collections.addAll(entitySpawnList, weightedEntityInfo.apply(builder).build());
             return this;
+        }
+
+        public Builder entitySpawnList(Function<Weighted.Builder<List<IEntityInfo>>, Weighted.Builder<List<IEntityInfo>>> weightedEntityInfo) {
+            return entitySpawnList(Weighted.RandomType.ALL, weightedEntityInfo);
         }
 
 

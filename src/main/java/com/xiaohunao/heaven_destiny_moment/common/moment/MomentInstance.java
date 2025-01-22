@@ -70,7 +70,7 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
         this.momentKey = momentKey;
     }
 
-    public static boolean create(ResourceKey<Moment<?>> momentKey, ServerLevel serverLevel, @Nullable BlockPos pos, @Nullable ServerPlayer serverPlayer, @Nullable Consumer<MomentInstance<?>> modifier) {
+    public static MomentInstance<?> create(ResourceKey<Moment<?>> momentKey, ServerLevel serverLevel, @Nullable BlockPos pos, @Nullable ServerPlayer serverPlayer, @Nullable Consumer<MomentInstance<?>> modifier) {
         return Optional.ofNullable(serverLevel.registryAccess().registryOrThrow(HDMRegistries.Keys.MOMENT))
                 .map(registry -> registry.get(momentKey))
                 .map(moment -> moment.newMomentInstance(serverLevel, momentKey))
@@ -78,10 +78,10 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
                     Optional.ofNullable(modifier).ifPresent(m -> m.accept(instance));
                     return MomentManager.of(serverLevel).addMoment(instance, serverLevel, pos, serverPlayer);
                 })
-                .orElse(false);
+                .orElse(null);
     }
 
-    public static boolean create(ResourceKey<Moment<?>> momentKey, ServerLevel serverLevel, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
+    public static MomentInstance<?> create(ResourceKey<Moment<?>> momentKey, ServerLevel serverLevel, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
         return create(momentKey,serverLevel,pos,serverPlayer,null);
     }
 
@@ -128,7 +128,7 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
         moment().flatMap(Moment::barRenderType).ifPresent(type ->
                 this.bar = new MomentBar(uuid,type));
 
-        if (!level.isClientSide){
+        if (!level.isClientSide && this.bar != null){
             PacketDistributor.sendToPlayersInDimension((ServerLevel) level,MomentBarSyncPayload.addPlayer(this.bar));
         }
 

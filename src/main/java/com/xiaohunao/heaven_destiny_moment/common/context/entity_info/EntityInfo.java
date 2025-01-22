@@ -1,7 +1,6 @@
 package com.xiaohunao.heaven_destiny_moment.common.context.entity_info;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -10,14 +9,13 @@ import com.xiaohunao.heaven_destiny_moment.common.context.amount.IntegerAmount;
 import com.xiaohunao.heaven_destiny_moment.common.context.amount.RandomAmount;
 import com.xiaohunao.heaven_destiny_moment.common.context.attachable.IAttachable;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class EntityInfo implements IEntityInfo {

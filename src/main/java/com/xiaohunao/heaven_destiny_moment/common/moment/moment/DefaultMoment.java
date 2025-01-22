@@ -6,7 +6,6 @@ import com.xiaohunao.heaven_destiny_moment.client.gui.bar.render.IBarRenderType;
 import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.context.TipSettings;
-import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMMomentRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.Moment;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
@@ -23,7 +22,7 @@ public class DefaultMoment extends Moment<Moment<?>> {
             Area.CODEC.optionalFieldOf("area").forGetter(Moment::area),
             MomentData.CODEC.optionalFieldOf("moment_data_context").forGetter(Moment::momentData),
             TipSettings.CODEC.optionalFieldOf("tips").forGetter(Moment::tipSettings),
-            ClientSettings.CODEC.optionalFieldOf("clientSettingsContext").forGetter(Moment::clientSettings)
+            ClientSettings.CODEC.optionalFieldOf("clientSettings").forGetter(Moment::clientSettings)
     ).apply(instance, DefaultMoment::new));
 
 
@@ -31,8 +30,8 @@ public class DefaultMoment extends Moment<Moment<?>> {
         super();
     }
 
-    public DefaultMoment(Optional<IBarRenderType> renderType, Optional<Area> area, Optional<MomentData> momentDataContext, Optional<TipSettings> tipSettingsContext, Optional<ClientSettings> clientSettingsContext) {
-        super(renderType, area, momentDataContext, tipSettingsContext, clientSettingsContext);
+    public DefaultMoment(Optional<IBarRenderType> renderType, Optional<Area> area, Optional<MomentData> momentDataContext, Optional<TipSettings> tipSettingsContext, Optional<ClientSettings> clientSettings) {
+        super(renderType, area, momentDataContext, tipSettingsContext, clientSettings);
     }
 
     @Override
