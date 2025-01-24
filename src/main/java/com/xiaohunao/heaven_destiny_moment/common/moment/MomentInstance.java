@@ -5,6 +5,8 @@ import com.google.common.collect.Sets;
 import com.mojang.logging.LogUtils;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
+import com.xiaohunao.heaven_destiny_moment.common.callback.MomentCallbackManager;
+import com.xiaohunao.heaven_destiny_moment.common.callback.RewardCallBack;
 import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.ICondition;
@@ -82,7 +84,7 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
     }
 
     public static MomentInstance<?> create(ResourceKey<Moment<?>> momentKey, ServerLevel serverLevel, BlockPos pos, @Nullable ServerPlayer serverPlayer) {
-        return create(momentKey,serverLevel,pos,serverPlayer,null);
+        return create(momentKey, serverLevel, pos, serverPlayer, null);
     }
 
     public static Registry<Moment<?>> registryChecked(ResourceKey<Moment<?>> momentKey, Level level) {
@@ -96,6 +98,7 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
 
     /**
      * 检查是否为指定类型的时刻
+     *
      * @param key 时刻注册键
      * @return 是否匹配
      */
@@ -105,6 +108,7 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
 
     /**
      * 获取时刻实例
+     *
      * @return 时刻实例的Optional包装
      */
     public Optional<T> moment() {
@@ -116,7 +120,7 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
     /**
      * 初始化时刻实例
      */
-    public void init(){
+    public void init() {
         initMomentBar();
         initSpawnPosList();
     }
@@ -124,12 +128,12 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
     /**
      * 初始化时刻进度条
      */
-    public void initMomentBar(){
+    public void initMomentBar() {
         moment().flatMap(Moment::barRenderType).ifPresent(type ->
-                this.bar = new MomentBar(uuid,type));
+                this.bar = new MomentBar(uuid, type));
 
-        if (!level.isClientSide && this.bar != null){
-            PacketDistributor.sendToPlayersInDimension((ServerLevel) level,MomentBarSyncPayload.addPlayer(this.bar));
+        if (!level.isClientSide && this.bar != null) {
+            PacketDistributor.sendToPlayersInDimension((ServerLevel) level, MomentBarSyncPayload.addPlayer(this.bar));
         }
 
     }
@@ -137,12 +141,13 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
     /**
      * 初始化生成点列表
      */
-    public void initSpawnPosList(){
+    public void initSpawnPosList() {
 
     }
 
     /**
      * 获取随机生成点
+     *
      * @return 随机生成点坐标
      */
     public Vec3 getRandomSpawnPos() {
@@ -157,20 +162,22 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
 
     /**
      * 更新进度条进度
+     *
      * @param progress 进度值(0-1)
      */
-    public void updateBarProgress(float progress){
-        if (this.bar != null){
+    public void updateBarProgress(float progress) {
+        if (this.bar != null) {
             this.bar.updateProgress(progress);
-            if (!level.isClientSide){
-                PacketDistributor.sendToPlayersInDimension((ServerLevel) level,MomentBarSyncPayload.updateProgress(this.bar));
+            if (!level.isClientSide) {
+                PacketDistributor.sendToPlayersInDimension((ServerLevel) level, MomentBarSyncPayload.updateProgress(this.bar));
             }
         }
     }
 
     /**
      * 从NBT标签加载时刻实例
-     * @param level 世界实例
+     *
+     * @param level       世界实例
      * @param compoundTag NBT数据
      * @return 加载的时刻实例
      */
@@ -221,22 +228,22 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
         compoundTag.put("player_uuids", playerUUIDTags);
 
         ListTag spawnPosListTag = new ListTag();
-        spawnPosList.forEach(vec3 -> spawnPosListTag.add(Vec3.CODEC.encodeStart(NbtOps.INSTANCE,vec3).getOrThrow()));
-        compoundTag.put("spawnPosList",spawnPosListTag);
+        spawnPosList.forEach(vec3 -> spawnPosListTag.add(Vec3.CODEC.encodeStart(NbtOps.INSTANCE, vec3).getOrThrow()));
+        compoundTag.put("spawnPosList", spawnPosListTag);
 
 
         return compoundTag;
     }
 
     private void serializeBar(CompoundTag compoundTag) {
-        if (this.bar != null){
-            compoundTag.put("bar",MomentBar.CODEC.encodeStart(NbtOps.INSTANCE,this.bar).getOrThrow());
+        if (this.bar != null) {
+            compoundTag.put("bar", MomentBar.CODEC.encodeStart(NbtOps.INSTANCE, this.bar).getOrThrow());
         }
     }
 
     private void deserializeBar(CompoundTag compoundTag) {
-        if (compoundTag.contains("bar")){
-            this.bar = MomentBar.CODEC.decode(NbtOps.INSTANCE,compoundTag.get("bar")).getOrThrow().getFirst();
+        if (compoundTag.contains("bar")) {
+            this.bar = MomentBar.CODEC.decode(NbtOps.INSTANCE, compoundTag.get("bar")).getOrThrow().getFirst();
         }
     }
 
@@ -253,7 +260,7 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
         playerUUIDTags.forEach(tag -> playerUUIDs.add(UUID.fromString(tag.getAsString())));
 
         ListTag spawnPosListTag = compoundTag.getList("spawnPosList", Tag.TAG_LIST);
-        spawnPosListTag.forEach(tag -> spawnPosList.add(Vec3.CODEC.decode(NbtOps.INSTANCE,tag).getOrThrow().getFirst()));
+        spawnPosListTag.forEach(tag -> spawnPosList.add(Vec3.CODEC.decode(NbtOps.INSTANCE, tag).getOrThrow().getFirst()));
     }
 
     private void serializeMetaData(CompoundTag compoundTag) {
@@ -306,9 +313,9 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
 
         List<ICondition> conditions = conditionsOptional.get();
         players.forEach(player -> {
-            if (player instanceof ServerPlayer serverPlayer){
+            if (player instanceof ServerPlayer serverPlayer) {
                 BlockPos blockPos = player.blockPosition();
-                boolean allConditionsMatch = conditions.stream().allMatch(condition -> condition.matches(this, blockPos,serverPlayer));
+                boolean allConditionsMatch = conditions.stream().allMatch(condition -> condition.matches(this, blockPos, serverPlayer));
                 if (allConditionsMatch) {
                     setState(state);
                 }
@@ -318,19 +325,19 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
 
     private void updateMomentState() {
         if (tick == 0L) {
-            MomentEvent.Ready ready = (MomentEvent.Ready)setState(MomentState.READY);
-            if (ready.isCanceled()){
+            MomentEvent.Ready ready = (MomentEvent.Ready) setState(MomentState.READY);
+            if (ready.isCanceled()) {
                 setState(MomentState.END);
             }
         }
 
-        if (state == MomentState.READY){
+        if (state == MomentState.READY) {
             ready();
         }
 
-        if (state == MomentState.START){
-            MomentEvent.Start start = (MomentEvent.Start)setState(MomentState.START);
-            if (!start.isCanceled()){
+        if (state == MomentState.START) {
+            MomentEvent.Start start = (MomentEvent.Start) setState(MomentState.START);
+            if (!start.isCanceled()) {
                 start();
                 setState(MomentState.ONGOING);
             }
@@ -340,16 +347,16 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
             ongoing();
         }
 
-        if (state == MomentState.VICTORY){
-            MomentEvent.Victory momentEvent = (MomentEvent.Victory)setState(MomentState.VICTORY);
-            if (!momentEvent.isCanceled()){
+        if (state == MomentState.VICTORY) {
+            MomentEvent.Victory momentEvent = (MomentEvent.Victory) setState(MomentState.VICTORY);
+            if (!momentEvent.isCanceled()) {
                 victory();
             }
             setState(MomentState.END);
         }
 
-        if (state == MomentState.LOSE){
-            MomentEvent.Lose momentEvent = (MomentEvent.Lose)setState(MomentState.LOSE);
+        if (state == MomentState.LOSE) {
+            MomentEvent.Lose momentEvent = (MomentEvent.Lose) setState(MomentState.LOSE);
             if (!momentEvent.isCanceled()) {
                 lose();
             }
@@ -374,13 +381,16 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
     protected void victory() {
         moment().flatMap(Moment::momentData)
                 .flatMap(MomentData::rewards)
-                .ifPresent(rewards ->
-                    players.forEach(player ->
-                            rewards.forEach(reward ->
-                                    reward.createReward(this, player)
-                            )
-                    )
-                );
+                .ifPresent(rewards -> players.forEach(player -> rewards.forEach(reward -> {
+                    if (!reward.identifier().isEmpty()) {
+                        RewardCallBack callback = MomentCallbackManager.getRewardCallback(uuid, reward.identifier());
+                        if (callback != null) {
+                            callback.createReward(reward, this, player);
+                            return;
+                        }
+                    }
+                    reward.createReward(this, player);
+                })));
     }
 
     protected void lose() {
@@ -391,13 +401,12 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
 
     }
 
-    public void end(){}
-
+    public void end() {}
 
 
     public MomentEvent setState(MomentState state) {
         this.state = state;
-        if (level instanceof ServerLevel serverLevel){
+        if (level instanceof ServerLevel serverLevel) {
             PacketDistributor.sendToPlayersInDimension(serverLevel, new MomentManagerSyncPayload(this.serializeNBT()));
         }
         moment().flatMap(Moment::tipSettings).ifPresent(tip -> tip.playTooltip(this));
@@ -412,7 +421,7 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
     public List<Player> getPlayers(Predicate<? super Player> predicate) {
         List<Player> list = Lists.newArrayList();
 
-        for(Player player : level.players()) {
+        for (Player player : level.players()) {
             if (predicate.test(player)) {
                 list.add(player);
             }
@@ -421,7 +430,7 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
     }
 
     public void updatePlayers() {
-        if (bar != null){
+        if (bar != null) {
 
         }
 
@@ -433,11 +442,11 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
         newPlayers.stream()
                 .filter(player -> !oldPlayers.contains(player))
                 .forEach(player1 -> {
-                    if (MomentManager.of(level).addPlayerToMoment(player1,this)) {
+                    if (MomentManager.of(level).addPlayerToMoment(player1, this)) {
 //                        bar.addPlayer(serverPlayer);
                         players.add(player1);
                         playerUUIDs.add(player1.getUUID());
-                        if (this.bar != null){
+                        if (this.bar != null) {
                             this.bar.addPlayer(player1);
                         }
                     }
@@ -446,11 +455,11 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
                 .filter(player -> !newPlayers.contains(player))
                 .forEach(player1 -> {
 
-                    if (MomentManager.of(level).removePlayerToMoment(player1,this)) {
+                    if (MomentManager.of(level).removePlayerToMoment(player1, this)) {
 //                      bar.removePlayer(player1);
                         players.remove(player1);
                         playerUUIDs.add(player1.getUUID());
-                        if (this.bar != null){
+                        if (this.bar != null) {
                             this.bar.removePlayer(player1);
                         }
                     }
@@ -461,15 +470,15 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
         if (level.isClientSide) return;
 
         players.stream().filter(Objects::nonNull).forEach(player ->
-            moment().ifPresent(moment -> {
-                boolean inArea = moment.isInArea((ServerLevel) level, player.blockPosition());
-                boolean uuidContains = inAreaPlayers.contains(player.getUUID());
-                if (inArea && !uuidContains) {
-                    onPlayerEnterArea((ServerPlayer) player);
-                } else if (!inArea && uuidContains) {
-                    onPlayerExitArea((ServerPlayer) player);
-                }
-            }));
+                moment().ifPresent(moment -> {
+                    boolean inArea = moment.isInArea((ServerLevel) level, player.blockPosition());
+                    boolean uuidContains = inAreaPlayers.contains(player.getUUID());
+                    if (inArea && !uuidContains) {
+                        onPlayerEnterArea((ServerPlayer) player);
+                    } else if (!inArea && uuidContains) {
+                        onPlayerExitArea((ServerPlayer) player);
+                    }
+                }));
     }
 
     private void onPlayerExitArea(ServerPlayer player) {
@@ -502,19 +511,19 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
     }
 
     public void addKillCount(LivingEntity livingEntity) {
-        this.setData(HDMAttachments.MOMENT_KILL_ENTITY,getData(HDMAttachments.MOMENT_KILL_ENTITY).addKillCount(livingEntity));
+        this.setData(HDMAttachments.MOMENT_KILL_ENTITY, getData(HDMAttachments.MOMENT_KILL_ENTITY).addKillCount(livingEntity));
     }
 
     public void livingDeath(LivingEntity entity) {
 
     }
 
-    public boolean canCreate(Map<UUID, MomentInstance<?>> runMoments, ServerLevel serverLevel, @Nullable BlockPos pos,@Nullable ServerPlayer player) {
+    public boolean canCreate(Map<UUID, MomentInstance<?>> runMoments, ServerLevel serverLevel, @Nullable BlockPos pos, @Nullable ServerPlayer player) {
         return true;
     }
 
     public Player getRandomPlayer() {
-        if (players.isEmpty()){
+        if (players.isEmpty()) {
             return null;
         }
 
@@ -526,21 +535,21 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
         return moment().map(Moment::isClientOnlyMoment).orElse(false);
     }
 
-    public boolean canSpawnEntity(Level level, Entity entity, BlockPos pos){
+    public boolean canSpawnEntity(Level level, Entity entity, BlockPos pos) {
         return true;
     }
 
-    public void setEntityTagMark(Entity entity){
-        entity.setData(HDMAttachments.MOMENT_ENTITY,entity.getData(HDMAttachments.MOMENT_ENTITY).setUid(this.uuid));
+    public void setEntityTagMark(Entity entity) {
+        entity.setData(HDMAttachments.MOMENT_ENTITY, entity.getData(HDMAttachments.MOMENT_ENTITY).setUid(this.uuid));
     }
 
-    public void setSpawnPos(Entity entity){
+    public void setSpawnPos(Entity entity) {
         ISpawnAlgorithm spawnAlgorithm = moment()
                 .flatMap(Moment::momentData)
                 .flatMap(MomentData::entitySpawnSettings)
                 .flatMap(EntitySpawnSettings::spawnAlgorithm)
                 .orElse(OpenAreaSpawnAlgorithm.DEFAULT);
-        entity.setPos(spawnAlgorithm.spawn(this,entity));
+        entity.setPos(spawnAlgorithm.spawn(this, entity));
     }
 
     public void spawnEntity(Entity entity) {
