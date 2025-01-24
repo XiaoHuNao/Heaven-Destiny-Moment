@@ -7,7 +7,9 @@ import com.xiaohunao.heaven_destiny_moment.common.context.AttributeElement;
 import com.xiaohunao.heaven_destiny_moment.common.context.Weighted;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
@@ -55,6 +57,16 @@ public record AttributeReward(Weighted<AttributeElement> attributes) implements 
 
         public Builder add(AttributeElement element, int weight) {
             builder.add(element,weight);
+            return this;
+        }
+
+        public Builder add(Holder<Attribute> attribute, AttributeModifier attributeModifier){
+            builder.add(new AttributeElement(attribute,attributeModifier),1);
+            return this;
+        }
+
+        public Builder add(Holder<Attribute> attribute, AttributeModifier attributeModifier, int weight){
+            builder.add(new AttributeElement(attribute,attributeModifier),weight);
             return this;
         }
     }

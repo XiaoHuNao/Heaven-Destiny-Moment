@@ -34,12 +34,12 @@ public record EffectReward(Weighted<MobEffectInstance> effectInstances) implemen
             return this;
         }
 
-        public Builder addEffect(MobEffectInstance effectInstance, int weight) {
+        public Builder add(MobEffectInstance effectInstance, int weight) {
             builder.add(effectInstance, weight);
             return this;
         }
 
-        public Builder addEffect(MobEffectInstance effectInstance) {
+        public Builder add(MobEffectInstance effectInstance) {
             builder.add(effectInstance, 1);
             return this;
         }

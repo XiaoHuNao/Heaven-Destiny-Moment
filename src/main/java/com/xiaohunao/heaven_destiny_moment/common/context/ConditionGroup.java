@@ -9,7 +9,12 @@ import com.xiaohunao.heaven_destiny_moment.common.context.condition.ICondition;
 import java.util.List;
 import java.util.Optional;
 
-public record ConditionGroup(Optional<Pair<Boolean, List<ICondition>>> create, Optional<List<ICondition>> victory, Optional<List<ICondition>> lose, Optional<List<ICondition>> end) {
+public record ConditionGroup(
+        Optional<Pair<Boolean, List<ICondition>>> create,
+        Optional<List<ICondition>> victory,
+        Optional<List<ICondition>> lose,
+        Optional<List<ICondition>> end) {
+
     public static final Codec<Pair<Boolean, List<ICondition>>> CREATE_CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.BOOL.lenientOptionalFieldOf("auto", false).forGetter(Pair::getFirst),
             Codec.list(ICondition.CODEC).fieldOf("conditions").orElseGet(List::of).forGetter(Pair::getSecond)

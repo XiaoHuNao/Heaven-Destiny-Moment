@@ -66,11 +66,21 @@ public record PlayerCondition(Type type, Optional<MinMaxBounds.Ints> level, Opti
     }
 
     private boolean matchesLevel(ServerPlayer serverplayer) {
-        return this.level.map(level -> level.matches(serverplayer.experienceLevel)).orElse(true);
+        return this.level.map(level -> {
+            if (level().isEmpty()) {
+                return true;
+            }
+            return level.matches(serverplayer.experienceLevel);
+        }).orElse(true);
     }
 
     private boolean matchesGameType(ServerPlayer serverplayer) {
-        return this.gameType.map(gameMode -> gameMode.contains(serverplayer.gameMode.getGameModeForPlayer())).orElse(true);
+        return this.gameType.map(gameMode -> {
+            if (level().isEmpty()) {
+                return true;
+            }
+            return gameMode.contains(serverplayer.gameMode.getGameModeForPlayer());
+        }).orElse(true);
     }
 
     private boolean matchesStats(ServerPlayer serverplayer) {
@@ -134,7 +144,7 @@ public record PlayerCondition(Type type, Optional<MinMaxBounds.Ints> level, Opti
 //    }
 
     public static class Builder {
-        private Type type;
+        private final Type type;
         private MinMaxBounds.Ints level = MinMaxBounds.Ints.ANY;
         private List<GameType> gameType = Lists.newArrayList();
         private ImmutableList.Builder<PlayerPredicate.StatMatcher<?>> stats;

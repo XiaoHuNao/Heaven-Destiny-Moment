@@ -42,6 +42,11 @@ public record ItemReward(Weighted<ItemStack> items) implements IReward {
             return this;
         }
 
+        public Builder add(ItemStack itemStack) {
+            builder.add(itemStack,1);
+            return this;
+        }
+
 
     }
 

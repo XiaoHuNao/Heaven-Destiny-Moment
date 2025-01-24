@@ -28,7 +28,7 @@ import java.util.function.BooleanSupplier;
 public record LocationCondition(Optional<LocationPredicate.PositionPredicate> position, Optional<List<ResourceKey<Biome>>> biomes,
                                 Optional<List<ResourceKey<Structure>>> structures, Optional<List<ResourceKey<Level>>> dimension,
                                 Optional<Boolean> smokey, Optional<LightPredicate> light, Optional<BlockPredicate> block,
-                                Optional<FluidPredicate> fluid, Optional<Boolean> canSeeSky, Optional<List<Integer>> validMoonPhases) implements ICondition {
+                                Optional<FluidPredicate> fluid, Optional<Boolean> canSeeSky) implements ICondition {
     private static final Logger log = LoggerFactory.getLogger(LocationCondition.class);
     public static final ResourceLocation ID = HeavenDestinyMoment.asResource("location");
     public static final MapCodec<LocationCondition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -40,8 +40,7 @@ public record LocationCondition(Optional<LocationPredicate.PositionPredicate> po
             LightPredicate.CODEC.optionalFieldOf("light").forGetter(LocationCondition::light),
             BlockPredicate.CODEC.optionalFieldOf("block").forGetter(LocationCondition::block),
             FluidPredicate.CODEC.optionalFieldOf("fluid").forGetter(LocationCondition::fluid),
-            Codec.BOOL.optionalFieldOf("canSeeSky").forGetter(LocationCondition::canSeeSky),
-            Codec.INT.listOf().optionalFieldOf("validMoonPhases").forGetter(LocationCondition::validMoonPhases)
+            Codec.BOOL.optionalFieldOf("canSeeSky").forGetter(LocationCondition::canSeeSky)
     ).apply(instance, LocationCondition::new));
 
     @Override
@@ -62,8 +61,7 @@ public record LocationCondition(Optional<LocationPredicate.PositionPredicate> po
                 checkCondition(() -> matchesLight(level, blockPos), "Light level does not match", blockPos) &&
                 checkCondition(() -> matchesBlock(level, blockPos), "Block does not match", blockPos) &&
                 checkCondition(() -> matchesFluid(level, blockPos), "Fluid does not match", blockPos) &&
-                checkCondition(() -> matchesCanSeeSky(level, blockPos), "CanSeeSky condition does not match", blockPos) &&
-                checkCondition(() -> matchesValidMoonPhases(level, blockPos), "ValidMoonPhases condition does not match", blockPos);
+                checkCondition(() -> matchesCanSeeSky(level, blockPos), "CanSeeSky condition does not match", blockPos);
     }
 
     private boolean checkCondition(BooleanSupplier condition, String failureMessage, Object detail) {
@@ -116,10 +114,6 @@ public record LocationCondition(Optional<LocationPredicate.PositionPredicate> po
         return canSeeSky.map(s -> s == level.canSeeSky(pos)).orElse(true);
     }
 
-    private boolean matchesValidMoonPhases(ServerLevel level, BlockPos blockPos) {
-        return validMoonPhases.map(s -> s.contains(level.getMoonPhase())).orElse(true);
-    }
-
     @Override
     public MapCodec<? extends ICondition> codec() {
         return HDMContextRegister.LOCATION_CONDITION.get();
@@ -137,7 +131,7 @@ public record LocationCondition(Optional<LocationPredicate.PositionPredicate> po
         private Optional<BlockPredicate> block;
         private Optional<FluidPredicate> fluid;
         private Optional<Boolean> canSeeSky;
-        private Optional<List<Integer>> validMoonPhases;
+
 
         public Builder() {
             this.x = MinMaxBounds.Doubles.ANY;
@@ -151,7 +145,6 @@ public record LocationCondition(Optional<LocationPredicate.PositionPredicate> po
             this.block = Optional.empty();
             this.fluid = Optional.empty();
             this.canSeeSky = Optional.empty();
-            this.validMoonPhases = Optional.empty();
         }
 
         public static Builder location() {
@@ -160,7 +153,7 @@ public record LocationCondition(Optional<LocationPredicate.PositionPredicate> po
 
         public LocationCondition build() {
             Optional<LocationPredicate.PositionPredicate> optional = LocationPredicate.PositionPredicate.of(this.x, this.y, this.z);
-            return new LocationCondition(optional, this.biomes, this.structures, this.dimension, this.smokey, this.light, this.block, this.fluid, this.canSeeSky,this.validMoonPhases);
+            return new LocationCondition(optional, this.biomes, this.structures, this.dimension, this.smokey, this.light, this.block, this.fluid, this.canSeeSky);
         }
 
         @SafeVarargs
@@ -256,11 +249,6 @@ public record LocationCondition(Optional<LocationPredicate.PositionPredicate> po
 
         public Builder setCanSeeSky(boolean canSeeSky) {
             this.canSeeSky = Optional.of(canSeeSky);
-            return this;
-        }
-
-        public Builder setValidMoonPhases(Integer... validMoonPhases) {
-            this.validMoonPhases = Optional.of(List.of(validMoonPhases));
             return this;
         }
     }
