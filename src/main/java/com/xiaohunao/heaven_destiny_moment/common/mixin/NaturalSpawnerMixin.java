@@ -2,6 +2,7 @@ package com.xiaohunao.heaven_destiny_moment.common.mixin;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.xiaohunao.heaven_destiny_moment.common.context.BiomeEntitySpawnSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.MobSpawnRule;
@@ -16,13 +17,10 @@ import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.SpawnGroupData;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.NaturalSpawner;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.biome.*;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -31,7 +29,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -177,8 +174,8 @@ public class NaturalSpawnerMixin {
 //    }
 
     @Inject(method = "spawnCategoryForPosition(Lnet/minecraft/world/entity/MobCategory;Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ChunkAccess;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/NaturalSpawner$SpawnPredicate;Lnet/minecraft/world/level/NaturalSpawner$AfterSpawnCallback;)V",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"),locals = LocalCapture.CAPTURE_FAILSOFT, cancellable = true)
-    private static void spawnCategoryForPosition(MobCategory category, ServerLevel serverLevel, ChunkAccess chunk, BlockPos pos, NaturalSpawner.SpawnPredicate filter, NaturalSpawner.AfterSpawnCallback callback, CallbackInfo ci, StructureManager structuremanager, ChunkGenerator chunkgenerator, int i, BlockState blockstate, BlockPos.MutableBlockPos blockpos$mutableblockpos, int j, int k, int l, int i1, int j1, MobSpawnSettings.SpawnerData mobspawnsettings$spawnerdata, SpawnGroupData spawngroupdata, int k1, int l1, int i2, double d0, double d1, Player player, double d2, Mob mob) {
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"), cancellable = true)
+    private static void spawnCategoryForPosition(MobCategory category, ServerLevel serverLevel, ChunkAccess chunk, BlockPos pos, NaturalSpawner.SpawnPredicate filter, NaturalSpawner.AfterSpawnCallback callback, CallbackInfo ci, @Local Mob mob) {
         MomentManager momentManager = MomentManager.of(serverLevel.getLevel());
         for (MomentInstance<?> instance : momentManager.getImmutableRunMoments().values()) {
             if (instance.canSpawnEntity(serverLevel,mob,pos)) {
