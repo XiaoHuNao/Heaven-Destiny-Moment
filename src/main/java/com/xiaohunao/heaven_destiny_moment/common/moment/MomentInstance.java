@@ -5,8 +5,6 @@ import com.google.common.collect.Sets;
 import com.mojang.logging.LogUtils;
 import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.MomentBar;
-import com.xiaohunao.heaven_destiny_moment.common.callback.MomentCallbackManager;
-import com.xiaohunao.heaven_destiny_moment.common.callback.RewardCallBack;
 import com.xiaohunao.heaven_destiny_moment.common.context.EntitySpawnSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.context.condition.ICondition;
@@ -381,16 +379,13 @@ public abstract class MomentInstance<T extends Moment<?>> extends AttachmentHold
     protected void victory() {
         moment().flatMap(Moment::momentData)
                 .flatMap(MomentData::rewards)
-                .ifPresent(rewards -> players.forEach(player -> rewards.forEach(reward -> {
-                    if (!reward.identifier().isEmpty()) {
-                        RewardCallBack callback = MomentCallbackManager.getRewardCallback(uuid, reward.identifier());
-                        if (callback != null) {
-                            callback.createReward(reward, this, player);
-                            return;
-                        }
-                    }
-                    reward.createReward(this, player);
-                })));
+                .ifPresent(rewards ->
+                    players.forEach(player ->
+                            rewards.forEach(reward ->
+                                    reward.createReward(this, player)
+                            )
+                    )
+                );
     }
 
     protected void lose() {

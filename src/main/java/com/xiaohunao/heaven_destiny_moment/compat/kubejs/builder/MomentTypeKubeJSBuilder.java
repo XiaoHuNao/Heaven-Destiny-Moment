@@ -1,7 +1,8 @@
 package com.xiaohunao.heaven_destiny_moment.compat.kubejs.builder;
 
-import com.xiaohunao.heaven_destiny_moment.common.callback.MomentCallbackManager;
-import com.xiaohunao.heaven_destiny_moment.common.callback.MomentInstanceCallback;
+
+
+import com.xiaohunao.heaven_destiny_moment.common.callback.CallbackSerializable;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentType;
 import com.xiaohunao.heaven_destiny_moment.compat.kubejs.KubeJSMoment;
@@ -27,7 +28,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class MomentTypeKubeJSBuilder extends BuilderBase<MomentType<?>> {
-    private final Map<String, MomentInstanceCallback<?, ?>> callbacks = new HashMap<>();
+    private final Map<String, KubeJSMoment.MomentInstanceCallback<?, ?>> callbacks = new HashMap<>();
 
     public MomentTypeKubeJSBuilder(ResourceLocation id) {
         super(id);
@@ -36,10 +37,9 @@ public class MomentTypeKubeJSBuilder extends BuilderBase<MomentType<?>> {
     @Override
     public MomentType<?> createObject() {
         return new MomentType.Builder<>((uuid, level, key) -> {
-            callbacks.forEach((methodName, callback) -> {
-                MomentCallbackManager.registerMomentInstanceCallback(uuid, methodName, callback);
-            });
-            return new KubeJSMoment.KubeJSMomentInstance(uuid, level, key);
+            KubeJSMoment.KubeJSMomentInstance instance = new KubeJSMoment.KubeJSMomentInstance(uuid, level, key);
+            callbacks.forEach(instance::registerCallback);
+            return instance;
         }).build();
     }
 
@@ -147,13 +147,13 @@ public class MomentTypeKubeJSBuilder extends BuilderBase<MomentType<?>> {
     }
 
     @FunctionalInterface
-    public interface CanCreateCallback {
+    public interface CanCreateCallback extends CallbackSerializable{
         boolean canCreate(KubeJSMoment.KubeJSMomentInstance instance, Map<UUID, MomentInstance<?>> runMoments,
                           ServerLevel serverLevel, @Nullable BlockPos pos, @Nullable ServerPlayer player);
     }
 
     @FunctionalInterface
-    public interface CanSpawnEntityCallback {
+    public interface CanSpawnEntityCallback extends CallbackSerializable {
         boolean canSpawnEntity(KubeJSMoment.KubeJSMomentInstance instance, Level level, Entity entity, BlockPos pos);
     }
 }

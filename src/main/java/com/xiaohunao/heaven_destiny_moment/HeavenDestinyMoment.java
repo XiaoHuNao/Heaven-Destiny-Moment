@@ -7,6 +7,8 @@ import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMMomentRegister;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMRegistries;
 import com.xiaohunao.heaven_destiny_moment.compat.LoadedCompat;
+import com.xiaohunao.heaven_destiny_moment.common.callback.CallbackManager;
+import com.xiaohunao.heaven_destiny_moment.common.callback.CallbackMetadata;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -25,8 +27,6 @@ public class HeavenDestinyMoment {
     public static final String MODID = "heaven_destiny_moment";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-
-
     public HeavenDestinyMoment(IEventBus modEventBus, ModContainer modContainer) {
         HDMMomentRegister.register(modEventBus);
         HDMContextRegister.register(modEventBus);
@@ -35,8 +35,10 @@ public class HeavenDestinyMoment {
 
         modEventBus.addListener(HDMRegistries::registerRegistries);
         modEventBus.addListener(HDMRegistries::registerDataPackRegistries);
-    }
 
+        // 只需要初始化回调管理器
+        CallbackManager.init(modEventBus);
+    }
 
     public static ResourceLocation asResource(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);

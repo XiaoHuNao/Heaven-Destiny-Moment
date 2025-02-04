@@ -3,8 +3,6 @@ package com.xiaohunao.heaven_destiny_moment.compat.kubejs;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.xiaohunao.heaven_destiny_moment.client.gui.bar.render.IBarRenderType;
-import com.xiaohunao.heaven_destiny_moment.common.callback.MomentCallbackManager;
-import com.xiaohunao.heaven_destiny_moment.common.callback.MomentInstanceCallback;
 import com.xiaohunao.heaven_destiny_moment.common.context.ClientSettings;
 import com.xiaohunao.heaven_destiny_moment.common.context.MomentData;
 import com.xiaohunao.heaven_destiny_moment.common.context.TipSettings;
@@ -60,11 +58,12 @@ public class KubeJSMoment extends Moment<KubeJSMoment> {
 
         protected KubeJSMomentInstance(Level level, ResourceKey<Moment<?>> momentKey) {
             super(MomentRegister.KUBEJS.get(), level, momentKey);
+            callbacks.forEach(this::registerCallback);
         }
 
         public KubeJSMomentInstance(UUID uuid, Level level, ResourceKey<Moment<?>> momentKey) {
             super(MomentRegister.KUBEJS.get(), uuid, level, momentKey);
-            MomentCallbackManager.getMomentInstanceCallback(uuid).forEach(this::registerCallback);
+            callbacks.forEach(this::registerCallback);
         }
 
 
@@ -213,6 +212,11 @@ public class KubeJSMoment extends Moment<KubeJSMoment> {
         public boolean canSpawnEntity(Level level, Entity entity, BlockPos pos) {
             return executeCallback("canSpawnEntity", new SpawnParams(level, entity, pos), () -> super.canSpawnEntity(level, entity, pos));
         }
+    }
+
+    @FunctionalInterface
+    public interface MomentInstanceCallback<T, R> {
+        R execute(KubeJSMoment.KubeJSMomentInstance instance, T param);
     }
 
     public record CreateParams(Map<UUID, MomentInstance<?>> runMoments, ServerLevel serverLevel, BlockPos pos, ServerPlayer player) {}
