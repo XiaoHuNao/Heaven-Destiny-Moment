@@ -7,8 +7,6 @@ import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMMomentRegister;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMRegistries;
 import com.xiaohunao.heaven_destiny_moment.compat.LoadedCompat;
-import com.xiaohunao.heaven_destiny_moment.common.callback.CallbackManager;
-import com.xiaohunao.heaven_destiny_moment.common.callback.CallbackMetadata;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -19,6 +17,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import org.slf4j.Logger;
 
@@ -35,10 +34,17 @@ public class HeavenDestinyMoment {
 
         modEventBus.addListener(HDMRegistries::registerRegistries);
         modEventBus.addListener(HDMRegistries::registerDataPackRegistries);
+        modEventBus.addListener(this::onFMLCommonSetup);
     }
 
     public static ResourceLocation asResource(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
+    }
+
+    @SubscribeEvent
+    public void onFMLCommonSetup(FMLCommonSetupEvent event) {
+//        NeoForge.EVENT_BUS.start();
+//        NeoForge.EVENT_BUS.post(new RegisterCallbackEvent());
     }
 
     public static String asDescriptionId(String path) {

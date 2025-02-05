@@ -1,20 +1,31 @@
 package com.xiaohunao.heaven_destiny_moment.common.context.reward;
 
 import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.xiaohunao.heaven_destiny_moment.common.callback.CallbackSerializable;
+import com.xiaohunao.heaven_destiny_moment.common.callback.callback.RewardCallback;
 import com.xiaohunao.heaven_destiny_moment.common.context.Weighted;
 import com.xiaohunao.heaven_destiny_moment.common.init.HDMContextRegister;
 import com.xiaohunao.heaven_destiny_moment.common.moment.MomentInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-public record ItemReward(Weighted<ItemStack> items) implements IReward {
-    public static final MapCodec<ItemReward> CODEC = MapCodec.assumeMapUnsafe(Weighted.codec(ItemStack.CODEC)
-            .fieldOf("items")
-            .xmap(ItemReward::new, ItemReward::items)
-            .codec());
+public class ItemReward extends Reward {
+    public static final MapCodec<ItemReward> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        CallbackSerializable.CODEC.fieldOf("rewardCallback").forGetter(ItemReward::getRewardCallback),
+        Weighted.codec(ItemStack.CODEC).fieldOf("items").forGetter(ItemReward::items)
+    ).apply(instance, (callback, items) -> (ItemReward) new ItemReward(items).rewardCallback(callback)));
+
+    private final Weighted<ItemStack> items;
+
+
+
+    public ItemReward(Weighted<ItemStack> items) {
+        this.items = items;
+    }
 
     @Override
-    public void createReward(MomentInstance<?> moment, Player player) {
+    public void defaultRewards(MomentInstance<?> moment, Player player) {
         items.getRandomWeighted().forEach(item -> {
             player.getInventory().add(item);
         });
@@ -25,16 +36,21 @@ public record ItemReward(Weighted<ItemStack> items) implements IReward {
         return HDMContextRegister.ITEM_REWARD.get();
     }
 
+    public Weighted<ItemStack> items() {
+        return items;
+    }
+
     public static class Builder {
         private final Weighted.Builder<ItemStack> builder = new Weighted.Builder<>();
+        private RewardCallback rewardCallback;
 
-        public Builder randomType(Weighted.RandomType randomType){
+        public Builder randomType(Weighted.RandomType randomType) {
             builder.randomType(randomType);
             return this;
         }
 
         public ItemReward build() {
-            return new ItemReward(builder.build());
+            return (ItemReward)new ItemReward(builder.build()).rewardCallback(rewardCallback);
         }
 
         public Builder add(ItemStack itemStack, int weight) {
@@ -43,7 +59,12 @@ public record ItemReward(Weighted<ItemStack> items) implements IReward {
         }
 
         public Builder add(ItemStack itemStack) {
-            builder.add(itemStack,1);
+            builder.add(itemStack, 1);
+            return this;
+        }
+
+        public Builder rewardCallback(RewardCallback rewardCallback){
+            this.rewardCallback = rewardCallback;
             return this;
         }
 

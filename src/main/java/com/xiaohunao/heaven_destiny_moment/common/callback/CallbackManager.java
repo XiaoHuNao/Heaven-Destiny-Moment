@@ -1,16 +1,7 @@
 package com.xiaohunao.heaven_destiny_moment.common.callback;
 
-import com.xiaohunao.heaven_destiny_moment.HeavenDestinyMoment;
-import com.xiaohunao.heaven_destiny_moment.common.callback.callback.ConditionCallback;
-import com.xiaohunao.heaven_destiny_moment.common.callback.callback.RewardCallback;
-import com.xiaohunao.heaven_destiny_moment.common.event.RegisterCallbackEvent;
-import com.xiaohunao.heaven_destiny_moment.compat.kubejs.builder.MomentTypeKubeJSBuilder;
-import net.neoforged.bus.api.Event;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,14 +12,6 @@ import java.util.Map;
 public class CallbackManager {
     private static final Map<CallbackMetadata.CallbackSignature, Class<?>> CALLBACK_INTERFACES = new HashMap<>();
     private static final Map<String, Class<?>> PRIMITIVE_TYPE_MAP = new HashMap<>();
-    
-    /**
-     * 初始化回调管理器
-     * @param modEventBus mod事件总线
-     */
-    public static void init(IEventBus modEventBus) {
-        NeoForge.EVENT_BUS.addListener(CallbackManager::onRegisterCallbacks);
-    }
 
     /**
      * 解析类名为Class对象
@@ -81,17 +64,6 @@ public class CallbackManager {
             ));
     }
 
-    /**
-     * 检查接口是否已注册
-     */
-    public static boolean isCallbackInterfaceRegistered(Class<?> callbackInterface) {
-        Method method = getFunctionalInterfaceMethod(callbackInterface);
-        String returnType = method.getReturnType().getName();
-        Class<?>[] paramTypes = method.getParameterTypes();
-        CallbackMetadata.CallbackSignature signature = 
-            new CallbackMetadata.CallbackSignature(returnType, paramTypes);
-        return CALLBACK_INTERFACES.containsKey(signature);
-    }
 
     private static Method getFunctionalInterfaceMethod(Class<?> interfaceClass) {
         if (!interfaceClass.isAnnotationPresent(FunctionalInterface.class)) {
@@ -100,7 +72,7 @@ public class CallbackManager {
             );
         }
 
-        return java.util.Arrays.stream(interfaceClass.getMethods())
+        return Arrays.stream(interfaceClass.getMethods())
                 .filter(method -> !method.isDefault() && !java.lang.reflect.Modifier.isStatic(method.getModifiers()))
                 .findFirst()
                 .orElse(null);
@@ -110,29 +82,5 @@ public class CallbackManager {
         if (!callbackInterface.isInterface()) {
             throw new IllegalArgumentException("Callback type must be an interface: " + callbackInterface);
         }
-    }
-
-
-    private static void onRegisterCallbacks(RegisterCallbackEvent event) {
-        // 注册默认的回调接口
-        event.getCallbackRegistry().register(
-            ConditionCallback.class,
-            RewardCallback.class,
-            MomentTypeKubeJSBuilder.CanSpawnEntityCallback.class,
-            MomentTypeKubeJSBuilder.CanCreateCallback.class
-        );
-
-
-        event.getPrimitiveTypeRegistry().registerAll(Map.of(
-                "boolean", boolean.class,
-                "byte", byte.class,
-                "char", char.class,
-                "short", short.class,
-                "int", int.class,
-                "long", long.class,
-                "float", float.class,
-                "double", double.class,
-                "void", void.class
-        ));
     }
 }

@@ -2,22 +2,11 @@ package com.xiaohunao.heaven_destiny_moment.common.callback;
 
 import com.google.gson.Gson;
 import com.mojang.serialization.Codec;
-import com.xiaohunao.heaven_destiny_moment.common.callback.callback.ConditionCallback;
-import com.xiaohunao.heaven_destiny_moment.common.callback.callback.RewardCallback;
-import com.xiaohunao.heaven_destiny_moment.compat.kubejs.builder.MomentTypeKubeJSBuilder;
 import org.objectweb.asm.Type;
-import net.neoforged.bus.api.IEventBus;
-import com.xiaohunao.heaven_destiny_moment.common.event.RegisterCallbackEvent;
 
-import java.lang.FunctionalInterface;
 import java.lang.invoke.SerializedLambda;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.lang.reflect.*;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.lang.reflect.Modifier;
 
 /**
  * 回调函数元数据类，用于序列化和反序列化函数式接口
@@ -29,6 +18,7 @@ public record CallbackMetadata(String implClass, String implMethodName, String[]
         jsonStr -> gson.fromJson(jsonStr, CallbackMetadata.class), 
         gson::toJson
     );
+
     
     /**
      * 回调函数签名记录类，用于标识不同类型的回调函数
@@ -59,20 +49,25 @@ public record CallbackMetadata(String implClass, String implMethodName, String[]
      * @param callback 要序列化的回调函数
      * @return 回调函数元数据
      */
-    public static CallbackMetadata serialize(CallbackSerializable callback) throws Exception {
-        Method serializationMethod = callback.getClass().getDeclaredMethod("writeReplace");
-        serializationMethod.setAccessible(true);
-        SerializedLambda lambdaInfo = (SerializedLambda) serializationMethod.invoke(callback);
+    public static CallbackMetadata serialize(CallbackSerializable callback) {
+        try {
+            Method serializationMethod = callback.getClass().getDeclaredMethod("writeReplace");
+            serializationMethod.setAccessible(true);
+            SerializedLambda lambdaInfo = (SerializedLambda) serializationMethod.invoke(callback);
 
-        String[] methodParamTypes = parseMethodSignature(lambdaInfo.getImplMethodSignature());
-        String methodReturnType = parseReturnType(lambdaInfo.getImplMethodSignature());
+            String[] methodParamTypes = parseMethodSignature(lambdaInfo.getImplMethodSignature());
+            String methodReturnType = parseReturnType(lambdaInfo.getImplMethodSignature());
 
-        return new CallbackMetadata(
-            lambdaInfo.getImplClass().replace("/", "."),
-            lambdaInfo.getImplMethodName(),
-            methodParamTypes,
-            methodReturnType
-        );
+            return new CallbackMetadata(
+                    lambdaInfo.getImplClass().replace("/", "."),
+                    lambdaInfo.getImplMethodName(),
+                    methodParamTypes,
+                    methodReturnType
+            );
+        } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     /**
@@ -80,25 +75,29 @@ public record CallbackMetadata(String implClass, String implMethodName, String[]
      * @param metadata 回调函数元数据
      * @return 反序列化后的回调函数
      */
-    public static CallbackSerializable deserialize(CallbackMetadata metadata) throws Exception {
-        Class<?> implementationClass = Class.forName(metadata.implClass());
-        Class<?>[] parameterTypes = Arrays.stream(metadata.paramTypes)
-                .map(CallbackMetadata::resolveClass)
-                .toArray(Class<?>[]::new);
-        
-        Method implementationMethod = implementationClass.getDeclaredMethod(
-            metadata.implMethodName, 
-            parameterTypes
-        );
-        implementationMethod.setAccessible(true);
+    public static CallbackSerializable deserialize(CallbackMetadata metadata){
+        try {
+            Class<?> implementationClass = Class.forName(metadata.implClass());
+            Class<?>[] parameterTypes = Arrays.stream(metadata.paramTypes)
+                    .map(CallbackMetadata::resolveClass)
+                    .toArray(Class<?>[]::new);
 
-        Class<?> callbackType = CallbackManager.findCallbackInterface(metadata.returnType, parameterTypes);
+            Method implementationMethod = implementationClass.getDeclaredMethod(
+                    metadata.implMethodName,
+                    parameterTypes
+            );
+            implementationMethod.setAccessible(true);
 
-        return (CallbackSerializable) Proxy.newProxyInstance(
-            CallbackMetadata.class.getClassLoader(),
-            new Class<?>[] { callbackType },
-            new CallbackInvocationHandler(implementationMethod, metadata)
-        );
+            Class<?> callbackType = CallbackManager.findCallbackInterface(metadata.returnType, parameterTypes);
+
+            return (CallbackSerializable) Proxy.newProxyInstance(
+                    CallbackMetadata.class.getClassLoader(),
+                    new Class<?>[] { callbackType },
+                    new CallbackInvocationHandler(implementationMethod, metadata)
+            );
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
