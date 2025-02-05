@@ -35,9 +35,6 @@ public class HeavenDestinyMoment {
 
         modEventBus.addListener(HDMRegistries::registerRegistries);
         modEventBus.addListener(HDMRegistries::registerDataPackRegistries);
-
-        // 只需要初始化回调管理器
-        CallbackManager.init(modEventBus);
     }
 
     public static ResourceLocation asResource(String path) {

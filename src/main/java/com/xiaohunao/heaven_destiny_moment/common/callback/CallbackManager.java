@@ -8,6 +8,7 @@ import com.xiaohunao.heaven_destiny_moment.compat.kubejs.builder.MomentTypeKubeJ
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ public class CallbackManager {
      * @param modEventBus mod事件总线
      */
     public static void init(IEventBus modEventBus) {
-        modEventBus.addListener(CallbackManager::onRegisterCallbacks);
+        NeoForge.EVENT_BUS.addListener(CallbackManager::onRegisterCallbacks);
     }
 
     /**
